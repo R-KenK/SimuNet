@@ -57,21 +57,35 @@ do.scan<-function(Adj=NULL,total_scan=NULL,
   method<- match.arg(method)
   scan.default.args(Adj,total_scan,method,...)
 
+  # set n and nodes_names according to available inputs
   if(!is.null(Adj)){n<- nrow(Adj);nodes_names<- rownames(Adj)} else {n<- nrow(presence.prob);nodes_names<- rownames(presence.prob)}
+  # subset a presence probability vector the same way Adj is subset (depends on Adj's mode (cf. igraph))
   presence.P<- presence.prob[Adj.subfun(presence.prob)];p<- length(presence.P)
 
+  # choose if the optimization for rare events should be performed or not (general case)
   if(!use.rare.opti){
+    # structure the scan as a matrix filled with zeros
     scan<- matrix(0,nrow = n,ncol = n,dimnames = list(nodes_names,nodes_names))
+    # core of the randomization: draw a (theoretical) tie or not for each (relevant, cf. triangular matrices or undirected) dyad according to its presence probability
+    # TO FIX: Are each dyad evaluated twice in the undirected (=max) case?
     scan[Adj.subfun(scan)]<- stats::rbinom(p,1,presence.P)
   }else{
+    # optimization for rare events: all-zeros scans were already drawn by `simulate_zeros.non.zeros()` in the parent `iterate_scans()`
     scan<- matrix(0,nrow = n,ncol = n,dimnames = list(nodes_names,nodes_names))
+    # choose a random order between the dyads to draw
     rand.order<- sample(1:p,p)
+    # determine the cumulative probability that a given dyad will be the first to be drawn with a 1 (tie), after adjusting to such a given conditional probability that there should be at least one tie in the scan.
     P.cond<- cumsum(adjust.conditional.prob(presence.P[rand.order]))
+    # given the cumulative probability of each dyad (in a random order), determine which would be the first one observed with a tie (at least one will be a tie because of the cumulative distribution of presence ending with a presence probability of 1)
     first.one<- min(which(stats::runif(1)<P.cond))
+    # set this dyad as a tie
     scan[Adj.subfun(scan)][rand.order][first.one]<- 1
+    # TO FIX: the dyad before first.one should be zeros
+    # draw the rest of the dyads with their _original_ presence probability (now that the scan did have at least a tie)
     scan[Adj.subfun(scan)][rand.order][-first.one]<- stats::rbinom(p-1,1,presence.P[rand.order][-first.one])
   }
 
+  # according to the empirical method chosen, return a scan as is, after masking some dyads with observable_edges(), or after only showing the focal
   switch(method,
          "theoretical" = list(theoretical = scan),
          "group" = list(theoretical = scan,

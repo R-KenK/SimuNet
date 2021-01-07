@@ -58,9 +58,10 @@ focal.scan<- function(scan.theoretical,focal){
 #' make_focal.list(Adj,total_scan,focal.prob_fun = function(n,Adj) compute.strength(Adj,"directed"))
 make_focal.list<- function(Adj,total_scan,
                            focal.prob_fun = "even",all.sampled = TRUE){
-
+  # shape future focal.list, filling it with NAs
   n<- nrow(Adj);focal.list<- rep(NA,total_scan);
 
+  # manage the case of an even focal.list
   if(is.character(focal.prob_fun)){
     if(focal.prob_fun=="even"){
       focal.list[is.na(focal.list)]<- c(rep(1:n,total_scan%/%n),sample(1:n,total_scan%%n,replace = FALSE))
@@ -68,17 +69,21 @@ make_focal.list<- function(Adj,total_scan,
     }
   }
 
+  # if not even, select at least each each node once, and adjust the rest of the sampling effort needed
   if(all.sampled){
     if(n > total_scan){stop("total_scan is too small to sample all nodes.")}
     focal.list[sample(1:total_scan,n)]<- 1:n;total_scan<- total_scan-n;
   }
 
+  # `focal.prob_fun = NULL` consider a uniform probability distribution the different nodes at each scan
   if(is.null(focal.prob_fun)){
     focal.list[is.na(focal.list)]<- ceiling(runif(total_scan,0,n))
     return(focal.list)
   }
 
+  # applies the user-defined function, adjust the minimum probability to be non zero
   P<- focal.prob_fun(n,Adj);if(any(P==0)){P<-P+min(P[P>0])}
+  # replace remaining NAs for each scan with a node given their probability distribution at each scan
   focal.list[is.na(focal.list)]<- sample(1:n,total_scan,replace = TRUE,prob = P)
   focal.list
 }

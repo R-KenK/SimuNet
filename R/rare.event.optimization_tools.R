@@ -110,7 +110,7 @@ decide_use.rare.opti<- function(n,total_scan,max.obs=NULL,alpha=0.05){
 #' @param total_scan integer, sampling effort
 #' @param presence.prob presence probability matrix (or vector)
 #'
-#' @return a list of NULL representing the non-zero scan to run with an attribute `n.zero` being the number of full-zero scans,and `non.zero.pos`
+#' @return a list of NULL representing the non-zero scan to run with an attribute `n.zero` being the number of full-zero scans,and `non.zero.pos` TO EDIT?
 #' @export
 #' @importFrom stats rbinom
 #'
@@ -133,7 +133,7 @@ simulate_zeros.non.zeros<- function(total_scan,presence.prob){
 #' @return a cumulative distribution function of the probability that the i-th dyad (with probability presence.prob[i]) is the first to yield a 1
 #' @export
 #'
-#' @details Workflow is as follows: first simulate.zeros.non.zeros() determines which scans are all-zeros and which are non-zeros. Then for non zeros, at a random order each dyad is drawn in order with conditional probability that: (1) there is at least one 1 in the scan, and (2) all the previous coins were zeros. Once the first one is drawn, the rest are drawn with their regular probabilities. In details, cumulative density probability of each dyad (in a given random order) to be the first one to be a 1 is calculated, and a random draw determine which one is first, set the previous ones to zero, and draw the rest normally. cf. Supplmenentary material X.
+#' @details Workflow is as follows: first simulate.zeros.non.zeros() determines which scans are all-zeros and which are non-zeros. Then for non zeros, at a random order each dyad is drawn in order with conditional probability that: (1) there is at least one tie (tie) in the scan, and (2) all the previous coins were zeros. Once the first one is drawn, the rest are drawn with their regular probabilities. In details, cumulative density probability of each dyad (in a given random order) to be the first one to be a 1 is calculated, and a random draw determine which one is first, set the previous ones to zero, and draw the rest normally. cf. Supplmenentary material X.
 #'
 #' @examples
 #' # Internal use.
