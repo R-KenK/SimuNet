@@ -1,7 +1,7 @@
 #' Iterate scans
-#' Internal use in Boot_scan. Iterate several binary group or focal scans with probabilities derived from a provided adjancecy matrix, to produce a new adjancecy matrix.
+#' Internal use in Boot_scan. Iterate several binary group or focal scans with probabilities derived from a provided adjacency matrix, to produce a new adjacency matrix.
 #'
-#' @param Adj square integers matrix of occurences of dyads. Optional if using presence.prob. WIP: implement method for association matrices...
+#' @param Adj square integers matrix of occurrences of dyads. Optional if using presence.prob. WIP: implement method for association matrices...
 #' @param total_scan integer, sampling effort. Note that 1/total_scan should be relatively small, increasingly small with increasing precision. Optional if using presence.prob.
 #' @param method Character scalar, specifies if the function should return a theoretical perfect group scan, an  empirical group scan (a similarly dimensioned matrix as Adj), or a focal scan (a vector representing the given focal's row in the group scan matrix).
 #' @param output Character scalar, specify if the function should return the list of scans, or reduce them into the bootstrapped adjacency matrix
@@ -108,7 +108,7 @@ iterate_scans<- function(Adj=NULL,total_scan,method=c("theoretical","group","foc
       do.scan(presence.prob = presence.prob,method = method,focal = focal.list[non.zero.list][i],obs.prob = obs.prob,Adj.subfun = Adj.subfun,use.rare.opti = use.rare.opti)
     }
   )
-  attr(scan_list,"n.zeros")<- n.zeros # absence attribute if the standard algoritm is used
+  attr(scan_list,"n.zeros")<- n.zeros # absent attribute (=NULL) if the standard algorithm is used
   if(!use.rare.opti){attr(scan_list,"non.zero.list")<- NULL}else{attr(scan_list,"non.zero.list")<- non.zero.list}
 
   # Format the output, summing up scans if necessary ------------------------

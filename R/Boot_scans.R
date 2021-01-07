@@ -1,7 +1,7 @@
 #' Bootstrap scans
-#' Bootstrap iterated binary group or focal scans with probabilities derived from a provided adjancecy matrix.
+#' Bootstrap iterated binary group or focal scans with probabilities derived from a provided adjacency matrix.
 #'
-#' @param Adj square integers matrix of occurences of dyads. WIP: implement method for association matrices...
+#' @param Adj square integers matrix of occurrences of dyads. WIP: implement method for association matrices...
 #' @param n.boot integer, number of bootstrap to perform.
 #' @param total_scan integer, sampling effort. Note that 1/total_scan should be relatively small, increasingly small with increasing precision.
 #' @param method Character scalar, specifies if the function should return a theoretical perfect group scan, an  empirical group scan (a similarly dimensioned matrix as Adj), or a focal scan (a vector representing the given focal's row in the group scan matrix).
@@ -67,6 +67,7 @@ Boot_scans<- function(Adj,total_scan,method=c("theoretical","group","focal","bot
   method<- match.arg(method)
   output<- match.arg(output)
   mode<- match.arg(mode)
+
 
   scan.default.args(Adj = Adj,total_scan = total_scan,method = method,obs.prob = obs.prob,mode = mode,focal.list = focal.list,...)
 
