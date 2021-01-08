@@ -1,108 +1,108 @@
 # Rare events optimization related functions ------------------------------
 
-#' Generate new data using orthogonal polynoms of input variable
-#'
-#' @param n integer, number of node of the network
-#' @param total_scan integer, sampling effort
-#' @param max.obs integer, maximum number of observation after `total_scan` scans
-#' @param algorithm character, which algorithm to produce new data for.
-#'
-#' @return a data.frame inputed on the same orthogonal polynomial scale as the one used by the standard and optimized models of expected time
-#' @export
-#' @importFrom stats predict
-#'
-#' @examples
-#' # Internal use in opti.expected.time
-new.data.poly<- function(n,total_scan,max.obs,algorithm = c("standard","optimization for rare event")){
-  algorithm<- match.arg(algorithm)
-  switch(algorithm,
-         "standard" = {
-           n.poly<- n.poly.std
-           total.poly<- total.poly.std
-           max.poly<- max.poly.std
-         },
-         "optimization for rare event" = {
-           n.poly<- n.poly.opt
-           total.poly<- total.poly.opt
-           max.poly<- max.poly.opt
-         }
-  )
-  cbind(data.frame(n = n,total_scan = total_scan,max.obs = max.obs),
-        n = stats::predict(n.poly,n),
-        total_scan = stats::predict(total.poly,total_scan),
-        max.obs = stats::predict(max.poly,max.obs))
-}
+# #' Generate new data using orthogonal polynoms of input variable
+# #'
+# #' @param n integer, number of node of the network
+# #' @param total_scan integer, sampling effort
+# #' @param max.obs integer, maximum number of observation after `total_scan` scans
+# #' @param algorithm character, which algorithm to produce new data for.
+# #'
+# #' @return a data.frame inputed on the same orthogonal polynomial scale as the one used by the standard and optimized models of expected time
+# #' @export
+# #' @importFrom stats predict
+# #'
+# #' @examples
+# #' # Internal use in opti.expected.time
+# new.data.poly<- function(n,total_scan,max.obs,algorithm = c("standard","optimization for rare event")){
+#   algorithm<- match.arg(algorithm)
+#   switch(algorithm,
+#          "standard" = {
+#            n.poly<- n.poly.std
+#            total.poly<- total.poly.std
+#            max.poly<- max.poly.std
+#          },
+#          "optimization for rare event" = {
+#            n.poly<- n.poly.opt
+#            total.poly<- total.poly.opt
+#            max.poly<- max.poly.opt
+#          }
+#   )
+#   cbind(data.frame(n = n,total_scan = total_scan,max.obs = max.obs),
+#         n = stats::predict(n.poly,n),
+#         total_scan = stats::predict(total.poly,total_scan),
+#         max.obs = stats::predict(max.poly,max.obs))
+# }
 
-#' Calculating expected time using the standard scan method from glm model
-#'
-#' @param n number of node of the original network
-#' @param total_scan sampling effort
-#' @param max.obs maximum value of the weighted adjacency matrix of the original network
-#' @param se.fit logical, should the standard error be computed by the predict() function?
-#'
-#' @return the result of the expected time model predictions (in milliseconds), i.e. a vector with values `fit`, `se.fit`, and `residual.scale`.
-#' @export
-#' @importFrom stats predict
-#'
-#' @examples
-#' # Internal use in decide_use.rare.opti
-standard.expected.time<- function(n,total_scan,max.obs,se.fit = TRUE){
-  new.dat<- new.data.poly(n = n,total_scan = total_scan,max.obs = max.obs,algorithm = "standard")
-  stats::predict(standard.model,newdata = new.dat,type = "response",se.fit = se.fit)
-}
+# #' Calculating expected time using the standard scan method from glm model
+# #'
+# #' @param n number of node of the original network
+# #' @param total_scan sampling effort
+# #' @param max.obs maximum value of the weighted adjacency matrix of the original network
+# #' @param se.fit logical, should the standard error be computed by the predict() function?
+# #'
+# #' @return the result of the expected time model predictions (in milliseconds), i.e. a vector with values `fit`, `se.fit`, and `residual.scale`.
+# #' @export
+# #' @importFrom stats predict
+# #'
+# #' @examples
+# #' # Internal use in decide_use.rare.opti
+# standard.expected.time<- function(n,total_scan,max.obs,se.fit = TRUE){
+#   new.dat<- new.data.poly(n = n,total_scan = total_scan,max.obs = max.obs,algorithm = "standard")
+#   stats::predict(standard.model,newdata = new.dat,type = "response",se.fit = se.fit)
+# }
 
-#' Calculating expected time using the optimization for rare event from glm model
-#'
-#' @param n number of node of the original network
-#' @param total_scan sampling effort
-#' @param max.obs maximum value of the weighted adjacency matrix of the original network
-#' @param se.fit logical, should the standard error be computed by the predict() function?
-#'
-#' @return the result of the expected time model predictions (in milliseconds), i.e. a vector with values `fit`, `se.fit`, and `residual.scale`.
-#' @export
-#' @importFrom stats predict
-#'
-#' @examples
-#' # Internal use in decide_use.rare.opti
-opti.expected.time<- function(n,total_scan,max.obs,se.fit = TRUE){
-  new.dat<- new.data.poly(n = n,total_scan = total_scan,max.obs = max.obs,algorithm = "opti")
-  stats::predict(opti.model,newdata = new.dat,type = "response",se.fit = se.fit)
-}
+# #' Calculating expected time using the optimization for rare event from glm model
+# #'
+# #' @param n number of node of the original network
+# #' @param total_scan sampling effort
+# #' @param max.obs maximum value of the weighted adjacency matrix of the original network
+# #' @param se.fit logical, should the standard error be computed by the predict() function?
+# #'
+# #' @return the result of the expected time model predictions (in milliseconds), i.e. a vector with values `fit`, `se.fit`, and `residual.scale`.
+# #' @export
+# #' @importFrom stats predict
+# #'
+# #' @examples
+# #' # Internal use in decide_use.rare.opti
+# opti.expected.time<- function(n,total_scan,max.obs,se.fit = TRUE){
+#   new.dat<- new.data.poly(n = n,total_scan = total_scan,max.obs = max.obs,algorithm = "opti")
+#   stats::predict(opti.model,newdata = new.dat,type = "response",se.fit = se.fit)
+# }
 
-#' Decide based on expected times if the otpimization for rare event should be used
-#'
-#' @param n number of node of the original network, or can be an adjacency matrix
-#' @param total_scan integer, sampling effort.
-#' @param max.obs maximum value of the weighted adjacency matrix of the original network. Optional if n is inputted as an adjacency matrix.
-#' @param alpha numerical in [0,1], type I error significance level.
-#'
-#' @return a logical value meaning that the optimization for rare events should be use when TRUE is returned.
-#' @export
-#'
-#' @examples
-#' decide_use.rare.opti(30,900,10)
-#' decide_use.rare.opti(30,9000,10)
-decide_use.rare.opti<- function(n,total_scan,max.obs=NULL,alpha=0.05){
-  if(is.null(max.obs)&is.matrix(n)){max.obs<- max(n)}
-  if(is.matrix(n)){n<- nrow(n)}
-  expected.time.std<- standard.expected.time(n = n,total_scan = total_scan,max.obs = max.obs)
-  expected.time.opt<- opti.expected.time(n = n,total_scan = total_scan,max.obs = max.obs)
-
-  if(any(is.infinite(expected.time.std$fit),is.infinite(expected.time.opt$fit))){return(FALSE)}
-
-  test<- t_test_from_summary(m1 = expected.time.std$fit,
-                             m2 = expected.time.opt$fit,
-                             sd1 = expected.time.std$se.fit,
-                             sd2 = expected.time.opt$se.fit,
-                             n1 = n,n2 = n,
-                             m0 = 0,equal.variance = FALSE)
-
-  if(test[["Difference of means"]]>0){ # m1-m2 <=> if optimization is faster
-    test[["p-value"]]<=alpha # If difference between optimization and standard is significative. Otherwise favor the standard method
-  }else{
-    FALSE
-  }
-}
+# #' Decide based on expected times if the otpimization for rare event should be used
+# #'
+# #' @param n number of node of the original network, or can be an adjacency matrix
+# #' @param total_scan integer, sampling effort.
+# #' @param max.obs maximum value of the weighted adjacency matrix of the original network. Optional if n is inputted as an adjacency matrix.
+# #' @param alpha numerical in [0,1], type I error significance level.
+# #'
+# #' @return a logical value meaning that the optimization for rare events should be use when TRUE is returned.
+# #' @export
+# #'
+# #' @examples
+# #' decide_use.rare.opti(30,900,10)
+# #' decide_use.rare.opti(30,9000,10)
+# decide_use.rare.opti<- function(n,total_scan,max.obs=NULL,alpha=0.05){
+#   if(is.null(max.obs)&is.matrix(n)){max.obs<- max(n)}
+#   if(is.matrix(n)){n<- nrow(n)}
+#   expected.time.std<- standard.expected.time(n = n,total_scan = total_scan,max.obs = max.obs)
+#   expected.time.opt<- opti.expected.time(n = n,total_scan = total_scan,max.obs = max.obs)
+#
+#   if(any(is.infinite(expected.time.std$fit),is.infinite(expected.time.opt$fit))){return(FALSE)}
+#
+#   test<- t_test_from_summary(m1 = expected.time.std$fit,
+#                              m2 = expected.time.opt$fit,
+#                              sd1 = expected.time.std$se.fit,
+#                              sd2 = expected.time.opt$se.fit,
+#                              n1 = n,n2 = n,
+#                              m0 = 0,equal.variance = FALSE)
+#
+#   if(test[["Difference of means"]]>0){ # m1-m2 <=> if optimization is faster
+#     test[["p-value"]]<=alpha # If difference between optimization and standard is significative. Otherwise favor the standard method
+#   }else{
+#     FALSE
+#   }
+# }
 
 
 #' Simulate which scan returns an all-zeros matrix

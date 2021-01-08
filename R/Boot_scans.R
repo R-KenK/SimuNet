@@ -45,15 +45,15 @@
 #' Boot_scans(Adj,total_scan = 42,focal.list = focal.list,n.boot = 3,scaled = TRUE,
 #'            method = "group",use.rare.opti=FALSE,mode = "directed",obs.prob = 0.5,output = "list")
 #' Boot_scans(Adj,total_scan = 42,focal.list = focal.list,n.boot = 3,scaled = FALSE,
-#'            method = "focal",mode = "max",output = "adj")
+#'            method = "focal",use.rare.opti=FALSE,mode = "max",output = "adj")
 #' Boot_scans(Adj,total_scan = 42,focal.list = "even",n.boot = 3,scaled = TRUE,
-#'            method = "focal",mode = "plus",output = "adj")
+#'            method = "focal",use.rare.opti=FALSE,mode = "plus",output = "adj")
 #' Boot_scans(Adj,total_scan = 42,focal.list = function(n,Adj) 1:n*1:n,n.boot = 3,scaled = TRUE,
-#'            method = "focal",mode = "max",output = "adj")
+#'            method = "focal",use.rare.opti=FALSE,mode = "max",output = "adj")
 #' Boot_scans(Adj,total_scan = 42,obs.prob = 0.2,n.boot=3,scaled = TRUE,
-#'            method = "group",mode = "directed",output = "list")
+#'            method = "group",use.rare.opti=FALSE,mode = "directed",output = "list")
 #' Boot_scans(Adj,total_scan = 42,obs.prob = obs.prob,n.boot=3,scaled = TRUE,
-#'            method = "both",mode = "directed",output = "all")
+#'            method = "both",use.rare.opti=FALSE,mode = "directed",output = "all")
 #' Boot_scans(Adj,total_scan = 400,obs.prob = obs.prob,n.boot=3,scaled = TRUE,
 #'            method = "both",mode = "directed",use.rare.opti = TRUE,output = "adj")
 Boot_scans<- function(Adj,total_scan,method=c("theoretical","group","focal","both"),focal.list=NULL,n.boot,...,
@@ -71,10 +71,10 @@ Boot_scans<- function(Adj,total_scan,method=c("theoretical","group","focal","bot
 
   scan.default.args(Adj = Adj,total_scan = total_scan,method = method,obs.prob = obs.prob,mode = mode,focal.list = focal.list,...)
 
-  if(is.null(use.rare.opti)){
-    n<- nrow(Adj)
-    use.rare.opti<- decide_use.rare.opti(n = n,total_scan = total_scan,max.obs = max(Adj),alpha = 0.05)
-  }
+  # if(is.null(use.rare.opti)){
+  #   n<- nrow(Adj)
+  #   use.rare.opti<- decide_use.rare.opti(n = n,total_scan = total_scan,max.obs = max(Adj),alpha = 0.05)
+  # }
 
   Bootstrap<- pbapply::pblapply(
     1:n.boot,
