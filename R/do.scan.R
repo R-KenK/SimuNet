@@ -195,59 +195,50 @@ scan.default.args<- function(Adj,total_scan,method,...){
 # Adjacency mode tools ----------------------------------------------------
 
 #' Make Adjacency fit the selected mode
-#' From a directed adjacency matrix, make it fit the selected mode.
+#' Internal use.
 #'
-#' @param Adj an adjacency matrix
+#' @param raw.scan a raw (directed by default) binary adjacency matrix, pre-theoretical or pre-empirical, to which the chosen `mode` is to be applied
 #' @param mode Character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
 #'
-#' @return an adjacency matrix fitting the selected mode
-#' @export
-#'
-#' @examples
-#' set.seed(42)
-#'
-#' n<- 5;nodes<- letters[1:n];
-#' Adj<- matrix(data = 0,nrow = n,ncol = n,dimnames = list(nodes,nodes))
-#' Adj[non.diagonal(Adj)]<- sample(0:30,n*(n-1),replace = TRUE)
-#' Adj<- iterate_scans(Adj,42,method="group",mode="directed",output = "adjacency")
-#' adjacency_mode(Adj$group,"max")
-adjacency_mode<- function(Adj,
-                          mode = c("directed", "undirected", "max","min", "upper", "lower", "plus","vector")){
-  mode<- match.arg(mode)
+#' @return an adjacency matrix fitting the chosen `mode` is to be applied
+#' @noRd
+apply_mode<- function(raw.scan,mode = c("directed", "undirected", "max","min", "upper", "lower", "plus","vector"),na.minimize = FALSE){
   switch(mode,
-         "undirected" = ,
+         "undirected" = , # as in `igraph`, consider this mode to be the same as `max`
          "max" = {
-           both.na<- is.na(Adj)&is.na(t(Adj))
-           ifelse(
+           min.value<- min(raw.scan,na.rm = TRUE);replace_NA_by_half.min<- function(X) {replace_NA(X = X,value = min.value/2)} # sets `NA`s to a value between zero and the min, in order to turn the directed into undirected with only one `>=` test.
+           both.na<- is.na(raw.scan) & is.na(t(raw.scan))
+           ifelse(  # `ifelse` rather than `if()` statements to return a vector or matrix after inputting a logical vector or matrix
              test = !both.na,
              yes = ifelse(
-               comp_with_transposed(Adj,`>=`),
-               null_na(Adj),
-               null_na(t(Adj))
+               compare_with_transposed(raw.scan,comp.fun = `>=`,manage_NA.fun = replace_NA_by_half.min),
+               raw.scan,
+               t(raw.scan)
              ),
-             no = NA
+             no = NA # double NAs
            )
          },
          "min" = {
-           both.na<- is.na(Adj)&is.na(t(Adj))
+           min.value<- min(raw.scan,na.rm = TRUE);replace_NA_by_half.min<- function(X) {replace_NA(X,value = min.value/2)} # sets `NA`s to a value between zero and the min, in order to turn the directed into undirected with only one `<=` test.
+           both.na<- is.na(raw.scan) & is.na(t(raw.scan))
            ifelse(
              test = !both.na,
              yes = ifelse(
-               comp_with_transposed(Adj,`<=`),
-               null_na(Adj),
-               null_na(t(Adj))
+               compare_with_transposed(raw.scan,comp.fun = `<=`,manage_NA.fun = replace_NA_by_half.min),
+               raw.scan,
+               t(raw.scan)
              ),
              no = NA
            )
          },
-         "plus" = {
-           both.na<- is.na(Adj)&is.na(t(Adj))
-           ifelse(!both.na,null_na(Adj)+null_na(t(Adj)),NA)
+         "plus" = {  # WHAT DOES THIS MEAN FOR BINARY SCANS?
+           not.na<- !is.na(raw.scan) & !is.na(t(raw.scan))
+           ifelse(not.na,raw.scan+t(raw.scan),NA)
          },
          "directed" = ,
          "upper" = ,
-         "lower" =  Adj,
-         "vector" = Adj
+         "lower" =  ,
+         "vector" = raw.scan
   )
 }
 
@@ -256,25 +247,32 @@ adjacency_mode<- function(Adj,
 #' @param X a vector or matrix
 #'
 #' @return similarly dimensioned vector or matrix with zeros instead of NAs
-#' @export
-#'
-#' @examples
-#' # Internal use
-null_na<- function(X){
+#' @noRd
+zero_NA<- function(X){
   ifelse(!is.na(X),X,0)
 }
 
+#' Replace NAs by a set value in vectors/matrices
+#'
+#' @param X a vector or matrix
+#' @param value a numeric scalar
+#'
+#' @return similarly dimensioned vector or matrix with `value` instead of NAs
+#' @noRd
+replace_NA<- function(X,value){
+  ifelse(!is.na(X),X,value)
+}
+
 #' Compare elements of a matrix with its transposed
-#' wrapper using `null_na`
+#' wrapper using `zero_NA`
 #'
 #' @param X a numeric matrix
 #' @param comp.fun a function to compare X with t(X), in this order. Default is superior or equal
+#' @param manage_NA.fun a function to replace `NA`s in `X` with a value. Default is `zero_NA` to replace them with zeros (recycled code)
 #'
 #' @return a logical matrix
-#' @export
-#'
-#' @examples
-#' # Internal use
-comp_with_transposed<- function(X,comp.fun = `>=`){
-  comp.fun(null_na(X),null_na(t(X)))
+#' @noRd
+compare_with_transposed<- function(X,comp.fun = `>=`,manage_NA.fun = zero_NA){
+  comp.fun(manage_NA.fun(X),manage_NA.fun(t(X)))
 }
+
