@@ -1,3 +1,39 @@
+# SimuNet (development version)
+* First shift toward integration of OOP elements into the simulation framework:
+    * Revamp from the ground up of the `do.scan` part of the non-OOP previous version
+    * Attempt at homogenizing SimuNet's internal syntax:
+        * the wrappers - to perform the whole network simulations (former `Boot_scan()`), iterate single scans into weighted adjacency matrix (former `iterate_scans()`), and draw a single random binary scan (former `do.scan()`) - will now follow the syntax `simu_*()` (starting with the `simu_scan()` wrapper to supersede `do.scan()`)
+        * new simulation internal objects (cf. below) will have generator following the syntax `generate_className()`, and as needed `print.className()` and other relevant S3 class methods.
+        * presently, their related code use variable names distinct from their `className` syntax, rather favoring a `variable = class.name` syntax internally
+        * function names including internal ones are (hopefully) more explicit, and are now action verbs to follow coding "grammar" recommendations
+* For the OOP-transition purpose, creation of several simulation objects (S3 class):
+    * `presenceProb` objects, generator and related S3 methods: calculate and store infos on the presence probability `P` of a tie at each scan for each dyad, from inputted adjacency matrix (`Adj`), sampling effort (`total_scan`), and igraph network `mode`
+    * `samplingParam` objects, generator and related S3 methods: store all usefull parameters, some in the form of new object classes (S3), related to the empirical aspect of the network simulation. Presently, stores what's needed for a single binary focal scan, i.e. infos on a single focal (out of a list of focals). Specifically, `samplingParam` objects store:
+        * `method`: a character scalar between `"group"`,`"focal"` and `"both"`, indicating the chosen scan sampling method.
+        * `mode`: a character scalar representing the igraph network `mode`.
+        * `obsProb` objects (cf. below)
+        * `focal` objects (cf. below)
+    * `obsProb` objects, generator and related S3 methods: calculate and store a probability of observation `P` of an edge at each scan sampling for each dyad, from inputted user-defined function `obs.prob_fun` of `(i,j,Adj)` (that can also be used to pass a single [0,1] numeric to use as a constant, or the string `"random"` to have all dyad probability drawn from `runif(n*n,0,1)`)
+    * `focalList` objects, generator and related S3 methods: draw and store a list `focals` of `total_scan` focals (used internally as their indices, but also keep track of their names), from inputted user-defined function `focal.prob_fun` of `(n,Adj)` (that should return a vector of `n` probability for each node to be drawn at each scan, but that can also be used to pass as the strings `"random"` or `"even"` to have them drawn from `sample()` or to maximize the evenness of drawn focals in the focal list)
+    * `focal` objects, generator and related S3 methods (including `plot.scan` S3 method to plot the network relying on `plot.igraph`): determine and store which `focal` to sample, from inputted `focalList` object (cf. above) and `scan.number` (out of the sampling effort `total_scan`)
+    * `scan` objects, generator and related S3 methods: draw and store, from inputted `presenceProb` object:
+        * a `raw` scan: directed binary matrix drawn from the probability of presence of edges contained in a `presenceProb` object
+        * a `theoretical` scan: the `raw` scan to which the selected mode has been applied
+        * a `scan.type` scan string: for `scan` object not sampled from yet (i.e. not empirical scans of the `empiScan` class (cf.below)), `scan$scan.type = "theoretical"`, but later in the process can become `"empirical"`
+        * the original adjacency matrix `Adj`, sampling effort `total_scan`, selected igraph network `mode`, the probability matrix `presence.prob` (from `presenceProb$P`), and other parameters mostly for internal use
+    * `empiScan` objects, generator and related S3 methods: draw and store, from inputted `scan` and `samplingParam` objects:
+        * inherits from the `scan` S3 class
+        * but have their `scan.type = "empirical"`
+        * a `method` string from `samplingParam$method`
+        * and both/either a `group` and/or `focal` scan: matrix/matrices containing* `0`,`1`, or `NA`, which represents an edge that hasn't been sampled. Internally sample from `scan$theoretical`, to which the igraph network `mode` was already applied, and is set to keep `NA`s where they were drawn (relevant for `"group"` scan sampling), even if this result in a undirected adjacency matrix where `NA`s are non-symetrical.  
+        A function to minimize solvable `NA`s will be soon introduced: for `mode = "max"`, this is e.g. when `scan$raw[i,j] = 1` and `scan$raw[j,i] = NA` or inversly, for which both values can be set to `1`; for `mode = "min"`, this is e.g. when `scan$raw[i,j] = 0` and `scan$raw[j,i] = NA` or inversly, for which both values can be set to `0`.  
+        *: with `mode = "plus"`, possible values also include `2`
+* Revamping from the ground up as the new object were formalized and introduced in the algorithm, the internal code also got cleaned and fixed in some places as code was recycled from its previous non-OOP state:
+    * Some functions were updated to split some of their overall work into additional more explicit and more "single-step/purpose" functions (e.g. `generate_obsProb` now relies on `determine_obs.prob_type` and `calculate_obs.prob` instead of containing all the code in itself)
+    * `empiScan$focal` now show not only the line of the `focal` sampled, but also its column
+    * rethinking of the way the igraph network `mode` is applied: `apply_mode` now keep track of an always `"directed"` `raw` scan, makes it symmetrical into a `theoretical` scan if an undirected `mode` is selected (`"undirected"`, `"max"`, `"min"`, or `"plus"`), from which a `focal` and `group` scans are sampled through `sample_from_scan` (that internally relies on `group_sample` and `focal_sample`). Through this changes, internal algorithm changed significantly, especially in how `NA`s are handled in `group` scans. Also, `zero_NA` has been generalized into `replace_NA`, with subsequent changes in `compare_with_transposed`, but these are not used anymore within `apply_mode` and are kept for now just in case.
+    * removed normally-superseded `*.R` files (`focal.list.R`, `obs.prob_._tools`), renamed `do.scan.R` into `do.scan.old.R`
+
 # SimuNet 0.1.0
 * Imported simulation-oriented functions from ConfiNet
 * Structure package till it checks ok on its own
