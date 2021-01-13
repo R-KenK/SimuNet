@@ -59,7 +59,7 @@ generate_obs.prob<- function(Adj,mode,obs.prob_fun = "random",
   obs.prob_type<- determine_obs.prob_type(obs.prob_fun = obs.prob_fun)
 
   obs.prob<- list(
-    P = calculate_obs.prob(obs.prob_fun = obs.prob_fun,obs.prob_type = obs.prob_type,n = n,nodes_names = nodes_names),
+    P = calculate_obs.prob(obs.prob_fun = obs.prob_fun,obs.prob_type = obs.prob_type,n = n,nodes_names = nodes_names, Adj = Adj),
     Adj = Adj,
     obs.prob_type = obs.prob_type,
     obs.prob_fun = obs.prob_fun
@@ -71,8 +71,9 @@ generate_obs.prob<- function(Adj,mode,obs.prob_fun = "random",
 
 #' Print method for `obsProb` objects
 #' @export
-print.obsProb<- function(obs.prob,...){
-  print.default(obs.prob$P,...)
+#' @noRd
+print.obsProb<- function(x,...){
+  print.default(x$P,...)
 }
 
 #' Determine the type of `obsProb` objects inputted or to create.
@@ -122,10 +123,11 @@ determine_obs.prob_type<- function(obs.prob_fun){
 #' }
 #' @param n integer, number of node in `Adj`.
 #' @param nodes_names character vector or `NULL`, names of the nodes in `Adj`.
+#' @param Adj square integers matrix of occurrences of dyads.
 #'
 #' @return the observation probability matrix P (to be stored in `obs.prob$P`)
 #' @noRd
-calculate_obs.prob<- function(obs.prob_fun,obs.prob_type,n,nodes_names){
+calculate_obs.prob<- function(obs.prob_fun,obs.prob_type,n,nodes_names,Adj){
   P<- switch(obs.prob_type,
              "constant" = matrix(obs.prob_fun,n,n,dimnames = list(nodes_names,nodes_names)),
              # only considering the case `obs.prob_fun = "random"`

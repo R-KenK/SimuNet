@@ -43,16 +43,17 @@ generate_empiScan<- function(scan,sampling.param){
 
 #' Print method for `scan` objects
 #' @export
-print.empiScan<- function(scan,...){
+#' @noRd
+print.empiScan<- function(x,...){
   cat("Scan type: theoretical\n\n")
-  print.default(scan$theoretical,...)
-  if(!is.null(scan$group)) {
+  print.default(x$theoretical,...)
+  if(!is.null(x$group)) {
     cat("\n\nScan type: group scan\n\n")
-    print.default(scan$group,...)
+    print.default(x$group,...)
   }
-  if(!is.null(scan$focal)) {
+  if(!is.null(x$focal)) {
     cat("\n\nScan type: focal scan\n\n")
-    print.default(scan$focal,...)
+    print.default(x$focal,...)
   }
 }
 
@@ -71,9 +72,10 @@ is.empiScan<- function(scan){
 #' @importFrom igraph graph_from_adjacency_matrix
 #' @importFrom igraph plot.igraph
 #' @export
-plot.empiScan<- function(scan,...){
-  G<- igraph::graph_from_adjacency_matrix(scan$theoretical,mode = scan$mode,weighted = scan$weighted)
-  igraph::plot.igraph(G,...)
+#' @noRd
+plot.empiScan<- function(x,...){ # Need a way to make it print two in case of method = "both"
+  x<- igraph::graph_from_adjacency_matrix(x$theoretical,mode = x$mode,weighted = x$weighted)
+  igraph::plot.igraph(x,...)
 }
 
 #' Empirically sample from a theoretical scan
@@ -89,9 +91,7 @@ plot.empiScan<- function(scan,...){
 #' }
 #'
 #' @return
-#' @export
-#'
-#' @examples
+#' @noRd
 sample_from_scan<- function(scan,sampling.param,method){
   # according to the empirical method chosen, applies some "empirical" missed observation via the correct sampling method
   switch(method,

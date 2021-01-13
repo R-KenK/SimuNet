@@ -48,9 +48,10 @@ generate_presence.prob<- function(Adj,total_scan,mode,
 
 #' Print method for `presenceProb` objects
 #' @export
-print.presenceProb<- function(presence.prob,...){
-  print.default(presence.prob$P,...)
-  cat("  mode: ",presence.prob$mode)
+#' @noRd
+print.presenceProb<- function(x,...){
+  print.default(x$P,...)
+  cat("  mode: ",x$mode)
 }
 
 #' Test if object if a `presenceProb` object

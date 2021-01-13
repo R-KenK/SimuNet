@@ -8,7 +8,11 @@
 #' @param output choose to either return a matrix of logical values (`TRUE`s, `FALSE`s on the diagonal, i.e. comparable behavior than `upper.tri` for instance) or a vector of the subsetted values of the matrix.
 #'
 #' @return either return a matrix of logical values (`TRUE`s, `FALSE`s on the diagonal) or a vector of the subsetted values of the matrix.
-#' @noRd
+#' @export
+#'
+#' @examples
+#' M<- matrix(sample(1:10,16,replace = TRUE),4,4)
+#' non.diagonal(M)
 non.diagonal<- function(M,output=c("matrix.logical","vector.values")) {
   output<- match.arg(output)
   if(dim(M)[1]==dim(M)[2]) logicals<- upper.tri(M,diag = FALSE)|lower.tri(M,diag = FALSE) else stop("Matrix provided is not a square matrix.")
@@ -25,7 +29,11 @@ non.diagonal<- function(M,output=c("matrix.logical","vector.values")) {
 #' @param output choose to either return a matrix of logical values (`TRUE`s on the diagonal, i.e. comparable behavior than `diag` for instance) or a vector of the subsetted values of the matrix
 #'
 #' @return square logical matrix with diagonal of `TRUE`s
-#' @noRd
+#' @export
+#'
+#' @examples
+#' M<- matrix(sample(1:10,16,replace = TRUE),4,4)
+#' diagonal(M)
 diagonal<- function(M,output=c("matrix.logical","vector.values")) {
   output<- match.arg(output)
   if(dim(M)[1]==dim(M)[2]) logicals<- upper.tri(M,diag = TRUE)&!upper.tri(M,diag = FALSE) else stop("Matrix provided is not a square matrix.")

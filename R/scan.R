@@ -38,18 +38,20 @@ generate_scan<- function(presence.prob){
 
 #' Print method for `scan` objects
 #' @export
-print.scan<- function(scan,...){
-  cat("Scan type: ",scan$scan.type,", mode: ",scan$mode,"\n\n",sep = "")
-  print.default(scan$theoretical,...)
+#' @noRd
+print.scan<- function(x,...){
+  cat("Scan type: ",x$scan.type,", mode: ",x$mode,"\n\n",sep = "")
+  print.default(x$theoretical,...)
 }
 
 #' Plot method for `scan` objects
 #' @importFrom igraph graph_from_adjacency_matrix
 #' @importFrom igraph plot.igraph
 #' @export
-plot.scan<- function(scan,...){
-  G<- igraph::graph_from_adjacency_matrix(scan$theoretical,mode = scan$mode,weighted = scan$weighted)
-  igraph::plot.igraph(G,...,main = "theoretical")
+#' @noRd
+plot.scan<- function(x,...){
+  x<- igraph::graph_from_adjacency_matrix(x$theoretical,mode = x$mode,weighted = x$weighted)
+  igraph::plot.igraph(x,...,main = "theoretical")
 }
 
 #' Draw a raw binary scan from presence.prob

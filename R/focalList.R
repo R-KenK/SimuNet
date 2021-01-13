@@ -60,7 +60,7 @@ generate_focal.list<- function(Adj,total_scan,
 
   focal.list<- list(
     focals = draw_focal.list(focal.prob_fun = focal.prob_fun,all.sampled = all.sampled,focal.prob_type = focal.prob_type,
-                             n = n,total_scan = total_scan,nodes_names = nodes_names), #perhaps should enrich the type of this element with a vector of names
+                             n = n,Adj = Adj,total_scan = total_scan,nodes_names = nodes_names), #perhaps should enrich the type of this element with a vector of names
     Adj = Adj,
     total_scan = total_scan,
     focal.prob_type = focal.prob_type,
@@ -74,10 +74,11 @@ generate_focal.list<- function(Adj,total_scan,
 
 #' Print method for `focalList` objects
 #' @export
-print.focalList<- function(focal.list,...){
-  if(!is.null(names(focal.list$focals))){cat("  node name: ",names(focal.list$focals),"\n")}
-  cat(" node index: ",focal.list$focals)
-  # print.default(focal.list$focals,...)
+#' @noRd
+print.focalList<- function(x,...){
+  if(!is.null(names(x$focals))){cat("  node name: ",names(x$focals),"\n")}
+  cat(" node index: ",x$focals)
+  # print.default(x$focals,...)
 }
 
 #' Test if object if a `focalList` object
@@ -139,13 +140,14 @@ determine_focal.prob_type<- function(focal.prob_fun){
 #'   \item{or "random"}
 #' }
 #' @param n integer, number of node in `Adj`.
+#' @param Adj square integers matrix of occurrences of dyads.
 #' @param total_scan integer, sampling effort. Note that 1/total_scan should be relatively small, increasingly small with increasing precision. Optional if using presence.prob.
 #' @param nodes_names character vector or `NULL`, names of the nodes in `Adj`
 #'
 #' @return a named vector of focals (as integers)
 #' @noRd
 draw_focal.list<- function(focal.prob_fun,all.sampled,focal.prob_type,
-                           n,total_scan,nodes_names) {
+                           n,Adj,total_scan,nodes_names) {
   # shape future focal.list, filling it with NAs
   focal.list<- rep(NA,total_scan);
 

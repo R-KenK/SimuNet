@@ -22,7 +22,8 @@
 #'
 #' focal.list<- generate_focal.list(Adj,total_scan,focal.prob_fun = "even")
 #' generate_focal(focal.list,5)
-#' # generate_focal(focal.list,50) # returns an error if `scan.number` is incompatible with `total_scan`
+#' # below returns an error if `scan.number` is incompatible with `total_scan`
+#' # generate_focal(focal.list,50)
 #'
 generate_focal<- function(focal.list,
                           scan.number){
@@ -39,12 +40,13 @@ generate_focal<- function(focal.list,
 
 #' Print method for `focal` objects
 #' @export
-print.focal<- function(focal,...){
+#' @noRd
+print.focal<- function(x,...){
   cat(
     paste0(
-      ifelse(!is.null(names(focal$focal)),paste0("  node name: ",names(focal$focal)),""),
-      "\n node index: ",focal$focal,
-      "\nscan number: ",focal$scan.number," out of ",focal$focal.list$total_scan
+      ifelse(!is.null(names(x$focal)),paste0("  node name: ",names(x$focal)),""),
+      "\n node index: ",x$focal,
+      "\nscan number: ",x$scan.number," out of ",x$focal.list$total_scan
     )
   )
 }
