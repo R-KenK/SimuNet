@@ -7,7 +7,7 @@
 #' @param mode Character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
 #' @param Adj.subfun optional, used internally in scan-related functions. Subsetting function of the adjacency matrix. Driven by igraph "mode" argument.
 #'
-#' @return an `presenceProb` object (S3 class) containing:
+#' @return a `presenceProb` object (S3 class) containing:
 #' \itemize{
 #'   \item{P}{a [0,1] numeric matrix of probability of presence of a tie between each dyad}
 #'   \item{Adj}{inputted `Adj`}
@@ -26,9 +26,8 @@
 #' Adj[non.diagonal(Adj)]<- sample(0:total_scan,n*(n-1),replace = TRUE)
 #' Adj
 #'
-#' generate_presence.prob(Adj,total_scan,mode = "directed")
-#'
-generate_presence.prob<- function(Adj,total_scan,mode,
+#' generate_presenceProb(Adj,total_scan,mode = "directed")
+generate_presenceProb<- function(Adj,total_scan,mode,
                                   Adj.subfun = NULL){
   if(is.null(Adj.subfun)){
     Adj.subfun<- choose_Adj.subfun(mode = mode)

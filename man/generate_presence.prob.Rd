@@ -16,7 +16,7 @@ generate_presence.prob(Adj, total_scan, mode, Adj.subfun = NULL)
 \item{Adj.subfun}{optional, used internally in scan-related functions. Subsetting function of the adjacency matrix. Driven by igraph "mode" argument.}
 }
 \value{
-an `presenceProb` object (S3 class) containing:
+a `presenceProb` object (S3 class) containing:
 \itemize{
   \item{P}{a [0,1] numeric matrix of probability of presence of a tie between each dyad}
   \item{Adj}{inputted `Adj`}

@@ -31,16 +31,16 @@
 #' focal.list<- generate_focal.list(Adj,total_scan,focal.prob_fun = "even",all.sampled = TRUE)
 #' focal<- generate_focal(focal.list,10)
 #'
-#' generate_sampling.param(method = "group",obs.prob = obs.prob.random)
-#' generate_sampling.param(method = "focal",focal = focal)
-#' generate_sampling.param(method = "both",obs.prob = obs.prob.constant,
+#' generate_samplingParam(method = "group",obs.prob = obs.prob.random)
+#' generate_samplingParam(method = "focal",focal = focal)
+#' generate_samplingParam(method = "both",obs.prob = obs.prob.constant,
 #'                         focal = focal.list,scan.number = 20)
-generate_sampling.param<- function(method = c("group","focal","both"),mode = c("directed","undirected","max","min","upper","lower","plus","vector"),
+generate_samplingParam<- function(method = c("group","focal","both"),mode = c("directed","undirected","max","min","upper","lower","plus","vector"),
                                    obs.prob = NULL,focal = NULL,scan.number = NULL){
   method<- match.arg(method);
   mode<- match.arg(mode);
 
-  check_samplingParam_consistency(method = method,obs.prob = obs.prob,focal.list = focal)
+  check_if_required_param_present(method = method,obs.prob = obs.prob,focal = focal)
 
   if(is.focalList(focal)) {
     if(is.null(scan.number)) {stop("Please provide a `scan.number` if a `focalList` object is passed through `focal`.")}
@@ -82,11 +82,11 @@ print.samplingParam<- function(x,...){
 #'
 #' @return
 #' @noRd
-check_samplingParam_consistency<- function(method,obs.prob,focal.list){
+check_if_required_param_present<- function(method,obs.prob,focal){
   switch(method,
          "group" = if(is.null(obs.prob)) {stop("Chosen `method` requires an `obsProb` object.")},
-         "focal" = if(is.null(focal.list)) {stop("Chosen `method` requires a `focal` or `focalList` object")},
-         "both" = if(is.null(obs.prob) | is.null(focal.list)) {stop("Chosen `method` requires both an `obsProb` and a `focalList` objects")},
+         "focal" = if(is.null(focal)) {stop("Chosen `method` requires a `focal` or `focalList` object")},
+         "both" = if(is.null(obs.prob) | is.null(focal)) {stop("Chosen `method` requires both an `obsProb` and a `focalList` objects")},
          stop("Inputted `method` not recognized.")
   )
 }

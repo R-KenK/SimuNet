@@ -76,6 +76,17 @@ print.obsProb<- function(x,...){
   print.default(x$P,...)
 }
 
+#' Test if object if a `obsProb` object
+#'
+#' @param x an object to test.
+#'
+#' @return logical, TRUE if the inputted object is a `obsProb` object.
+#'
+#' @noRd
+is.obsProb<- function(x){
+  inherits(x,"obsProb")
+}
+
 #' Determine the type of `obsProb` objects inputted or to create.
 #' from the class of `obs.prob_fun` inputted.
 #'

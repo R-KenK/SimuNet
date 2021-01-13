@@ -20,7 +20,7 @@
 #' Adj[non.diagonal(Adj)]<- sample(0:total_scan,n*(n-1),replace = TRUE)
 #' Adj
 #'
-#' focal.list<- generate_focal.list(Adj,total_scan,focal.prob_fun = "even")
+#' focal.list<- generate_focalList(Adj,total_scan,focal.prob_fun = "even")
 #' generate_focal(focal.list,5)
 #' # below returns an error if `scan.number` is incompatible with `total_scan`
 #' # generate_focal(focal.list,50)

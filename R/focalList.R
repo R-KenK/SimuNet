@@ -40,19 +40,19 @@
 #' Adj[non.diagonal(Adj)]<- sample(0:total_scan,n*(n-1),replace = TRUE)
 #' Adj
 #'
-#' generate_focal.list(Adj,total_scan,focal.prob_fun = "even")
-#' generate_focal.list(Adj,total_scan,focal.prob_fun = "random",all.sampled = FALSE)
+#' generate_focalList(Adj,total_scan,focal.prob_fun = "even")
+#' generate_focalList(Adj,total_scan,focal.prob_fun = "random",all.sampled = FALSE)
 #'
 #' # using a user-defined function:
 #' user_function.n<- function(n,Adj) {1:n} # comparable to a dyad-trait-based bias
 #' user_function.n2<- function(n,Adj) {1:n*1:n} # comparable to a dyad-trait-based bias
 #' user_function.Adj<- function(n,Adj) {colSums(Adj*Adj)} # comparable to a network-based bias
 #'
-#' generate_focal.list(Adj,total_scan,focal.prob_fun = user_function.n,all.sampled = FALSE)
-#' generate_focal.list(Adj,total_scan,focal.prob_fun = user_function.n2,all.sampled = TRUE)
-#' generate_focal.list(Adj,total_scan,focal.prob_fun = user_function.Adj,all.sampled = FALSE)
+#' generate_focalList(Adj,total_scan,focal.prob_fun = user_function.n,all.sampled = FALSE)
+#' generate_focalList(Adj,total_scan,focal.prob_fun = user_function.n2,all.sampled = TRUE)
+#' generate_focalList(Adj,total_scan,focal.prob_fun = user_function.Adj,all.sampled = FALSE)
 #'
-generate_focal.list<- function(Adj,total_scan,
+generate_focalList<- function(Adj,total_scan,
                                focal.prob_fun = "even",all.sampled = TRUE){
   n<- nrow(Adj);nodes_names<- rownames(Adj)
 
@@ -124,7 +124,7 @@ determine_focal.prob_type<- function(focal.prob_fun){
 }
 
 #' Draw a vector of focals
-#' Internal use. Users should rather use `generate_focal.list`. Apply the inputted `focal.prob_fun` to draw a vector of focals.
+#' Internal use. Users should rather use `generate_focalList`. Apply the inputted `focal.prob_fun` to draw a vector of focals.
 #'
 #' @param focal.prob_fun either:
 #' \itemize{
