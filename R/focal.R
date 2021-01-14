@@ -1,13 +1,13 @@
 #' Generator for `focal` objects
 #'
 #' @param focal.list a `focalList` object
-#' @param scan.number an integer between in `1:total_scan`
+#' @param scan.number an integer vector included in `1:total_scan`. Special case `"all"` sets scan.number to `1:total_scan`
 #'
 #' @return an `focal` object (S3 class) containing:
 #' \itemize{
-#'   \item{focal}{named integer scalar representing the _index_ of the node to sample at scan number `scan.number`}
+#'   \item{focal}{named integer vector representing the _index_ of the node(s) to sample at scan number(s) `scan.number`}
 #'   \item{focal.list}{inputted `focal.list` object}
-#'   \item{scan.number}{inputted `scan.number`}
+#'   \item{scan.number}{inputted `scan.number`. If `"all"` was inputted, set to `1:total_scan`}
 #' }
 #' @export
 #'
@@ -22,12 +22,20 @@
 #'
 #' focal.list<- generate_focalList(Adj,total_scan,focal.prob_fun = "even")
 #' generate_focal(focal.list,5)
+#' generate_focal(focal.list,3:10)
+#' generate_focal(focal.list,"all")
 #' # below returns an error if `scan.number` is incompatible with `total_scan`
 #' # generate_focal(focal.list,50)
+#' # generate_focal(focal.list,40:43)
 #'
 generate_focal<- function(focal.list,
                           scan.number){
-  if(scan.number > focal.list$total_scan) {stop("Inputted `scan.number` higher than `total_scan`.")}
+  if (length(scan.number) == 1) {
+    if (scan.number == "all") {
+      scan.number<- 1:focal.list$total_scan
+    }
+  }
+  if (any(scan.number > focal.list$total_scan)) {stop("Inputted `scan.number` involves number(s) higher than `total_scan`.")}
 
   focal<- list(
     focal = focal.list$focals[scan.number],
@@ -44,10 +52,10 @@ generate_focal<- function(focal.list,
 print.focal<- function(x,...){
   cat(
     paste0(
-      ifelse(!is.null(names(x$focal)),paste0("  node name: ",names(x$focal)),""),
+      ifelse(!is.null(names(x$focal)),"\n  node name: ",""),names(x$focal), # won't display anything if nodes don't have names
       "\n node index: ",x$focal,
-      "\nscan number: ",x$scan.number," out of ",x$focal.list$total_scan
-    )
+      "\nscan number: ",x$scan.number," out of ",x$focal.list$total_scan,"\n"
+    ),sep = ""
   )
 }
 
