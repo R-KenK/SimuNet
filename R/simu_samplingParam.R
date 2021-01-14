@@ -1,12 +1,40 @@
 # sampling.param generation and related functions -------------------------------
 
-#' Wrapper for `samplingParam` objects
+#' Define the sampling parameters to use in the network simulations
+#' To use before calling `simu_scan`. Wrapper for `samplingParam` objects.
 #'
-#' @param method Character scalar, specifies if the function should return a theoretical perfect group scan, an  empirical group scan (a similarly dimensioned matrix as Adj), or a focal scan (a vector representing the given focal's row in the group scan matrix).
-#' @param mode Character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
-#' @param obs.prob an `obsProb` object
-#' @param focal a `focal` object. Otherwise, a `focalList` object can be provided alongside a `scan.number`
-#' @param scan.number Optional. Only required if inputted `focal` is a `focalList` object. An integer between in `1:total_scan`
+#' @param Adj square integers matrix of occurrences of dyads. Empirical adjacency matrix for the simulation to inspire its internal probabilities from.
+#' @param total_scan integer, sampling effort. Note that 1/total_scan should be relatively small, increasingly small with increasing precision.
+#' @param mode Character scalar, specifies what type of igraph network `mode` should be used to convert the supplied matrix. Possible values are:
+#' \itemize{
+#'   \item{`"directed"` (the default): for non-symetrical adjacency matrix where `Adj[i,j]` doesn't have the same meaning as `Adj[j,i]`}
+#'   \item{`"undirected"`: same as `"max"`}
+#'   \item{`"upper"`: undirected matrix focusing only on the upper triangle of `Adj` (relying on `upper.tri`). Either `"upper"` or `"lower"` could be favor if only one of `Adj[i,j]` and `Adj[j,i]` should be randomized}
+#'   \item{`"lower"`: undirected matrix focusing only on the lower triangle of `Adj` (relying on `lower.tri`)}
+#'   \item{`"max"`: from a `"directed"` randomization process (both `Adj[i,j]` and `Adj[j,i]` will be drawn at each scan), `max(Adj[i,j],Adj[j,i])` will be kept for both}
+#'   \item{`"min"`: from a `"directed"` randomization process (both `Adj[i,j]` and `Adj[j,i]` will be drawn at each scan), `min(Adj[i,j],Adj[j,i])` will be kept for both}
+#'   \item{`"plus."`:  from a `"directed"` randomization process (both `Adj[i,j]` and `Adj[j,i]` will be drawn at each scan), `Adj[i,j] + Adj[j,i]` will be kept for both}
+#'   \item{`"vector"`: experimental. To consider adjacency matrices as flat vectors to be randomized. Relevance unexplored yet.}
+#'   \item{See details \link[igraph]{graph_from_adjacency_matrix}}
+#' }
+#' @param group.scan_param internally the `obs.prob_fun` variable to be passed to `generate_obsProb`. Either:
+#' \itemize{
+#'   \item{a single [0,1] numeric value for all dyad representing their probability of being sampled or not (`obs.prob_type` will be `"constant"`)}
+#'   \item{the string `"random"` if each dyad should have its probability drawn from a uniform distribution between 0 and 1 (`runif(n*n,0,1)`)}
+#'   \item{a user-defined function of (i,j,Adj) that output a probability of presence for the dyad}
+#' }
+#' @param focal.scan_param internally the `focal.prob_fun` variable to be passed to `generate_focalList`. Either:
+#' \itemize{
+#'   \item{the special case `"even"` tries to even out the `focal.list` as much as possible before drawing randomly following a uniform distribution}
+#'   \item{`"random"`: pick focals following a uniform distribution}
+#'   \item{a user-defined function of (n,Adj) that output a weight of being focal for each node (passed as the `prob` argument to `base::sample` function)}
+#' }
+#' @param scan.number either:
+#'  \itemize{
+#'   \item{an integer vector included in `1:total_scan` of the scans to perform}
+#'   \item{the special case `"all"` (default) sets `scan.number` to `1:total_scan` and set the simulation to perform all the scans}
+#' }
+#' @param all.sampled logical, should all individuals be sampled at least once by design? Default is `TRUE`. Internally passed to `generate_focalList`. After drawing each node once, the rest of the `focal.list` is  sampled according to `focal.prob_fun`. Returns an error if `total_scan` is smaller than the number of nodes.
 #'
 #' @return an `samplingParam` object (S3 class) containing:
 #' \itemize{
@@ -26,60 +54,67 @@
 #' Adj[non.diagonal(Adj)]<- sample(0:total_scan,n*(n-1),replace = TRUE)
 #' Adj
 #'
-#' obs.prob.random<- generate_obs.prob(Adj,"directed",obs.prob_fun = "random")
-#' obs.prob.constant<- generate_obs.prob(Adj,"directed",obs.prob_fun = .42)
-#' focal.list<- generate_focal.list(Adj,total_scan,focal.prob_fun = "even",all.sampled = TRUE)
-#' focal<- generate_focal(focal.list,10)
-#'
-#' generate_samplingParam(method = "group",obs.prob = obs.prob.random)
-#' generate_samplingParam(method = "focal",focal = focal)
-#' generate_samplingParam(method = "both",obs.prob = obs.prob.constant,
-#'                         focal = focal.list,scan.number = 20)
-simu_samplingParam<- function(mode = c("directed","undirected","max","min","upper","lower","plus","vector"),
-                              obs.prob = NULL,focal = NULL,scan.number = NULL){
+#' simu_samplingParam(Adj,total_scan,focal.scan_param = "even")
+#' simu_samplingParam(Adj,total_scan,mode = "max",group.scan_param = 0.42)
+#' simu_samplingParam(Adj,total_scan,mode = "min",
+#'                    group.scan_param = 0.42,
+#'                    focal.scan_param = "random",scan.number = 1:4)
+simu_samplingParam<- function(Adj,total_scan,mode = c("directed","undirected","max","min","upper","lower","plus","vector"),
+                              group.scan_param = NULL,focal.scan_param = NULL,all.sampled = TRUE,scan.number = "all"){
   mode<- match.arg(mode);
+  method<- determine_method(group.scan_param = group.scan_param,focal.scan_param = focal.scan_param)
 
-  method<- determine_method(obs.prob = obs.prob,focal = focal)
-
-  if(is.focalList(focal)) {
-    if(is.null(scan.number)) {stop("Please provide a `scan.number` if a `focalList` object is passed through `focal`.")}
-    focal<- generate_focal(focal.list = focal,scan.number = scan.number)
-  }
-
-  sampling.param<- list(
-    method = method,
-    mode = mode,
-    obs.prob = obs.prob,
-    focal = focal # also contains focal.list
+  switch(method,
+         "group" = {
+           obs.prob<- generate_obsProb(Adj = Adj,mode = mode,obs.prob_fun = group.scan_param)
+           focal<- NULL
+         },
+         "focal" = {
+           focal.list<- generate_focalList(Adj = Adj,total_scan = total_scan,focal.prob_fun = focal.scan_param,all.sampled = all.sampled)
+           focal<- generate_focal(focal.list = focal.list,scan.number = scan.number)
+           obs.prob<- NULL
+         },
+         "both" = {
+           obs.prob<- generate_obsProb(Adj = Adj,mode = mode,obs.prob_fun = group.scan_param)
+           focal.list<- generate_focalList(Adj = Adj,total_scan = total_scan,focal.prob_fun = focal.scan_param,all.sampled = all.sampled)
+           focal<- generate_focal(focal.list = focal.list,scan.number = scan.number)
+         },
+         stop("Inputted `method` not recognized.")
   )
-  class(sampling.param)<- "samplingParam"
-  sampling.param
+  generate_samplingParam(method = method,mode = mode,obs.prob = obs.prob,focal = focal)
 }
 
 #' Determine the sampling parameters `method`
 #' from inputted parameters
 #'
-#' @param obs.prob_fun either:
+#' @param group.scan_param internally the `obs.prob_fun` variable to be passed to `generate_obsProb`. Either:
 #' \itemize{
-#'   \item{a user-defined function of (i,j,Adj) that output a probability of presence for the dyad,}
-#'   \item{a single [0,1] numeric value for all dyad representing their probability of being sampled or not. (obs.prob_type will be "constant")}
-#'   \item{the string "random" if each dyad should have its probability drawn from a uniform distribution between 0 and 1 (`runif(n,0,1)`).}
+#'   \item{a single [0,1] numeric value for all dyad representing their probability of being sampled or not (`obs.prob_type` will be `"constant"`)}
+#'   \item{the string `"random"` if each dyad should have its probability drawn from a uniform distribution between 0 and 1 (`runif(n*n,0,1)`)}
+#'   \item{a user-defined function of (i,j,Adj) that output a probability of presence for the dyad}
+#' }
+#' @param focal.scan_param internally the `focal.prob_fun` variable to be passed to `generate_focalList`. Either:
+#' \itemize{
+#'   \item{the special case `"even"` tries to even out the `focal.list` as much as possible before drawing randomly following a uniform distribution}
+#'   \item{`"random"`: pick focals following a uniform distribution}
+#'   \item{a user-defined function of (n,Adj) that output a weight of being focal for each node (passed as the `prob` argument to `base::sample` function)}
 #' }
 #'
 #' @return a character scalar:
 #' \itemize{
-#'   \item{"user-defined function"}
-#'   \item{"constant"}
-#'   \item{or "random"}
+#'   \item{`"group"`}
+#'   \item{`"focal"`}
+#'   \item{or `"both"`}
 #' }
 #'
 #' @noRd
-determine_method<- function(obs.prob,focal){
-
-  switch(method,
-         "group" = if(is.null(obs.prob)) {stop("Chosen `method` requires an `obsProb` object.")},
-         "focal" = if(is.null(focal)) {stop("Chosen `method` requires a `focal` or `focalList` object")},
-         "both" = if(is.null(obs.prob) | is.null(focal)) {stop("Chosen `method` requires both an `obsProb` and a `focalList` objects")},
-         stop("Inputted `method` not recognized.")
-  )
+determine_method<- function(group.scan_param,focal.scan_param){
+  is.group<- !is.null(group.scan_param);is.focal<- !is.null(focal.scan_param)
+  if (is.group & is.focal) {
+    return("both")
+  } else {
+    if (is.group) {return("group")}
+    if (is.focal) {return("focal")}
+    stop("Please input enough parameters to determine which method to use.")
+  }
 }
