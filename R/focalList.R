@@ -144,7 +144,7 @@ determine_focal.prob_type<- function(focal.prob_fun){
 #' @param total_scan integer, sampling effort. Note that 1/total_scan should be relatively small, increasingly small with increasing precision. Optional if using presence.prob.
 #' @param nodes_names character vector or `NULL`, names of the nodes in `Adj`
 #'
-#' @importFrom runif stats
+#' @importFrom stats runif
 #'
 #' @return a named vector of focals (as integers)
 #' @noRd

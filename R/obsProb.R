@@ -132,7 +132,7 @@ determine_obs.prob_type<- function(obs.prob_fun){
 #' @param nodes_names character vector or `NULL`, names of the nodes in `Adj`.
 #' @param Adj square integers matrix of occurrences of dyads.
 #'
-#' @importFrom runif stats
+#' @importFrom stats runif
 #'
 #' @return the observation probability matrix P (to be stored in `obs.prob$P`)
 #' @noRd

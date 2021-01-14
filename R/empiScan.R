@@ -106,7 +106,7 @@ sample_from_scan<- function(scan,sampling.param,method){
 #' @param scan a `scan` object with `scan.type = "theoretical"`
 #' @param obs.prob an `obsProb` object
 #'
-#' @importFrom rbinom stats
+#' @importFrom stats rbinom
 #'
 #' @return a binary adjacency matrix with potentially some dyads not observed (turned into `NA`)
 #' @noRd
@@ -124,7 +124,7 @@ group_sample<- function(scan,obs.prob){
 #' @param scan a `scan` object with `scan.type = "theoretical"`
 #' @param obs.prob an `obsProb` object
 #'
-#' @importFrom rbinom stats
+#' @importFrom stats rbinom
 #'
 #' @return a binary adjacency matrix with potentially some dyads not observed (turned into `NA`)
 #' @noRd
