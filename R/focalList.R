@@ -6,7 +6,7 @@
 #' @param total_scan integer, sampling effort. Note that 1/total_scan should be relatively small, increasingly small with increasing precision. Optional if using presence.prob.
 #' @param focal.prob_fun either:
 #' \itemize{
-#'   \item{a user-defined function of (n,Adj) that output a weight of being focal for each node (passed as `prob` argument to `base::sample` function)}
+#'   \item{a user-defined function of (n,Adj) that output a weight of being focal for each node (passed as the `prob` argument to `base::sample` function)}
 #'   \item{`NULL` or `"random"`, pick focals following a uniform distribution}
 #'   \item{Special case `"even"` tries to even out the `focal.list` as much as possible before drawing randomly following a uniform distribution}
 #' }

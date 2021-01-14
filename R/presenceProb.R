@@ -30,7 +30,7 @@
 generate_presenceProb<- function(Adj,total_scan,mode,
                                   Adj.subfun = NULL){
   if(is.null(Adj.subfun)){
-    Adj.subfun<- choose_Adj.subfun(mode = mode)
+    Adj.subfun<- determine_Adj.subfun(mode = mode)
   }
 
   presence.prob<- list(

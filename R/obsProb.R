@@ -49,10 +49,10 @@
 #' generate_obs.prob(Adj,"directed",obs.prob_fun = user_function.ij)
 #' generate_obs.prob(Adj,"directed",obs.prob_fun = user_function.Adj)
 #'
-generate_obs.prob<- function(Adj,mode,obs.prob_fun = "random",
+generate_obsProb<- function(Adj,mode,obs.prob_fun = "random",
                              Adj.subfun = NULL){
   if(is.null(Adj.subfun)){
-    Adj.subfun<- choose_Adj.subfun(mode = mode)
+    Adj.subfun<- determine_Adj.subfun(mode = mode)
   }
   n<- nrow(Adj);nodes_names<- rownames(Adj)
 
