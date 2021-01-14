@@ -1,13 +1,17 @@
 #' Generator for `focal` objects
 #'
 #' @param focal.list a `focalList` object
-#' @param scan.number an integer vector included in `1:total_scan`. Special case `"all"` sets scan.number to `1:total_scan`
+#' @param scan.number either:
+#'  \itemize{
+#'   \item{an integer vector included in `1:total_scan` of the scans to perform}
+#'   \item{the special case `"all"` (default) sets `scan.number` to `1:total_scan` and set the simulation to perform all the scans}
+#' }
 #'
 #' @return an `focal` object (S3 class) containing:
 #' \itemize{
-#'   \item{focal}{named integer vector representing the _index_ of the node(s) to sample at scan number(s) `scan.number`}
-#'   \item{focal.list}{inputted `focal.list` object}
-#'   \item{scan.number}{inputted `scan.number`. If `"all"` was inputted, set to `1:total_scan`}
+#'   \item{`focal`: named integer vector representing the _index_ of the node(s) to sample at scan number(s) `scan.number`}
+#'   \item{`focal.list`: inputted `focal.list` object}
+#'   \item{`scan.number`:  inputted `scan.number`. If `"all"` was inputted, is set to `1:total_scan`}
 #' }
 #' @export
 #'
@@ -61,12 +65,12 @@ print.focal<- function(x,...){
 
 #' Test if object if a `focal` object
 #'
-#' @param focal an object to test.
+#' @param x an object to test.
 #'
-#' @return logical, TRUE if the inputted object is a `focal` object.
+#' @return logical, `TRUE` if the inputted object is a `focal` object.
 #'
 #' @noRd
-is.focal<- function(focal){
-  inherits(focal,"focal")
+is.focal<- function(x){
+  inherits(x,"focal")
 }
 

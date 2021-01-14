@@ -4,16 +4,27 @@
 #'
 #' @param Adj square integers matrix of occurrences of dyads.
 #' @param total_scan integer, sampling effort. Note that 1/total_scan should be relatively small, increasingly small with increasing precision. Optional if using presence.prob.
-#' @param mode Character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
-#' @param Adj.subfun optional, used internally in scan-related functions. Subsetting function of the adjacency matrix. Driven by igraph "mode" argument.
+#' @param mode Character scalar, specifies what type of igraph network `mode` should be used to convert the supplied matrix. Possible values are:
+#' \itemize{
+#'   \item{`"directed"` (the default): for non-symetrical adjacency matrix where `Adj[i,j]` doesn't have the same meaning as `Adj[j,i]`}
+#'   \item{`"undirected"`: same as `"max"`}
+#'   \item{`"upper"`: undirected matrix focusing only on the upper triangle of `Adj` (relying on `upper.tri`). Either `"upper"` or `"lower"` could be favor if only one of `Adj[i,j]` and `Adj[j,i]` should be randomized}
+#'   \item{`"lower"`: undirected matrix focusing only on the lower triangle of `Adj` (relying on `lower.tri`)}
+#'   \item{`"max"`: from a `"directed"` randomization process (both `Adj[i,j]` and `Adj[j,i]` will be drawn at each scan), `max(Adj[i,j],Adj[j,i])` will be kept for both}
+#'   \item{`"min"`: from a `"directed"` randomization process (both `Adj[i,j]` and `Adj[j,i]` will be drawn at each scan), `min(Adj[i,j],Adj[j,i])` will be kept for both}
+#'   \item{`"plus."`:  from a `"directed"` randomization process (both `Adj[i,j]` and `Adj[j,i]` will be drawn at each scan), `Adj[i,j] + Adj[j,i]` will be kept for both}
+#'   \item{`"vector"`: experimental. To consider adjacency matrices as flat vectors to be randomized. Relevance unexplored yet.}
+#'   \item{See details \link[igraph]{graph_from_adjacency_matrix}}
+#' }
+#' @param Adj.subfun optional, used internally in scan-related functions. Subsetting function of the adjacency matrix. Driven by igraph `"mode"` argument.
 #'
 #' @return a `presenceProb` object (S3 class) containing:
 #' \itemize{
-#'   \item{P}{a [0,1] numeric matrix of probability of presence of a tie between each dyad}
-#'   \item{Adj}{inputted `Adj`}
-#'   \item{total_scan}{inputted `total_scan`}
-#'   \item{mode}{inputted `mode`}
-#'   \item{Adj.subfun}{inputted `Adj.subfun`}
+#'   \item{`P`: a [0,1] numeric matrix of probability of presence of a tie between each dyad}
+#'   \item{`Adj`: inputted `Adj`}
+#'   \item{`total_scan`: inputted `total_scan`}
+#'   \item{`mode`: inputted `mode`}
+#'   \item{`Adj.subfun`: inputted `Adj.subfun`}
 #' }
 #'
 #' @export
@@ -55,13 +66,13 @@ print.presenceProb<- function(x,...){
 
 #' Test if object if a `presenceProb` object
 #'
-#' @param presence.prob an object to test.
+#' @param x an object to test.
 #'
 #' @return logical, TRUE if the inputted object is a `presenceProb` object.
 #'
 #' @noRd
-is.presenceProb<- function(presence.prob){
-  inherits(presence.prob,"presenceProb")
+is.presenceProb<- function(x){
+  inherits(x,"presenceProb")
 }
 
 #' Binarize from adjacency matrix

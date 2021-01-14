@@ -6,8 +6,12 @@
 #' @param mode Character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
 #' @param obs.prob an `obsProb` object
 #' @param focal a `focal` object. Otherwise, a `focalList` object can be provided alongside a `scan.number`
-#' @param scan.number Optional. Only required if inputted `focal` is a `focalList` object. An integer between in `1:total_scan`
-#'
+#' @param scan.number Optional. Only required if inputted `focal` is a `focalList` object. Either:
+#'  \itemize{
+#'   \item{an integer vector included in `1:total_scan` of the scans to perform}
+#'   \item{the special case `"all"` (default) sets `scan.number` to `1:total_scan` and set the simulation to perform all the scans}
+#' }
+
 #' @return an `samplingParam` object (S3 class) containing:
 #' \itemize{
 #'   \item{method}{inputted `method`}
@@ -26,9 +30,9 @@
 #' Adj[non.diagonal(Adj)]<- sample(0:total_scan,n*(n-1),replace = TRUE)
 #' Adj
 #'
-#' obs.prob.random<- generate_obs.prob(Adj,"directed",obs.prob_fun = "random")
-#' obs.prob.constant<- generate_obs.prob(Adj,"directed",obs.prob_fun = .42)
-#' focal.list<- generate_focal.list(Adj,total_scan,focal.prob_fun = "even",all.sampled = TRUE)
+#' obs.prob.random<- generate_obsProb(Adj,"directed",obs.prob_fun = "random")
+#' obs.prob.constant<- generate_obsProb(Adj,"directed",obs.prob_fun = .42)
+#' focal.list<- generate_focalList(Adj,total_scan,focal.prob_fun = "even",all.sampled = TRUE)
 #' focal<- generate_focal(focal.list,10)
 #'
 #' generate_samplingParam(method = "group",obs.prob = obs.prob.random)
@@ -61,7 +65,11 @@ generate_samplingParam<- function(method = c("group","focal","both"),mode = c("d
 #' @export
 #' @noRd
 print.samplingParam<- function(x,...){
-  cat("Sampling method: ",x$method)
+  cat(
+    paste0("\nSampling method: ",x$method,
+           "\nigraph network mode: ",x$mode),
+    sep = ""
+  )
   if(!is.null(x$obs.prob)) {
     cat("\n\nGroup-scan sampling details:\n  obs.prob:\n")
     print(x$obs.prob)

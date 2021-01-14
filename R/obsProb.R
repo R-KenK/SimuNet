@@ -6,26 +6,22 @@
 #' @param mode Character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
 #' @param obs.prob_fun either:
 #' \itemize{
-#'   \item{a user-defined function of (i,j,Adj) that output a probability of presence for the dyad,}
-#'   \item{a single [0,1] numeric value for all dyad representing their probability of being sampled or not. (obs.prob_type will be "constant")}
-#'   \item{the string "random" if each dyad should have its probability drawn from a uniform distribution between 0 and 1 (`runif(n,0,1)`).}
+#'   \item{a user-defined function of (i,j,Adj) that output a probability of presence for the dyad}
+#'   \item{a single [0,1] numeric value for all dyad representing their probability of being sampled or not (`obs.prob_type` will be `"constant"`)}
+#'   \item{the string `"random"` if each dyad should have its probability drawn from a uniform distribution between 0 and 1 (`runif(n*n,0,1)`)}
 #' }
 #' @param Adj.subfun subsetting function of the adjacency matrix. Driven by igraph "mode" argument.
 #'
 #' @return an `obsProb` object (S3 class) containing:
 #' \itemize{
-#'   \item{P}{a [0,1] numeric matrix of probability of observation (using the "group" scan sampling `method`) of each dyad.}
-#'   \item{Adj}{inputted `Adj`}
-#'   \item{obs.prob_type}{character scalar, either:
-#'     \item{"constant" if all dyad have the same probability of being sampled or not.}
-#'     \item{"random" if all dyad have a probability drawn from a uniform distribution between 0 and 1 (`runif(n,0,1)`).}
-#'     \item{"user-defined function" if the user inputted a function of (i,j,Adj) to calculate each dyad probability.}
+#'   \item{`P`: a [0,1] numeric matrix of probability of observation (using the "group" scan sampling `method`) of each dyad.}
+#'   \item{`Adj`: inputted `Adj`}
+#'   \item{`obs.prob_type`: character scalar, either:
+#'     \item{`"constant"`: if all dyad have the same probability of being sampled or not.}
+#'     \item{`"random"`: if all dyad have a probability drawn from a uniform distribution between 0 and 1 (`runif(n*n,0,1)`).}
+#'     \item{`"user-defined function"`: if the user inputted a function of (i,j,Adj) to calculate each dyad probability.}
 #'   }
-#'   \item{obs.prob_fun}{either:
-#'     \item{a user-defined function of (i,j,Adj) that output a probability of presence for the dyad,}
-#'     \item{a single [0,1] numeric value for all dyad representing their probability of being sampled or not. (obs.prob_type will be "constant")}
-#'     \item{the string "random" if each dyad should have its probability drawn from a uniform distribution between 0 and 1 (`runif(n,0,1)`).}
-#'   }
+#'   *
 #' }
 #'
 #' @export
@@ -38,16 +34,16 @@
 #' Adj[non.diagonal(Adj)]<- sample(0:total_scan,n*(n-1),replace = TRUE)
 #' Adj
 #'
-#' generate_obs.prob(Adj,"directed",obs.prob_fun = "random")
-#' generate_obs.prob(Adj,"directed",obs.prob_fun = 0.3)
+#' generate_obsProb(Adj,"directed",obs.prob_fun = "random")
+#' generate_obsProb(Adj,"directed",obs.prob_fun = 0.3)
 #'
 #' # using a user-defined function:
 #' user_function.ij<- function(i,j,Adj) {i+j} # comparable to a dyad-trait-based bias
 #' user_function.Adj<- function(i,j,Adj) {Adj*Adj} # comparable to a network-based bias
 #'
-#' generate_obs.prob(Adj,"directed",obs.prob_fun = "random")
-#' generate_obs.prob(Adj,"directed",obs.prob_fun = user_function.ij)
-#' generate_obs.prob(Adj,"directed",obs.prob_fun = user_function.Adj)
+#' generate_obsProb(Adj,"directed",obs.prob_fun = "random")
+#' generate_obsProb(Adj,"directed",obs.prob_fun = user_function.ij)
+#' generate_obsProb(Adj,"directed",obs.prob_fun = user_function.Adj)
 #'
 generate_obsProb<- function(Adj,mode,obs.prob_fun = "random",
                              Adj.subfun = NULL){
@@ -92,16 +88,16 @@ is.obsProb<- function(x){
 #'
 #' @param obs.prob_fun either:
 #' \itemize{
-#'   \item{a user-defined function of (i,j,Adj) that output a probability of presence for the dyad,}
-#'   \item{a single [0,1] numeric value for all dyad representing their probability of being sampled or not. (obs.prob_type will be "constant")}
-#'   \item{the string "random" if each dyad should have its probability drawn from a uniform distribution between 0 and 1 (`runif(n,0,1)`).}
+#'   \item{a single [0,1] numeric value for all dyad representing their probability of being sampled or not (`obs.prob_type` will be `"constant"`)}
+#'   \item{the string `"random"` if each dyad should have its probability drawn from a uniform distribution between 0 and 1 (`runif(n*n,0,1)`)}
+#'   \item{a user-defined function of (i,j,Adj) that output a probability of presence for the dyad}
 #' }
 #'
 #' @return a character scalar:
 #' \itemize{
-#'   \item{"user-defined function"}
-#'   \item{"constant"}
-#'   \item{or "random"}
+#'   \item{`"user-defined function"`}
+#'   \item{`"constant"`}
+#'   \item{or `"random"`}
 #' }
 #'
 #' @noRd
@@ -122,15 +118,15 @@ determine_obs.prob_type<- function(obs.prob_fun){
 #'
 #' @param obs.prob_fun either:
 #' \itemize{
-#'   \item{a user-defined function of (i,j,Adj) that output a probability of presence for the dyad,}
-#'   \item{a single [0,1] numeric value for all dyad representing their probability of being sampled or not. (obs.prob_type will be "constant")}
-#'   \item{the string "random" if each dyad should have its probability drawn from a uniform distribution between 0 and 1 (`runif(n,0,1)`).}
+#'   \item{a single [0,1] numeric value for all dyad representing their probability of being sampled or not (`obs.prob_type` will be `"constant"`)}
+#'   \item{the string `"random"` if each dyad should have its probability drawn from a uniform distribution between 0 and 1 (`runif(n*n,0,1)`)}
+#'   \item{a user-defined function of (i,j,Adj) that output a probability of presence for the dyad}
 #' }
 #' @param obs.prob_type a character scalar identified with `determine_obs.prob_type` function:
 #' \itemize{
-#'   \item{"user-defined function"}
-#'   \item{"constant"}
-#'   \item{or "random"}
+#'   \item{`"user-defined function"`}
+#'   \item{`"constant"`}
+#'   \item{or `"random"`}
 #' }
 #' @param n integer, number of node in `Adj`.
 #' @param nodes_names character vector or `NULL`, names of the nodes in `Adj`.
