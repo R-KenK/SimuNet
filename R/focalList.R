@@ -144,6 +144,8 @@ determine_focal.prob_type<- function(focal.prob_fun){
 #' @param total_scan integer, sampling effort. Note that 1/total_scan should be relatively small, increasingly small with increasing precision. Optional if using presence.prob.
 #' @param nodes_names character vector or `NULL`, names of the nodes in `Adj`
 #'
+#' @importFrom runif stats
+#'
 #' @return a named vector of focals (as integers)
 #' @noRd
 draw_focal.list<- function(focal.prob_fun,all.sampled,focal.prob_type,
@@ -164,7 +166,7 @@ draw_focal.list<- function(focal.prob_fun,all.sampled,focal.prob_type,
                           focal.list[sample(1:total_scan,n)]<- 1:n;total_scan<- total_scan-n;
                         }
 
-                        focal.list[is.na(focal.list)]<- ceiling(runif(total_scan,0,n))
+                        focal.list[is.na(focal.list)]<- ceiling(stats::runif(total_scan,0,n))
                         focal.list
                       },
                       "user-defined function" = {

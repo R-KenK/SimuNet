@@ -106,12 +106,14 @@ sample_from_scan<- function(scan,sampling.param,method){
 #' @param scan a `scan` object with `scan.type = "theoretical"`
 #' @param obs.prob an `obsProb` object
 #'
+#' @importFrom rbinom stats
+#'
 #' @return a binary adjacency matrix with potentially some dyads not observed (turned into `NA`)
 #' @noRd
 group_sample<- function(scan,obs.prob){
   observed<- scan$theoretical  # set the sampled scan to be like the `raw` one (i.e. this is a binary _directed_ adjacency matrix)
   obs.P<- obs.prob$P[scan$Adj.subfun(obs.prob$P)]  # subset obs.prob like the adjacency matrix (i.e. triangular matrix) into a vector of observation probabilities
-  missed<- rbinom(length(obs.P),1,obs.P)==0  # draw the missed observation
+  missed<- stats::rbinom(length(obs.P),1,obs.P)==0  # draw the missed observation
   observed[scan$Adj.subfun(observed)][missed]<- NA  # set the missed observation to `NA`
   observed
 }
@@ -122,12 +124,14 @@ group_sample<- function(scan,obs.prob){
 #' @param scan a `scan` object with `scan.type = "theoretical"`
 #' @param obs.prob an `obsProb` object
 #'
+#' @importFrom rbinom stats
+#'
 #' @return a binary adjacency matrix with potentially some dyads not observed (turned into `NA`)
 #' @noRd
 group_sample.old<- function(scan,obs.prob){
   observed<- scan$raw  # set the sampled scan to be like the `raw` one (i.e. this is a binary _directed_ adjacency matrix)
   obs.P<- obs.prob$P[scan$Adj.subfun(obs.prob$P)]  # subset obs.prob like the adjacency matrix (i.e. triangular matrix) into a vector of observation probabilities
-  missed<- rbinom(length(obs.P),1,obs.P)==0  # draw the missed observation
+  missed<- stats::rbinom(length(obs.P),1,obs.P)==0  # draw the missed observation
   observed[scan$Adj.subfun(observed)][missed]<- NA  # set the missed observation to `NA`
   apply_mode(observed,mode = scan$mode)
 }

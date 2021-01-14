@@ -132,13 +132,15 @@ determine_obs.prob_type<- function(obs.prob_fun){
 #' @param nodes_names character vector or `NULL`, names of the nodes in `Adj`.
 #' @param Adj square integers matrix of occurrences of dyads.
 #'
+#' @importFrom runif stats
+#'
 #' @return the observation probability matrix P (to be stored in `obs.prob$P`)
 #' @noRd
 calculate_obs.prob<- function(obs.prob_fun,obs.prob_type,n,nodes_names,Adj){
   P<- switch(obs.prob_type,
              "constant" = matrix(obs.prob_fun,n,n,dimnames = list(nodes_names,nodes_names)),
              # only considering the case `obs.prob_fun = "random"`
-             "random" = matrix(runif(n*n,0,1),n,n,dimnames = list(nodes_names,nodes_names)),  # n*n: lazy fix to be sure that all prob are drawn, but likely drawing n probabilities too many presently
+             "random" = matrix(stats::runif(n*n,0,1),n,n,dimnames = list(nodes_names,nodes_names)),  # n*n: lazy fix to be sure that all prob are drawn, but likely drawing n probabilities too many presently
              "user-defined function" = {
                dyads<- expand.grid(row = 1:n,col = 1:n)
                P<- matrix(nrow = n,ncol = n,dimnames = list(nodes_names,nodes_names),
