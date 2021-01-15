@@ -1,77 +1,195 @@
 # WIP: Wrapper to simulate a single scan ------------------------------------------
 
-# #' Simulate a single scan, theoretical or empirical
-# #'
-# #' @param Adj square integers matrix of occurrences of dyads. Can be used to pass a `presenceProb` object too.
-# #' @param total_scan integer, sampling effort. Note that 1/total_scan should be relatively small, increasingly small with increasing precision. Optional if using a `presenceProb` object.
-# #' @param sampling.param Optional if a theoretical scan is needed. Otherwise `samplingParam` object that stores:
-# #' \itemize{
-# #'   \item{method}{a character scalar, either:
-# #'     \item{"group"}{to use the group-scan sampling method}
-# #'     \item{"focal"}{to use the group-scan sampling method}
-# #'     \item{"both"}{to use both}
-# #'   }
-# #'   \item{obs.prob}{an `obsProb` object.}
-# #'   \item{focal}{a `focal` object.}
-# #' }
-# #' @param method Character scalar, specifies if the function should return a theoretical perfect group scan, an  empirical group scan (a similarly dimensioned matrix as Adj), or a focal scan (a vector representing the given focal's row in the group scan matrix). # TO REWRITE WITH ITEMS
-# #' @param obs.prob_fun Optional if a theoretical scan is needed.  either:
-# #' \itemize{
-# #'   \item{a user-defined function of (i,j,Adj) that output a probability of presence for the dyad,}
-# #'   \item{a single [0,1] numeric value for all dyad representing their probability of being sampled or not. (obs.prob_type will be "constant")}
-# #'   \item{the string "random" if each dyad should have its probability drawn from a uniform distribution between 0 and 1 (`runif(n,0,1)`).}
-# #' }
-# #' @param focal.prob_fun either:
-# #' \itemize{
-# #'   \item{a user-defined function of (n,Adj) that output a weight of being focal for each node (passed as `prob` argument to `base::sample` function)}
-# #'   \item{`NULL` or `"random"`, pick focals following a uniform distribution}
-# #'   \item{Special case `"even"` tries to even out the `focal.list` as much as possible before drawing randomly following a uniform distribution}
-# #' }
-# #' @param mode Character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
-# #'
-# #' @return
-# #' @export
-# #'
-# #' @examples
-# #' #' set.seed(42)
-# #'
-# #' n<- 5;nodes<- as.character(1:n);total_scan<- 42;
-# #' Adj<- matrix(data = 0,nrow = n,ncol = n,dimnames = list(nodes,nodes))
-# #' Adj[non.diagonal(Adj)]<- sample(0:42,n*(n-1),replace = TRUE)
-# #' Adj
-# #'
-# #' # Users can
-# #' generate_obs.prob(Adj,"directed",obs.prob_fun = "random")
-# #' generate_obs.prob(Adj,"directed",obs.prob_fun = 0.3)
-# #'
-# #' # using a user-defined function:
-# #' user_function.ij<- function(i,j,Adj) {i+j} # comparable to a dyad-trait-based bias
-# #' user_function.Adj<- function(i,j,Adj) {Adj*Adj} # comparable to a network-based bias
-# #'
-# #' generate_obs.prob(Adj,"directed",obs.prob_fun = user_function.ij)
-# #' generate_obs.prob(Adj,"directed",obs.prob_fun = user_function.Adj)
-# simu_scan<-function(Adj=NULL,total_scan=NULL,sampling.param = NULL,method = NULL,obs.prob_fun = NULL,focal.prob_fun = NULL,
-#                     mode = c("directed", "undirected", "max","min", "upper", "lower", "plus","vector")){
- #   mode<- match.arg(mode)
-#
-#   # Check if `Adj` has been passed as a `presenceProb` object or not, retrieve other variable otherwise if needed
-#   if (!is.presence.prob(Adj)) {
-#     Adj.subfun<- choose_Adj.subfun(mode)
-#     presence.prob<- generate_presence.prob(Adj = Adj,total_scan = total_scan,mode = mode,Adj.subfun = Adj.subfun)
-#   } else {
-#     presence.prob<- Adj
-#   }
-#
-#   # use the class "scan" object generator to
-#   scan<- generate_scan(presence.prob)
-#
-#   # output either the theoretical scan or applies sample_from_scan
-#   if (is.null(sampling.param) & is.null(method) & is.null(obs.prob_fun) & is.null(focal.prob_fun)) {
-#     scan
-#   } else {
-#     if(is.null(sampling.param)){
-#       sampling.param<- generate_sampling.param(method = method,mode = mode,obs.prob = obs.prob,focal.list = focal.list) # should return an error in case of missing parameters given the chosen method
-#     }
-#     sample_from_scan(scan = scan,sampling.param = sampling.param)
-#   }
-# }
+#' Simulate a single scan, theoretical or empirical
+#'
+#' @param Adj square integers matrix of occurrences of dyads. Empirical
+#'   adjacency matrix for the simulation to inspire its internal probabilities
+#'   from.
+#' @param total_scan integer, sampling effort. Note that 1/total_scan should be
+#'   relatively small, increasingly small with increasing precision. Optional if
+#'   using a `presenceProb` object.
+#' @param mode Character scalar, specifies what type of igraph network `mode`
+#'   should be used to convert the supplied matrix. Ignored if `sampling.param` is
+#'   provided. Possible values are:
+#' \itemize{
+#'   \item{`"directed"` (the default): for non-symmetrical adjacency matrix where
+#'   `Adj[i,j]` doesn't have the same meaning as `Adj[j,i]`}
+#'   \item{`"undirected"`: same as `"max"`}
+#'   \item{`"upper"`: undirected matrix focusing only on the upper triangle of
+#'   `Adj` (relying on `upper.tri`). Either `"upper"` or `"lower"` could be
+#'   favor if only one of `Adj[i,j]` and `Adj[j,i]` should be randomized}
+#'   \item{`"lower"`: undirected matrix focusing only on the lower triangle of
+#'   `Adj` (relying on `lower.tri`)}
+#'   \item{`"max"`: from a `"directed"` randomization process (both `Adj[i,j]`
+#'   and `Adj[j,i]` will be drawn at each scan), `max(Adj[i,j],Adj[j,i])` will
+#'   be kept for both}
+#'   \item{`"min"`: from a `"directed"` randomization process (both `Adj[i,j]`
+#'   and `Adj[j,i]` will be drawn at each scan), `min(Adj[i,j],Adj[j,i])` will
+#'   be kept for both}
+#'   \item{`"plus."`:  from a `"directed"` randomization process (both
+#'   `Adj[i,j]` and `Adj[j,i]` will be drawn at each scan), `Adj[i,j] +
+#'   Adj[j,i]` will be kept for both}
+#'   \item{`"vector"`: experimental. To consider adjacency matrices as flat
+#'   vectors to be randomized. Relevance unexplored yet.}
+#'   \item{See details \link[igraph]{graph_from_adjacency_matrix}}
+#' }
+#' @param sampling.param Optional if a theoretical scan is needed. Otherwise
+#'   a `samplingParam` object (S3 class) containing:
+#' \itemize{
+#'   \item{`method`: a character scalar:
+#'     \item{`"group"`: an empirical group-scan is performed, in which some
+#'     dyads can be missed (`NA` in the empirical adjacency matrix)}
+#'     \item{`"focal"`: an empirical focal-scan is performed, in which only the
+#'     row and column of the chosen focal is recorded (others are `NA` in the
+#'     empirical adjacency matrix)}
+#'     \item{or `"both"`: both methods are done in parallel from the same
+#'     theoretical scan}
+#'   }
+#'   \item{mode: inputted `mode`}
+#'   \item{obs.prob: inputted `obs.prob`}
+#'   \item{focal: inputted `focal`}
+#' }
+#'
+#' @return depending if `sampling.param` are provided, either:
+#'  \itemize{
+#'    \item{a `scan` object (S3 class) containing:
+#'      \item{`raw.scan`: a binary adjacency matrix, considered directed in the
+#'      algorithm}
+#'      \item{`theoretical.scan`: a binary adjacency matrix, where all ties were
+#'      observed but the `mode` has been applied}
+#'      \item{`scan.type`: character scalar. `generate_scan` sets it to
+#'      "theoretical", `sample_from_scan` will set it to "empirical" and append
+#'      the empirical matrix}
+#'      \item{`Adj`: `Adj` data contained in `presence.prob`}
+#'      \item{`total_scan`: `total_scan` data contained in `presence.prob`}
+#'      \item{`mode`: `mode` data contained in `presence.prob`}
+#'      \item{`weighted`: logical, at this stage can only be `TRUE` if `mode =
+#'      plus` (some edges can become `2`)}
+#'      \item{`Adj.subfun`: `Adj.subfun` data contained in `presence.prob`}
+#'      \item{`presence.prob`: `presence.prob$P` (only the probability matrix)
+#'      data contained in `presence.prob`}
+#'    }
+#'    \item{an `empiScan` object (S3 class) containing:
+#'      \item{`raw.scan`: a binary adjacency matrix, considered directed in the
+#'      algorithm}
+#'      \item{`theoretical.scan`: a binary adjacency matrix, where all ties were
+#'      observed but the `mode` has been applied}
+#'      \item{`scan.type`: set to `"empirical"` by `sample_from_scan`}
+#'      \item{`method`: from inputted `sampling.param`}
+#'      \item{`group.scan`: an adjacency matrix, where the observation
+#'      probability `obs.prob` from `sampling.param` of each dyad has been
+#'      applied. `NULL` if `method = "focal"`}
+#'      \item{`focal.scan`: an adjacency matrix, where only the selected `focal`
+#'      from `sampling.param` is visible. `NULL` if `method = "group"`}
+#'      \item{`Adj`: `Adj` data contained in `presence.prob`}
+#'      \item{`total_scan`: `total_scan` data contained in `presence.prob`}
+#'      \item{`mode`: `mode` data contained in `presence.prob`}
+#'      \item{`weighted`: logical, at this stage can only be `TRUE` if `mode =
+#'      plus` (some edges can become `2`)}
+#'      \item{`Adj.subfun`: `Adj.subfun` data contained in `presence.prob`}
+#'      \item{`presence.prob`: `presence.prob$P` (only the probability matrix)
+#'      data contained in `presence.prob`}
+#'    }
+#'  }
+#'
+#' @export
+#'
+#' @examples
+#' set.seed(42)
+#'
+#' n<- 5;nodes<- letters[1:n];total_scan<- 42;
+#' Adj<- matrix(data = 0,nrow = n,ncol = n,dimnames = list(nodes,nodes))
+#' Adj[non.diagonal(Adj)]<- sample(0:total_scan,n*(n-1),replace = TRUE)
+#' Adj
+#'
+#' # by default will simulate a directed theoretical scan
+#' simu_scan(Adj,total_scan)
+#'
+#' # but other mode can be used:
+#' simu_scan(Adj,total_scan,mode = "min")
+#'
+#'
+#' # Users can generate sampling parameters through `simu_samplingParam` to use in
+#' # `simu_scan`
+#' para.group.constant<- simu_samplingParam(Adj,total_scan,mode =
+#'                                          "max",group.scan_param = 0.42)
+#' simu_scan(Adj,total_scan,sampling.param = para.group.constant)
+#'
+#' # Users can also define functions to use trait- or network- based sampling
+#' # biases for group-scan sampling (cf. ?simu_samplingParam)
+#' obs.prob.trait.bias_fun<- function(i,j,Adj) {i+j} # comparable to a dyad-trait-based bias
+#' para.group.trait.bias<- simu_samplingParam(Adj,total_scan,mode ="directed",
+#'                                            group.scan_param = obs.prob.trait.bias_fun)
+#' para.group.net.bias<- simu_samplingParam(Adj,total_scan,mode =
+#'                                          "max",group.scan_param = function(i,j,Adj) {Adj*Adj})
+#'
+#' simu_scan(Adj,total_scan,sampling.param = para.group.trait.bias)
+#' simu_scan(Adj,total_scan,sampling.param = para.group.net.bias)
+#'
+#' # or for biases regarding which focals to draw for focal-scan sampling (cf.
+#' # ?simu_samplingParam)
+#' focal.trait.bias_fun<- function(n,Adj) {1:n} # comparable to a dyad-trait-based bias
+#' para.focal.trait.bias<- simu_samplingParam(Adj,
+#'                                            total_scan,mode = "directed",
+#'                                            focal.scan_param = focal.trait.bias_fun,
+#'                                            scans.to.do = 3)
+#' para.focal.net.bias<- simu_samplingParam(Adj,total_scan,mode = "max",
+#'                                          focal.scan_param = function(n,Adj) {colSums(Adj*Adj)},
+#'                                          scans.to.do = 20)
+#'
+#' simu_scan(Adj,total_scan,sampling.param = para.focal.trait.bias)
+#' simu_scan(Adj,total_scan,sampling.param = para.focal.net.bias)
+simu_scan <-
+  function(Adj = NULL,
+           total_scan = NULL,
+           mode = c("directed","undirected","max","min","upper","lower","plus","vector"),
+           sampling.param = NULL) {
+    if (!is.null(sampling.param)) {
+      if (!is.samplingParam(sampling.param)) {
+        stop(
+          "Please provide a valid `samplingParam` object. You can use simu_samplingParam() to create one."
+        )
+      } else {
+        method <- sampling.param$method
+        mode <- sampling.param$mode
+        obs.prob <- sampling.param$obs.prob
+        focal <- sampling.param$focal
+      }
+    } else {
+      mode <- match.arg(mode)
+    }
+
+    # Check if `Adj` has been passed as a `presenceProb` object or not, retrieve
+    # other variable otherwise if needed
+    if (!is.presenceProb(Adj)) {
+      Adj.subfun <- determine_Adj.subfun(mode)
+      presence.prob <-
+        generate_presenceProb(
+          Adj = Adj,
+          total_scan = total_scan,
+          mode = mode,
+          Adj.subfun = Adj.subfun
+        )
+    } else {
+      presence.prob <- Adj
+    }
+
+    # use the class "scan" object generator to
+    scan <- generate_scan(presence.prob)
+
+    # output either the theoretical scan or applies sample_from_scan
+    if (is.null(sampling.param)) {
+      scan
+    } else {
+      if (is.null(sampling.param)) {
+        sampling.param <-
+          generate_samplingParam(
+            method = method,
+            mode = mode,
+            obs.prob = obs.prob,
+            focal = focal
+          ) # should return an error in case of missing parameters given the chosen method
+      }
+      generate_empiScan(scan = scan, sampling.param = sampling.param)
+    }
+  }

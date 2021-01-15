@@ -1,29 +1,36 @@
 # Single scan related functions -------------------------------------------
 
 #' Generator for `scan` objects
-#' Internal use. The user should rather rely on `simu_scan` as a wrapper for the different steps needed to perform the scan from inputted data.
+#' Internal use. The user should rather rely on `simu_scan` as a wrapper for the
+#' different steps needed to perform the scan from inputted data.
 #'
 #' @param presence.prob a `presenceProb` object
 #'
-#' @return an `scan` object (S3 class) containing:
+#' @return a `scan` object (S3 class) containing:
 #' \itemize{
-#'   \item{raw}{a binary adjacency matrix, considered directed in the algorithm}
-#'   \item{theoretical}{a binary adjacency matrix, where all ties were observed but the `mode` has been applied}
-#'   \item{scan.type}{character scalar. `generate_scan` sets it to "theoretical", `sample_from_scan` will set it to "empirical" and append the empirical matrix}
-#'   \item{Adj}{`Adj` data contained in `presence.prob`}
-#'   \item{total_scan}{`total_scan` data contained in `presence.prob`}
-#'   \item{mode}{`mode` data contained in `presence.prob`}
-#'   \item{weighted}{logical, at this stage can only be `TRUE` if `mode = plus` (some edges can become `2`)}
-#'   \item{Adj.subfun}{`Adj.subfun` data contained in `presence.prob`}
-#'   \item{presence.prob}{`presence.prob$P` (only the probability matrix) data contained in `presence.prob`}
+#'   \item{`raw.scan`: a binary adjacency matrix, considered directed in the
+#'   algorithm}
+#'   \item{`theoretical.scan`: a binary adjacency matrix, where all ties were
+#'   observed but the `mode` has been applied}
+#'   \item{`scan.type`: character scalar. `generate_scan` sets it to
+#'   "theoretical", `sample_from_scan` will set it to "empirical" and append the
+#'   empirical matrix}
+#'   \item{`Adj`: `Adj` data contained in `presence.prob`}
+#'   \item{`total_scan`: `total_scan` data contained in `presence.prob`}
+#'   \item{`mode`: `mode` data contained in `presence.prob`}
+#'   \item{`weighted`: logical, at this stage can only be `TRUE` if `mode =
+#'   plus` (some edges can become `2`)}
+#'   \item{`Adj.subfun`: `Adj.subfun` data contained in `presence.prob`}
+#'   \item{`presence.prob`: `presence.prob$P` (only the probability matrix) data
+#'   contained in `presence.prob`}
 #' }
 #'
 #' @noRd
 generate_scan<- function(presence.prob){
   raw.scan<- draw_raw.scan(presence.prob = presence.prob)
   scan<- list(
-    raw = raw.scan,
-    theoretical = apply_mode(raw.scan = raw.scan,mode = presence.prob$mode),
+    raw.scan = raw.scan,
+    theoretical.scan = apply_mode(raw.scan = raw.scan,mode = presence.prob$mode),
     scan.type = "theoretical",
     Adj = presence.prob$Adj,
     total_scan = presence.prob$total_scan,

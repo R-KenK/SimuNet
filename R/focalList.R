@@ -6,28 +6,28 @@
 #' @param total_scan integer, sampling effort. Note that 1/total_scan should be relatively small, increasingly small with increasing precision. Optional if using presence.prob.
 #' @param focal.prob_fun either:
 #' \itemize{
-#'   \item{a user-defined function of (n,Adj) that output a weight of being focal for each node (passed as `prob` argument to `base::sample` function)}
+#'   \item{Special case `"even"` (default) tries to even out the `focal.list` as much as possible before drawing randomly following a uniform distribution}
 #'   \item{`NULL` or `"random"`, pick focals following a uniform distribution}
-#'   \item{Special case `"even"` tries to even out the `focal.list` as much as possible before drawing randomly following a uniform distribution}
+#'   \item{a user-defined function of (n,Adj) that output a weight of being focal for each node (passed as the `prob` argument to `base::sample` function)}
 #' }
 #' @param all.sampled logical, should all individuals be sampled before letting them be sampled according to `focal.prob_fun`? Ignored if `focal.prob_fun` is `"even"` (because all nodes will be sampled anyway. Returns an error if `total_scan` is smaller than the number of nodes.
 #'
 #' @return an `focalList` object (S3 class) containing:
 #' \itemize{
-#'   \item{focals}{a vector of focals (as integers)}
-#'   \item{Adj}{inputted `Adj`}
-#'   \item{total_scan}{inputted `total_scan`}
-#'   \item{focal.prob_type}{character scalar, either:
-#'     \item{"even" tries to even out the `focal.list` as much as possible before drawing randomly following a uniform distributionall dyad have the same probability of being sampled or not.}
-#'     \item{"random" if all node are equiprobable at each scan}
-#'     \item{"user-defined function" if the user inputted a function of (n,Adj) to calculate each node probability of being drawn at each scan}
+#'   \item{`focals`: a vector of focals (as integers)}
+#'   \item{`Adj`: inputted `Adj`}
+#'   \item{`total_scan`: inputted `total_scan`}
+#'   \item{`focal.prob_type`: character scalar, either:
+#'     \item{`"even"`: tries to even out the `focal.list` as much as possible before drawing randomly following a uniform distributionall dyad have the same probability of being sampled or not.}
+#'     \item{`"random"`: if all node are equiprobable at each scan}
+#'     \item{`"user-defined function"`: if the user inputted a function of (n,Adj) to calculate each node probability of being drawn at each scan}
 #'   }
-#'   \item{focal.prob_fun}{either:
-#'     \item{"even"}
-#'     \item{"random"}
+#'   \item{`focal.prob_fun`: either:
+#'     \item{`"even"`}
+#'     \item{`"random"`}
 #'     \item{inputted `focal.prob_fun` of (n,Adj)}
 #'   }
-#'   \item{all.sampled}{inputted `all.sampled`}
+#'   \item{`all.sampled`: inputted `all.sampled`}
 #' }
 #'
 #' @export
@@ -40,19 +40,19 @@
 #' Adj[non.diagonal(Adj)]<- sample(0:total_scan,n*(n-1),replace = TRUE)
 #' Adj
 #'
-#' generate_focal.list(Adj,total_scan,focal.prob_fun = "even")
-#' generate_focal.list(Adj,total_scan,focal.prob_fun = "random",all.sampled = FALSE)
+#' generate_focalList(Adj,total_scan,focal.prob_fun = "even")
+#' generate_focalList(Adj,total_scan,focal.prob_fun = "random",all.sampled = FALSE)
 #'
 #' # using a user-defined function:
 #' user_function.n<- function(n,Adj) {1:n} # comparable to a dyad-trait-based bias
 #' user_function.n2<- function(n,Adj) {1:n*1:n} # comparable to a dyad-trait-based bias
 #' user_function.Adj<- function(n,Adj) {colSums(Adj*Adj)} # comparable to a network-based bias
 #'
-#' generate_focal.list(Adj,total_scan,focal.prob_fun = user_function.n,all.sampled = FALSE)
-#' generate_focal.list(Adj,total_scan,focal.prob_fun = user_function.n2,all.sampled = TRUE)
-#' generate_focal.list(Adj,total_scan,focal.prob_fun = user_function.Adj,all.sampled = FALSE)
+#' generate_focalList(Adj,total_scan,focal.prob_fun = user_function.n,all.sampled = FALSE)
+#' generate_focalList(Adj,total_scan,focal.prob_fun = user_function.n2,all.sampled = TRUE)
+#' generate_focalList(Adj,total_scan,focal.prob_fun = user_function.Adj,all.sampled = FALSE)
 #'
-generate_focal.list<- function(Adj,total_scan,
+generate_focalList<- function(Adj,total_scan,
                                focal.prob_fun = "even",all.sampled = TRUE){
   n<- nrow(Adj);nodes_names<- rownames(Adj)
 
@@ -83,13 +83,13 @@ print.focalList<- function(x,...){
 
 #' Test if object if a `focalList` object
 #'
-#' @param focal.list an object to test.
+#' @param x an object to test.
 #'
 #' @return logical, TRUE if the inputted object is a `focalList` object.
 #'
 #' @noRd
-is.focalList<- function(focal.list){
-  inherits(focal.list,"focalList")
+is.focalList<- function(x){
+  inherits(x,"focalList")
 }
 
 #' Determine the type of `focalList` objects inputted or to create.
@@ -97,16 +97,16 @@ is.focalList<- function(focal.list){
 #'
 #' @param focal.prob_type either:
 #' \itemize{
-#'   \item{"even" tries to even out the `focal.list` as much as possible before drawing randomly following a uniform distributionall dyad have the same probability of being sampled or not.}
-#'   \item{"random" if all node are equiprobable at each scan}
-#'   \item{"user-defined function" if the user inputted a function of (n,Adj) to calculate each node probability of being drawn at each scan}
+#'   \item{`"even"`: tries to even out the `focal.list` as much as possible before drawing randomly following a uniform distributionall dyad have the same probability of being sampled or not.}
+#'   \item{`"random"`: if all node are equiprobable at each scan}
+#'   \item{`"user-defined function"`: if the user inputted a function of (n,Adj) to calculate each node probability of being drawn at each scan}
 #' }
 #'
 #' @return a character scalar:
 #' \itemize{
-#'   \item{"user-defined function"}
-#'   \item{"even"}
-#'   \item{or "random"}
+#'   \item{`"even"`}
+#'   \item{`"random"`}
+#'   \item{or `"user-defined function"`}
 #' }
 #'
 #' @noRd
@@ -124,25 +124,27 @@ determine_focal.prob_type<- function(focal.prob_fun){
 }
 
 #' Draw a vector of focals
-#' Internal use. Users should rather use `generate_focal.list`. Apply the inputted `focal.prob_fun` to draw a vector of focals.
+#' Internal use. Users should rather use `generate_focalList`. Apply the inputted `focal.prob_fun` to draw a vector of focals.
 #'
 #' @param focal.prob_fun either:
 #' \itemize{
-#'   \item{a user-defined function of (n,Adj) that output a weight of being focal for each node (passed as `prob` argument to `base::sample` function)}
-#'   \item{`NULL` or `"random"`, pick focals following a uniform distribution}
 #'   \item{Special case `"even"` tries to even out the `focal.list` as much as possible before drawing randomly following a uniform distribution}
+#'   \item{`NULL` or `"random"`, pick focals following a uniform distribution}
+#'   \item{a user-defined function of (n,Adj) that output a weight of being focal for each node (passed as the `prob` argument to `base::sample` function)}
 #' }
 #' @param all.sampled logical, should all individuals be sampled before letting them be sampled according to `focal.prob_fun`? Returns an error if total_scan is smaller than the number of nodes.
 #' @param focal.prob_type character scalar:
 #' \itemize{
-#'   \item{"user-defined function"}
-#'   \item{"even"}
-#'   \item{or "random"}
+#'   \item{`"even"`}
+#'   \item{`"random"`}
+#'   \item{or `"user-defined function"`}
 #' }
 #' @param n integer, number of node in `Adj`.
 #' @param Adj square integers matrix of occurrences of dyads.
 #' @param total_scan integer, sampling effort. Note that 1/total_scan should be relatively small, increasingly small with increasing precision. Optional if using presence.prob.
 #' @param nodes_names character vector or `NULL`, names of the nodes in `Adj`
+#'
+#' @importFrom stats runif
 #'
 #' @return a named vector of focals (as integers)
 #' @noRd
@@ -164,7 +166,7 @@ draw_focal.list<- function(focal.prob_fun,all.sampled,focal.prob_type,
                           focal.list[sample(1:total_scan,n)]<- 1:n;total_scan<- total_scan-n;
                         }
 
-                        focal.list[is.na(focal.list)]<- ceiling(runif(total_scan,0,n))
+                        focal.list[is.na(focal.list)]<- ceiling(stats::runif(total_scan,0,n))
                         focal.list
                       },
                       "user-defined function" = {

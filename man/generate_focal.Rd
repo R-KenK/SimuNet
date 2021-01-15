@@ -4,19 +4,23 @@
 \alias{generate_focal}
 \title{Generator for `focal` objects}
 \usage{
-generate_focal(focal.list, scan.number)
+generate_focal(focal.list, scans.to.do)
 }
 \arguments{
 \item{focal.list}{a `focalList` object}
 
-\item{scan.number}{an integer between in `1:total_scan`}
+\item{scans.to.do}{either:
+ \itemize{
+  \item{an integer vector included in `1:total_scan` of the scans to perform}
+  \item{the special case `"all"` (default) sets `scans.to.do` to `1:total_scan` and set the simulation to perform all the scans}
+}}
 }
 \value{
 an `focal` object (S3 class) containing:
 \itemize{
-  \item{focal}{named integer scalar representing the _index_ of the node to sample at scan number `scan.number`}
-  \item{focal.list}{inputted `focal.list` object}
-  \item{scan.number}{inputted `scan.number`}
+  \item{`focal`: named integer vector representing the _index_ of the node(s) to sample at scan number(s) `scans.to.do`}
+  \item{`focal.list`: inputted `focal.list` object}
+  \item{`scans.to.do`:  inputted `scans.to.do`. If `"all"` was inputted, is set to `1:total_scan`}
 }
 }
 \description{
@@ -31,9 +35,12 @@ Adj<- matrix(data = 0,nrow = n,ncol = n,dimnames = list(nodes,nodes))
 Adj[non.diagonal(Adj)]<- sample(0:total_scan,n*(n-1),replace = TRUE)
 Adj
 
-focal.list<- generate_focal.list(Adj,total_scan,focal.prob_fun = "even")
+focal.list<- generate_focalList(Adj,total_scan,focal.prob_fun = "even")
 generate_focal(focal.list,5)
-# below returns an error if `scan.number` is incompatible with `total_scan`
+generate_focal(focal.list,3:10)
+generate_focal(focal.list,"all")
+# below returns an error if `scans.to.do` is incompatible with `total_scan`
 # generate_focal(focal.list,50)
+# generate_focal(focal.list,40:43)
 
 }
