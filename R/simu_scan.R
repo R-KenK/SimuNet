@@ -50,7 +50,48 @@
 #'   \item{focal: inputted `focal`}
 #' }
 #'
-#' @return
+#' @return depending if `sampling.param` are provided, either:
+#'  \itemize{
+#'    \item{a `scan` object (S3 class) containing:
+#'      \item{`raw.scan`: a binary adjacency matrix, considered directed in the
+#'      algorithm}
+#'      \item{`theoretical.scan`: a binary adjacency matrix, where all ties were
+#'      observed but the `mode` has been applied}
+#'      \item{`scan.type`: character scalar. `generate_scan` sets it to
+#'      "theoretical", `sample_from_scan` will set it to "empirical" and append
+#'      the empirical matrix}
+#'      \item{`Adj`: `Adj` data contained in `presence.prob`}
+#'      \item{`total_scan`: `total_scan` data contained in `presence.prob`}
+#'      \item{`mode`: `mode` data contained in `presence.prob`}
+#'      \item{`weighted`: logical, at this stage can only be `TRUE` if `mode =
+#'      plus` (some edges can become `2`)}
+#'      \item{`Adj.subfun`: `Adj.subfun` data contained in `presence.prob`}
+#'      \item{`presence.prob`: `presence.prob$P` (only the probability matrix)
+#'      data contained in `presence.prob`}
+#'    }
+#'    \item{an `empiScan` object (S3 class) containing:
+#'      \item{`raw.scan`: a binary adjacency matrix, considered directed in the
+#'      algorithm}
+#'      \item{`theoretical.scan`: a binary adjacency matrix, where all ties were
+#'      observed but the `mode` has been applied}
+#'      \item{`scan.type`: set to `"empirical"` by `sample_from_scan`}
+#'      \item{`method`: from inputted `sampling.param`}
+#'      \item{`group.scan`: an adjacency matrix, where the observation
+#'      probability `obs.prob` from `sampling.param` of each dyad has been
+#'      applied. `NULL` if `method = "focal"`}
+#'      \item{`focal.scan`: an adjacency matrix, where only the selected `focal`
+#'      from `sampling.param` is visible. `NULL` if `method = "group"`}
+#'      \item{`Adj`: `Adj` data contained in `presence.prob`}
+#'      \item{`total_scan`: `total_scan` data contained in `presence.prob`}
+#'      \item{`mode`: `mode` data contained in `presence.prob`}
+#'      \item{`weighted`: logical, at this stage can only be `TRUE` if `mode =
+#'      plus` (some edges can become `2`)}
+#'      \item{`Adj.subfun`: `Adj.subfun` data contained in `presence.prob`}
+#'      \item{`presence.prob`: `presence.prob$P` (only the probability matrix)
+#'      data contained in `presence.prob`}
+#'    }
+#'  }
+#'
 #' @export
 #'
 #' @examples
@@ -64,21 +105,40 @@
 #' # by default will simulate a directed theoretical scan
 #' simu_scan(Adj,total_scan)
 #'
-#' # Users can generate sampling parameters through `simu_samplingParam` to use
-#' in `simu_scan`
+#' # but other mode can be used:
+#' simu_scan(Adj,total_scan,mode = "min")
+#'
+#'
+#' # Users can generate sampling parameters through `simu_samplingParam` to use in
+#' # `simu_scan`
 #' para.group.constant<- simu_samplingParam(Adj,total_scan,mode =
-#'                                            "max",group.scan_param = 0.42)
-#' simu_scan(Adj,total_scan,para.group.constant)
+#'                                          "max",group.scan_param = 0.42)
+#' simu_scan(Adj,total_scan,sampling.param = para.group.constant)
 #'
 #' # Users can also define functions to use trait- or network- based sampling
-#' # biases (cf. ?simu_samplingParam)
-#' obs.prob.trait.bias.ij<- function(i,j,Adj) {i+j} # comparable to a dyad-trait-based bias
-#' obs.prob.net.bias.Adj<- function(i,j,Adj) {Adj*Adj} # comparable to a network-based bias
+#' # biases for group-scan sampling (cf. ?simu_samplingParam)
+#' obs.prob.trait.bias_fun<- function(i,j,Adj) {i+j} # comparable to a dyad-trait-based bias
+#' para.group.trait.bias<- simu_samplingParam(Adj,total_scan,mode ="directed",
+#'                                            group.scan_param = obs.prob.trait.bias_fun)
+#' para.group.net.bias<- simu_samplingParam(Adj,total_scan,mode =
+#'                                          "max",group.scan_param = function(i,j,Adj) {Adj*Adj})
 #'
-#' simu_scan(Adj,total_scan,obs.prob.trait.bias.ij)
+#' simu_scan(Adj,total_scan,sampling.param = para.group.trait.bias)
+#' simu_scan(Adj,total_scan,sampling.param = para.group.net.bias)
 #'
-#' generate_obsProb(Adj,"directed",obs.prob_fun = user_function.ij)
-#' generate_obsProb(Adj,"directed",obs.prob_fun = user_function.Adj)
+#' # or for biases regarding which focals to draw for focal-scan sampling (cf.
+#' # ?simu_samplingParam)
+#' focal.trait.bias_fun<- function(n,Adj) {1:n} # comparable to a dyad-trait-based bias
+#' para.focal.trait.bias<- simu_samplingParam(Adj,
+#'                                            total_scan,mode = "directed",
+#'                                            focal.scan_param = focal.trait.bias_fun,
+#'                                            scans.to.do = 3)
+#' para.focal.net.bias<- simu_samplingParam(Adj,total_scan,mode = "max",
+#'                                          focal.scan_param = function(n,Adj) {colSums(Adj*Adj)},
+#'                                          scans.to.do = 20)
+#'
+#' simu_scan(Adj,total_scan,sampling.param = para.focal.trait.bias)
+#' simu_scan(Adj,total_scan,sampling.param = para.focal.net.bias)
 simu_scan <-
   function(Adj = NULL,
            total_scan = NULL,
@@ -87,10 +147,14 @@ simu_scan <-
     if (!is.null(sampling.param)) {
       if (!is.samplingParam(sampling.param)) {
         stop(
-          "Please provide a valid `samplingParam` object. You can use simu_samplingParam() for instance"
+          "Please provide a valid `samplingParam` object. You can use simu_samplingParam() to create one."
         )
+      } else {
+        method <- sampling.param$method
+        mode <- sampling.param$mode
+        obs.prob <- sampling.param$obs.prob
+        focal <- sampling.param$focal
       }
-      mode <- sampling.param$mode
     } else {
       mode <- match.arg(mode)
     }
@@ -123,7 +187,7 @@ simu_scan <-
             method = method,
             mode = mode,
             obs.prob = obs.prob,
-            focal.list = focal.list
+            focal = focal
           ) # should return an error in case of missing parameters given the chosen method
       }
       generate_empiScan(scan = scan, sampling.param = sampling.param)
