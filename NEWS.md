@@ -1,4 +1,13 @@
 # SimuNet (development version)
+
+# SimuNet 0.3.0.9000
+* Added a wrapper to `generate_samplingParam`. User should interact with `simu_samplingParam` to create `samplingParam` objects for their simulations.
+* Vectorized the `focal` and `scans.to.do` (which now replace `scan.number` for more transparency) components of `focal` objects. Next version should also vectorize some components of `samplingParam`, `obsProb`, `scan`, and `empiScan` objects
+* Finalized a working version of `simu_scan` for single theoretical and empirical scan. Next version should allow the user to directly use `simu_scan` to generate a list of either types of scans (thus superseding former `iterate_scans`).
+* Homogenize some function and variable names.
+
+
+# SimuNet 0.2.0.9000
 * First shift toward integration of OOP elements into the simulation framework:
     * Revamp from the ground up of the `do.scan` part of the non-OOP previous version
     * Attempt at homogenizing SimuNet's internal syntax:
