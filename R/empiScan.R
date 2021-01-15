@@ -17,8 +17,8 @@
 #'   \item{theoretical}{a binary adjacency matrix, where all ties were observed but the `mode` has been applied}
 #'   \item{scan.type}{set to `"empirical"` by `sample_from_scan`}
 #'   \item{method}{from inputted `sampling.param`}
-#'   \item{group}{an adjacency matrix, where the observation probability `obs.prob` from `sampling.param` of each dyad has been applied. `NULL` if `method = "focal"`}
-#'   \item{focal}{an adjacency matrix, where only the selected `focal` from `sampling.param` is visible. `NULL` if `method = "focal"`}
+#'   \item{group.scan}{an adjacency matrix, where the observation probability `obs.prob` from `sampling.param` of each dyad has been applied. `NULL` if `method = "focal"`}
+#'   \item{focal.scan}{an adjacency matrix, where only the selected `focal` from `sampling.param` is visible. `NULL` if `method = "focal"`}
 #'   \item{Adj}{`Adj` data contained in `presence.prob`}
 #'   \item{total_scan}{`total_scan` data contained in `presence.prob`}
 #'   \item{mode}{`mode` data contained in `presence.prob`}
@@ -30,12 +30,13 @@
 generate_empiScan<- function(scan,sampling.param){
   scan$scan.type<- "empirical"
   scan$method<- sampling.param$method
-  scan$sampling.param<- sampling.param$sampling.param
   if(!is.null(sampling.param$obs.prob)) {
-    scan$group<- sample_from_scan(scan = scan,sampling.param = sampling.param,method = "group")
+    scan$group.scan<- sample_from_scan(scan = scan,sampling.param = sampling.param,method = "group")
+    scan$obs.prob<- sampling.param$obs.prob
   }
   if(!is.null(sampling.param$focal)) {
-    scan$focal<- sample_from_scan(scan = scan,sampling.param = sampling.param,method = "focal")
+    scan$focal.scan<- sample_from_scan(scan = scan,sampling.param = sampling.param,method = "focal")
+    scan$focal<- sampling.param$focal
   }
   class(scan)<- c("empiScan","scan")
   scan
@@ -45,15 +46,15 @@ generate_empiScan<- function(scan,sampling.param){
 #' @export
 #' @noRd
 print.empiScan<- function(x,...){
-  cat("Scan type: theoretical\n\n")
+  cat("Scan type: theoretical, mode: ",x$mode,"\n\n",sep = "")
   print.default(x$theoretical,...)
-  if(!is.null(x$group)) {
-    cat("\n\nScan type: group scan\n\n")
-    print.default(x$group,...)
+  if(!is.null(x$group.scan)) {
+    cat("\n\nScan type: group scan, mode: ",x$mode,"\nobs.prob type: ",x$obs.prob$obs.prob_type,"\n\n",sep = "")
+    print.default(x$group.scan,...)
   }
-  if(!is.null(x$focal)) {
-    cat("\n\nScan type: focal scan\n\n")
-    print.default(x$focal,...)
+  if(!is.null(x$focal.scan)) {
+    cat("\n\nScan type: focal scan, mode: ",x$mode,"\nfocal.prob type: ",x$focal$focal.list$focal.prob_type,"\n\n",sep = "")
+    print.default(x$focal.scan,...)
   }
 }
 
