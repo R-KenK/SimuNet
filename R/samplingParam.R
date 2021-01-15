@@ -14,10 +14,10 @@
 
 #' @return an `samplingParam` object (S3 class) containing:
 #' \itemize{
-#'   \item{method}{inputted `method`}
-#'   \item{mode}{inputted `mode`}
-#'   \item{obs.prob}{inputted `obs.prob`}
-#'   \item{focal}{inputted `focal`}
+#'   \item{method: inputted `method`}
+#'   \item{mode: inputted `mode`}
+#'   \item{obs.prob: inputted `obs.prob`}
+#'   \item{focal: inputted `focal`}
 #' }
 #' @export
 #'
@@ -80,6 +80,17 @@ print.samplingParam<- function(x,...){
     cat("\n  o focal list:\n")
     print(x$focal$focal.list)
   }
+}
+
+#' Test if object if a `samplingParam` object
+#'
+#' @param x an object to test.
+#'
+#' @return logical, TRUE if the inputted object is a `samplingParam` object.
+#'
+#' @noRd
+is.samplingParam<- function(x){
+  inherits(x,"samplingParam")
 }
 
 #' Check if given the chosen `method` if the required parameters are provided
