@@ -52,10 +52,10 @@
 #'   focal for each node (passed as the `prob` argument to `base::sample`
 #'   function)}
 #' }
-#' @param scan.number either:
+#' @param scans.to.do either:
 #'  \itemize{
 #'   \item{an integer vector included in `1:total_scan` of the scans to perform}
-#'   \item{the special case `"all"` (default) sets `scan.number` to
+#'   \item{the special case `"all"` (default) sets `scans.to.do` to
 #'   `1:total_scan` and set the simulation to perform all the scans}
 #' }
 #' @param all.sampled logical, should all individuals be sampled at least once
@@ -86,7 +86,7 @@
 #' simu_samplingParam(Adj,total_scan,mode = "max",group.scan_param = 0.42)
 #' simu_samplingParam(Adj,total_scan,mode = "min",
 #'                    group.scan_param = 0.42,
-#'                    focal.scan_param = "random",scan.number = 1:4)
+#'                    focal.scan_param = "random",scans.to.do = 1:4)
 simu_samplingParam <-
   function(Adj,
            total_scan,
@@ -101,7 +101,7 @@ simu_samplingParam <-
            group.scan_param = NULL,
            focal.scan_param = NULL,
            all.sampled = TRUE,
-           scan.number = "all") {
+           scans.to.do = "all") {
     mode <- match.arg(mode)
 
     method <-
@@ -125,7 +125,7 @@ simu_samplingParam <-
             all.sampled = all.sampled
           )
         focal <-
-          generate_focal(focal.list = focal.list, scan.number = scan.number)
+          generate_focal(focal.list = focal.list, scans.to.do = scans.to.do)
         obs.prob <- NULL
       },
       "both" = {
@@ -141,7 +141,7 @@ simu_samplingParam <-
             all.sampled = all.sampled
           )
         focal <-
-          generate_focal(focal.list = focal.list, scan.number = scan.number)
+          generate_focal(focal.list = focal.list, scans.to.do = scans.to.do)
       },
       stop("Inputted `method` not recognized.")
     )

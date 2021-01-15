@@ -9,7 +9,7 @@ generate_samplingParam(
   mode = c("directed", "undirected", "max", "min", "upper", "lower", "plus", "vector"),
   obs.prob = NULL,
   focal = NULL,
-  scan.number = NULL
+  scans.to.do = NULL
 )
 }
 \arguments{
@@ -19,21 +19,21 @@ generate_samplingParam(
 
 \item{obs.prob}{an `obsProb` object}
 
-\item{focal}{a `focal` object. Otherwise, a `focalList` object can be provided alongside a `scan.number`}
+\item{focal}{a `focal` object. Otherwise, a `focalList` object can be provided alongside a `scans.to.do`}
 
-\item{scan.number}{Optional. Only required if inputted `focal` is a `focalList` object. Either:
+\item{scans.to.do}{Optional. Only required if inputted `focal` is a `focalList` object. Either:
  \itemize{
   \item{an integer vector included in `1:total_scan` of the scans to perform}
-  \item{the special case `"all"` (default) sets `scan.number` to `1:total_scan` and set the simulation to perform all the scans}
+  \item{the special case `"all"` (default) sets `scans.to.do` to `1:total_scan` and set the simulation to perform all the scans}
 }}
 }
 \value{
 an `samplingParam` object (S3 class) containing:
 \itemize{
-  \item{method}{inputted `method`}
-  \item{mode}{inputted `mode`}
-  \item{obs.prob}{inputted `obs.prob`}
-  \item{focal}{inputted `focal`}
+  \item{method: inputted `method`}
+  \item{mode: inputted `mode`}
+  \item{obs.prob: inputted `obs.prob`}
+  \item{focal: inputted `focal`}
 }
 }
 \description{
@@ -56,5 +56,5 @@ focal<- generate_focal(focal.list,10)
 generate_samplingParam(method = "group",obs.prob = obs.prob.random)
 generate_samplingParam(method = "focal",focal = focal)
 generate_samplingParam(method = "both",obs.prob = obs.prob.constant,
-                        focal = focal.list,scan.number = 20)
+                        focal = focal.list,scans.to.do = 20)
 }

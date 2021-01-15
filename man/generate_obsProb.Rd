@@ -9,26 +9,37 @@ generate_obsProb(Adj, mode, obs.prob_fun = "random", Adj.subfun = NULL)
 \arguments{
 \item{Adj}{square integers matrix of occurrences of dyads.}
 
-\item{mode}{Character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.}
+\item{mode}{Character scalar, specifies how igraph should interpret the
+supplied matrix. Default here is directed. Possible values are: directed,
+undirected, upper, lower, max, min, plus. Added vector too. See details
+\link[igraph]{graph_from_adjacency_matrix}.}
 
 \item{obs.prob_fun}{either:
 \itemize{
-  \item{a user-defined function of (i,j,Adj) that output a probability of presence for the dyad}
-  \item{a single [0,1] numeric value for all dyad representing their probability of being sampled or not (`obs.prob_type` will be `"constant"`)}
-  \item{the string `"random"` if each dyad should have its probability drawn from a uniform distribution between 0 and 1 (`runif(n*n,0,1)`)}
+  \item{a user-defined function of (i,j,Adj) that output a probability of
+  presence for the dyad}
+  \item{a single [0,1] numeric value for all dyad representing their
+  probability of being sampled or not (`obs.prob_type` will be `"constant"`)}
+  \item{the string `"random"` if each dyad should have its probability drawn
+  from a uniform distribution between 0 and 1 (`runif(n*n,0,1)`)}
 }}
 
-\item{Adj.subfun}{subsetting function of the adjacency matrix. Driven by igraph "mode" argument.}
+\item{Adj.subfun}{subsetting function of the adjacency matrix. Driven by
+igraph "mode" argument.}
 }
 \value{
 an `obsProb` object (S3 class) containing:
 \itemize{
-  \item{`P`: a [0,1] numeric matrix of probability of observation (using the "group" scan sampling `method`) of each dyad.}
+  \item{`P`: a [0,1] numeric matrix of probability of observation (using the
+  "group" scan sampling `method`) of each dyad.}
   \item{`Adj`: inputted `Adj`}
   \item{`obs.prob_type`: character scalar, either:
-    \item{`"constant"`: if all dyad have the same probability of being sampled or not.}
-    \item{`"random"`: if all dyad have a probability drawn from a uniform distribution between 0 and 1 (`runif(n*n,0,1)`).}
-    \item{`"user-defined function"`: if the user inputted a function of (i,j,Adj) to calculate each dyad probability.}
+    \item{`"constant"`: if all dyad have the same probability of being
+    sampled or not.}
+    \item{`"random"`: if all dyad have a probability drawn from a uniform
+    distribution between 0 and 1 (`runif(n*n,0,1)`).}
+    \item{`"user-defined function"`: if the user inputted a function of
+    (i,j,Adj) to calculate each dyad probability.}
   }
   *
 }

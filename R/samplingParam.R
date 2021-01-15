@@ -5,11 +5,11 @@
 #' @param method Character scalar, specifies if the function should return a theoretical perfect group scan, an  empirical group scan (a similarly dimensioned matrix as Adj), or a focal scan (a vector representing the given focal's row in the group scan matrix).
 #' @param mode Character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
 #' @param obs.prob an `obsProb` object
-#' @param focal a `focal` object. Otherwise, a `focalList` object can be provided alongside a `scan.number`
-#' @param scan.number Optional. Only required if inputted `focal` is a `focalList` object. Either:
+#' @param focal a `focal` object. Otherwise, a `focalList` object can be provided alongside a `scans.to.do`
+#' @param scans.to.do Optional. Only required if inputted `focal` is a `focalList` object. Either:
 #'  \itemize{
 #'   \item{an integer vector included in `1:total_scan` of the scans to perform}
-#'   \item{the special case `"all"` (default) sets `scan.number` to `1:total_scan` and set the simulation to perform all the scans}
+#'   \item{the special case `"all"` (default) sets `scans.to.do` to `1:total_scan` and set the simulation to perform all the scans}
 #' }
 
 #' @return an `samplingParam` object (S3 class) containing:
@@ -38,17 +38,17 @@
 #' generate_samplingParam(method = "group",obs.prob = obs.prob.random)
 #' generate_samplingParam(method = "focal",focal = focal)
 #' generate_samplingParam(method = "both",obs.prob = obs.prob.constant,
-#'                         focal = focal.list,scan.number = 20)
+#'                         focal = focal.list,scans.to.do = 20)
 generate_samplingParam<- function(method = c("group","focal","both"),mode = c("directed","undirected","max","min","upper","lower","plus","vector"),
-                                   obs.prob = NULL,focal = NULL,scan.number = NULL){
+                                   obs.prob = NULL,focal = NULL,scans.to.do = NULL){
   method<- match.arg(method);
   mode<- match.arg(mode);
 
   check_if_required_param_present(method = method,obs.prob = obs.prob,focal = focal)
 
   if(is.focalList(focal)) {
-    if(is.null(scan.number)) {stop("Please provide a `scan.number` if a `focalList` object is passed through `focal`.")}
-    focal<- generate_focal(focal.list = focal,scan.number = scan.number)
+    if(is.null(scans.to.do)) {stop("Please provide a `scans.to.do` if a `focalList` object is passed through `focal`.")}
+    focal<- generate_focal(focal.list = focal,scans.to.do = scans.to.do)
   }
 
   sampling.param<- list(
