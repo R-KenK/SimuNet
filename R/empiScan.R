@@ -7,6 +7,7 @@
 #' \itemize{
 #'   \item{method}{inputted `method`}
 #'   \item{mode}{inputted `mode`}
+#'   \item{scans.to.do: inputted `scans.to.do`}
 #'   \item{obs.prob}{inputted `obs.prob`}
 #'   \item{focal}{inputted `focal`}
 #' }
@@ -20,6 +21,7 @@
 #'   observed but the `mode` has been applied}
 #'   \item{`scan.type`: set to `"empirical"` by `sample_from_scan`}
 #'   \item{`method`: from inputted `sampling.param`}
+#'   \item{`scans.to.do`: from inputted `sampling.param`}
 #'   \item{`group.scan`: an adjacency matrix, where the observation probability
 #'   `obs.prob` from `sampling.param` of each dyad has been applied. `NULL` if
 #'   `method = "focal"`}
@@ -38,6 +40,7 @@
 generate_empiScan <- function(scan, sampling.param) {
   scan$scan.type <- "empirical"
   scan$method <- sampling.param$method
+  scan$scans.to.do <- sampling.param$scans.to.do
   if (!is.null(sampling.param$obs.prob)) {
     scan$group.scan <-
       sample_from_scan(scan = scan,
@@ -60,7 +63,17 @@ generate_empiScan <- function(scan, sampling.param) {
 #' @export
 #' @noRd
 print.empiScan <- function(x, ...) {
-  cat("Scan type: theoretical, mode: ", x$mode, "\n\n", sep = "")
+  n <- length(x$scans.to.do)
+  if(n >= 15) {
+    scans.to.do <- paste(do.call(paste,as.list(x$scans.to.do)[1:5]),
+                         "...",
+                         do.call(paste,as.list(x$scans.to.do)[(n-4):n])
+    )
+  } else {
+    scans.to.do <- x$scans.to.do
+  }
+  cat("\nScans performed: ",scans.to.do,sep=" ")
+  cat("\n\nScan type: theoretical, mode: ", x$mode, "\n\n", sep = "")
   print.default(x$theoretical.scan, ...)
   if (!is.null(x$group.scan)) {
     cat(
