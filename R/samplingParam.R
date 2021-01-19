@@ -11,11 +11,11 @@
 #'   \item{an integer vector included in `1:total_scan` of the scans to perform}
 #'   \item{the special case `"all"` (default) sets `scans.to.do` to `1:total_scan` and set the simulation to perform all the scans}
 #' }
-
 #' @return an `samplingParam` object (S3 class) containing:
 #' \itemize{
 #'   \item{method: inputted `method`}
 #'   \item{mode: inputted `mode`}
+#'   \item{scans.to.do: inputted `scans.to.do`}
 #'   \item{obs.prob: inputted `obs.prob`}
 #'   \item{focal: inputted `focal`}
 #' }
@@ -35,12 +35,12 @@
 #' focal.list<- generate_focalList(Adj,total_scan,focal.prob_fun = "even",all.sampled = TRUE)
 #' focal<- generate_focal(focal.list,10)
 #'
-#' generate_samplingParam(method = "group",obs.prob = obs.prob.random)
+#' generate_samplingParam(method = "group",obs.prob = obs.prob.random,scans.to.do = 10:30)
 #' generate_samplingParam(method = "focal",focal = focal)
 #' generate_samplingParam(method = "both",obs.prob = obs.prob.constant,
-#'                         focal = focal.list,scans.to.do = 20)
+#'                         focal = focal.list,scans.to.do = "all")
 generate_samplingParam<- function(method = c("group","focal","both"),mode = c("directed","undirected","max","min","upper","lower","plus","vector"),
-                                   obs.prob = NULL,focal = NULL,scans.to.do = NULL){
+                                   obs.prob = NULL,focal = NULL,scans.to.do = "all" ){
   method<- match.arg(method);
   mode<- match.arg(mode);
 
@@ -54,6 +54,7 @@ generate_samplingParam<- function(method = c("group","focal","both"),mode = c("d
   sampling.param<- list(
     method = method,
     mode = mode,
+    scans.to.do = scans.to.do,
     obs.prob = obs.prob,
     focal = focal # also contains focal.list
   )
@@ -70,6 +71,16 @@ print.samplingParam<- function(x,...){
            "\nigraph network mode: ",x$mode),
     sep = ""
   )
+  n <- length(x$scans.to.do)
+  if(n >= 15) {
+    scans.to.do <- paste(do.call(paste,as.list(x$scans.to.do)[1:5]),
+                        "...",
+                        do.call(paste,as.list(x$scans.to.do)[(n-4):n])
+    )
+  } else {
+    scans.to.do <- x$scans.to.do
+  }
+  cat("\nscans to do: ",scans.to.do,sep=" ")
   if(!is.null(x$obs.prob)) {
     cat("\n\nGroup-scan sampling details:\n  obs.prob:\n")
     print(x$obs.prob)
