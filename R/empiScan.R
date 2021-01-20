@@ -15,18 +15,18 @@
 #' @return an `empiScan` object (S3 class), inheriting from `scan` object,
 #'   containing:
 #' \itemize{
-#'   \item{`raw.scan`: a binary adjacency matrix, considered directed in the
-#'   algorithm}
-#'   \item{`theoretical.scan`: a binary adjacency matrix, where all ties were
-#'   observed but the `mode` has been applied}
+#'   \item{`raw.scan`: a list of binary adjacency matrix, considered directed in
+#'   the algorithm}
+#'   \item{`theoretical.scan`: a list of binary adjacency matrix, where all ties
+#'   were observed but the `mode` has been applied}
 #'   \item{`scan.type`: set to `"empirical"` by `sample_from_scan`}
 #'   \item{`method`: from inputted `sampling.param`}
 #'   \item{`scans.to.do`: from inputted `sampling.param`}
-#'   \item{`group.scan`: an adjacency matrix, where the observation probability
-#'   `obs.prob` from `sampling.param` of each dyad has been applied. `NULL` if
-#'   `method = "focal"`}
-#'   \item{`focal.scan`: an adjacency matrix, where only the selected `focal`
-#'   from `sampling.param` is visible. `NULL` if `method = "group"`}
+#'   \item{`group.scan`: a list of adjacency matrix, where the observation
+#'   probability `obs.prob` from `sampling.param` of each dyad has been applied.
+#'   `NULL` if `method = "focal"`}
+#'   \item{`focal.scan`: a list of adjacency matrix, where only the selected
+#'   `focal` from `sampling.param` is visible. `NULL` if `method = "group"`}
 #'   \item{`Adj`: `Adj` data contained in `presence.prob`}
 #'   \item{`total_scan`: `total_scan` data contained in `presence.prob`}
 #'   \item{`mode`: `mode` data contained in `presence.prob`}
@@ -64,6 +64,7 @@ generate_empiScan <- function(scan, sampling.param) {
 #' @noRd
 print.empiScan <- function(x, ...) {
   n <- length(x$scans.to.do)
+  # print the general simulation infos
   if(n >= 15) {
     scans.to.do <- paste(do.call(paste,as.list(x$scans.to.do)[1:5]),
                          "...",
@@ -74,7 +75,20 @@ print.empiScan <- function(x, ...) {
   }
   cat("\nScans performed: ",scans.to.do,sep=" ")
   cat("\n\nScan type: theoretical, mode: ", x$mode, "\n\n", sep = "")
-  print.default(x$theoretical.scan, ...)
+
+  # display the theoretical scans
+  if(n >= 10) {
+    print.default(x$theoretical.scan[1:3],...)
+    cat("... (",n-5," more scans)\n\n\n",sep = "")
+    cat("[[",n-1,"]]\n",sep = "")
+    print.default(x$theoretical.scan[[(n-1)]],...)
+    cat("[[",n,"]]\n",sep = "")
+    print.default(x$theoretical.scan[[n]],...)
+  } else {
+    print.default(x$theoretical.scan,...)
+  }
+
+  # display the optional group scans
   if (!is.null(x$group.scan)) {
     cat(
       "\n\nScan type: group scan, mode: ",
@@ -84,8 +98,19 @@ print.empiScan <- function(x, ...) {
       "\n\n",
       sep = ""
     )
-    print.default(x$group.scan, ...)
+    if(n >= 10) {
+      print.default(x$group.scan[1:3],...)
+      cat("... (",n-5," more scans)\n\n\n",sep = "")
+      cat("[[",n-1,"]]\n",sep = "")
+      print.default(x$group.scan[[(n-1)]],...)
+      cat("[[",n,"]]\n",sep = "")
+      print.default(x$group.scan[[n]],...)
+    } else {
+      print.default(x$group.scan, ...)
+    }
   }
+
+  # display the optional focal scans
   if (!is.null(x$focal.scan)) {
     cat(
       "\n\nScan type: focal scan, mode: ",
@@ -95,7 +120,16 @@ print.empiScan <- function(x, ...) {
       "\n\n",
       sep = ""
     )
-    print.default(x$focal.scan, ...)
+    if(n >= 10) {
+      print.default(x$focal.scan[1:3],...)
+      cat("... (",n-5," more scans)\n\n\n",sep = "")
+      cat("[[",n-1,"]]\n",sep = "")
+      print.default(x$focal.scan[[(n-1)]],...)
+      cat("[[",n,"]]\n",sep = "")
+      print.default(x$focal.scan[[n]],...)
+    } else {
+      print.default(x$focal.scan, ...)
+    }
   }
 }
 
@@ -103,7 +137,7 @@ print.empiScan <- function(x, ...) {
 #'
 #' @param scan an object to test.
 #'
-#' @return logical, TRUE if the inputted object is a `empiScan` object.
+#' @return logical, `TRUE` if the inputted object is a `empiScan` object.
 #'
 #' @noRd
 is.empiScan <- function(scan) {
@@ -131,13 +165,21 @@ plot.empiScan <-
 #' @param scan a `scan` object with `scan.type = "theoretical"`
 #' @param sampling.param a `samplingParam` object containing:
 #' \itemize{
-#'   \item{method}{inputted `method`}
-#'   \item{mode}{inputted `mode`}
-#'   \item{obs.prob}{inputted `obs.prob`}
-#'   \item{focal}{inputted `focal`}
+#'   \item{`method`: inputted `method`}
+#'   \item{`mode`: inputted `mode`}
+#'   \item{`scans.to.do`: inputted `scans.to.do`}
+#'   \item{`obs.prob`: inputted `obs.prob`}
+#'   \item{`focal`: inputted `focal`}
 #' }
 #'
-#' @return
+#' @return either:
+#' \itemize{
+#'   \item{a list of binary adjacency matrix with potentially some dyads not observed
+#'   (turned into `NA`)}
+#'   \item{a list of binary adjacency matrix with dyads not in the `focal$focal` row and
+#'   column turned into `NA`}
+#' }
+#'
 #' @noRd
 sample_from_scan <- function(scan, sampling.param, method) {
   # according to the empirical method chosen, applies some "empirical" missed
@@ -157,42 +199,30 @@ sample_from_scan <- function(scan, sampling.param, method) {
 #'
 #' @importFrom stats rbinom
 #'
-#' @return a binary adjacency matrix with potentially some dyads not observed
+#' @return a list of binary adjacency matrix with potentially some dyads not observed
 #'   (turned into `NA`)
 #' @noRd
 group_sample <- function(scan, obs.prob) {
+  # set the sampled scan to be like the `raw.scan` one (i.e. this is a binary
+  # _directed_ adjacency matrix)
   observed <-
-    scan$theoretical.scan  # set the sampled scan to be like the `raw.scan` one (i.e. this is a binary _directed_ adjacency matrix)
+    scan$theoretical.scan
+  # subset obs.prob like the adjacency matrix (i.e. triangular matrix) into a
+  # vector of observation probabilities
   obs.P <-
-    obs.prob$P[scan$Adj.subfun(obs.prob$P)]  # subset obs.prob like the adjacency matrix (i.e. triangular matrix) into a vector of observation probabilities
-  missed <-
-    stats::rbinom(length(obs.P), 1, obs.P) == 0  # draw the missed observation
-  observed[scan$Adj.subfun(observed)][missed] <-
-    NA  # set the missed observation to `NA`
-  observed
-}
-
-#' Perform a group scan sampling
-#' Internal use. Presently, the sampling is performed on the _raw_ scan
-#'
-#' @param scan a `scan` object with `scan.type = "theoretical"`
-#' @param obs.prob an `obsProb` object
-#'
-#' @importFrom stats rbinom
-#'
-#' @return a binary adjacency matrix with potentially some dyads not observed
-#'   (turned into `NA`)
-#' @noRd
-group_sample.old <- function(scan, obs.prob) {
-  observed <-
-    scan$raw.scan  # set the sampled scan to be like the `raw.scan` one (i.e. this is a binary _directed_ adjacency matrix)
-  obs.P <-
-    obs.prob$P[scan$Adj.subfun(obs.prob$P)]  # subset obs.prob like the adjacency matrix (i.e. triangular matrix) into a vector of observation probabilities
-  missed <-
-    stats::rbinom(length(obs.P), 1, obs.P) == 0  # draw the missed observation
-  observed[scan$Adj.subfun(observed)][missed] <-
-    NA  # set the missed observation to `NA`
-  apply_mode(observed, mode = scan$mode)
+    obs.prob$P[scan$Adj.subfun(obs.prob$P)]
+  lapply(
+    observed,
+    function(s) {
+      # draw the missed observation
+      missed <-
+        stats::rbinom(length(obs.P), 1, obs.P) == 0
+      # set the missed observation to `NA`
+      s[scan$Adj.subfun(s)][missed] <-
+        NA
+      s
+    }
+  )
 }
 
 #' Perform a focal scan sampling
@@ -201,31 +231,23 @@ group_sample.old <- function(scan, obs.prob) {
 #' @param scan a `scan` object with `scan.type = "theoretical"`
 #' @param focal an `focal` object
 #'
-#' @return a binary adjacency matrix with dyads not in the `focal$focal` row and
+#' @return a list of binary adjacency matrix with dyads not in the `focal$focal` row and
 #'   column turned into `NA`
 #' @noRd
 focal_sample <- function(scan, focal) {
+  # set the sampled scan to be like the `raw.scan` one (i.e. this is a binary
+  # _directed_ adjacency matrix)
   observed <-
-    scan$theoretical.scan  # set the sampled scan to be like the `raw.scan` one (i.e. this is a binary _directed_ adjacency matrix)
-  observed[-focal$focal, -focal$focal] <-
-    NA # set other rows and columns than those of the `focal` to `NA`
-  observed
+    scan$theoretical.scan
+  lapply(
+    seq_along(observed),
+    function(s) {
+      obs <- observed[[s]]
+      foc <- focal$focal[s]
+      # set other rows and columns than those of the `focal` to `NA`
+      obs[-foc,-foc] <-
+        NA
+      obs
+    }
+  )
 }
-
-#' Perform a focal scan sampling
-#' Internal use.
-#'
-#' @param scan a `scan` object with `scan.type = "theoretical"`
-#' @param focal an `focal` object
-#'
-#' @return a binary adjacency matrix with dyads not in the `focal$focal` row and
-#'   column turned into `NA`
-#' @noRd
-focal_sample.old <- function(scan, focal) {
-  observed <-
-    scan$raw.scan  # set the sampled scan to be like the `raw.scan` one (i.e. this is a binary _directed_ adjacency matrix)
-  observed[-focal$focal, -focal$focal] <-
-    NA # set other rows and columns than those of the `focal` to `NA`
-  apply_mode(observed, mode = scan$mode)
-}
-
