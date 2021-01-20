@@ -8,6 +8,11 @@
 #' @param total_scan integer, sampling effort. Note that 1/total_scan should be
 #'   relatively small, increasingly small with increasing precision. Optional if
 #'   using a `presenceProb` object.
+#' @param scans.to.do Optional. Only required if no `sampling.param` inputted (in which case it is ignored). Either:
+#'  \itemize{
+#'   \item{an integer vector included in `1:total_scan` of the scans to perform}
+#'   \item{the special case `"all"` (default) sets `scans.to.do` to `1:total_scan` and set the simulation to perform all the scans}
+#' }
 #' @param mode Character scalar, specifies what type of igraph network `mode`
 #'   should be used to convert the supplied matrix. Ignored if `sampling.param` is
 #'   provided. Possible values are:
@@ -53,15 +58,17 @@
 #' @return depending if `sampling.param` are provided, either:
 #'  \itemize{
 #'    \item{a `scan` object (S3 class) containing:
-#'      \item{`raw.scan`: a binary adjacency matrix, considered directed in the
+#'      \item{`raw.scan`: a list of raw binary adjacency matrix shaped like the
+#'      `Adj` contained in `presence.prob`, considered directed in the
 #'      algorithm}
-#'      \item{`theoretical.scan`: a binary adjacency matrix, where all ties were
-#'      observed but the `mode` has been applied}
+#'      \item{`theoretical.scan`: a list of binary adjacency matrix, where all
+#'      ties were observed but the `mode` has been applied}
 #'      \item{`scan.type`: character scalar. `generate_scan` sets it to
 #'      "theoretical", `sample_from_scan` will set it to "empirical" and append
 #'      the empirical matrix}
 #'      \item{`Adj`: `Adj` data contained in `presence.prob`}
 #'      \item{`total_scan`: `total_scan` data contained in `presence.prob`}
+#'      \item{`scans.to.do`: inputted `scans.to.do`}
 #'      \item{`mode`: `mode` data contained in `presence.prob`}
 #'      \item{`weighted`: logical, at this stage can only be `TRUE` if `mode =
 #'      plus` (some edges can become `2`)}
@@ -70,17 +77,18 @@
 #'      data contained in `presence.prob`}
 #'    }
 #'    \item{an `empiScan` object (S3 class) containing:
-#'      \item{`raw.scan`: a binary adjacency matrix, considered directed in the
-#'      algorithm}
-#'      \item{`theoretical.scan`: a binary adjacency matrix, where all ties were
-#'      observed but the `mode` has been applied}
+#'      \item{`raw.scan`: a list of binary adjacency matrix, considered directed
+#'      in the algorithm}
+#'      \item{`theoretical.scan`: a list of binary adjacency matrix, where all
+#'      ties were observed but the `mode` has been applied}
 #'      \item{`scan.type`: set to `"empirical"` by `sample_from_scan`}
 #'      \item{`method`: from inputted `sampling.param`}
-#'      \item{`group.scan`: an adjacency matrix, where the observation
+#'      \item{`scans.to.do`: from inputted `sampling.param`}
+#'      \item{`group.scan`: a list of adjacency matrix, where the observation
 #'      probability `obs.prob` from `sampling.param` of each dyad has been
 #'      applied. `NULL` if `method = "focal"`}
-#'      \item{`focal.scan`: an adjacency matrix, where only the selected `focal`
-#'      from `sampling.param` is visible. `NULL` if `method = "group"`}
+#'      \item{`focal.scan`: a list of adjacency matrix, where only the selected
+#'      `focal` from `sampling.param` is visible. `NULL` if `method = "group"`}
 #'      \item{`Adj`: `Adj` data contained in `presence.prob`}
 #'      \item{`total_scan`: `total_scan` data contained in `presence.prob`}
 #'      \item{`mode`: `mode` data contained in `presence.prob`}
@@ -102,24 +110,25 @@
 #' Adj[non.diagonal(Adj)]<- sample(0:total_scan,n*(n-1),replace = TRUE)
 #' Adj
 #'
-#' # by default will simulate a directed theoretical scan
+#' # by default will simulate a single directed theoretical scan
 #' simu_scan(Adj,total_scan)
 #'
-#' # but other mode can be used:
-#' simu_scan(Adj,total_scan,mode = "min")
+#' # but other mode can be used, as well as more scans:
+#' simu_scan(Adj,total_scan,mode = "min",scans.to.do = 1:3)
 #'
 #'
 #' # Users can generate sampling parameters through `simu_samplingParam` to use in
 #' # `simu_scan`
 #' para.group.constant<- simu_samplingParam(Adj,total_scan,mode =
-#'                                          "max",group.scan_param = 0.42)
+#'                                          "min",group.scan_param = 0.42)
 #' simu_scan(Adj,total_scan,sampling.param = para.group.constant)
 #'
 #' # Users can also define functions to use trait- or network- based sampling
 #' # biases for group-scan sampling (cf. ?simu_samplingParam)
 #' obs.prob.trait.bias_fun<- function(i,j,Adj) {i+j} # comparable to a dyad-trait-based bias
 #' para.group.trait.bias<- simu_samplingParam(Adj,total_scan,mode ="directed",
-#'                                            group.scan_param = obs.prob.trait.bias_fun)
+#'                                            group.scan_param = obs.prob.trait.bias_fun,
+#'                                            scans.to.do = 1:15)
 #' para.group.net.bias<- simu_samplingParam(Adj,total_scan,mode =
 #'                                          "max",group.scan_param = function(i,j,Adj) {Adj*Adj})
 #'
@@ -132,7 +141,7 @@
 #' para.focal.trait.bias<- simu_samplingParam(Adj,
 #'                                            total_scan,mode = "directed",
 #'                                            focal.scan_param = focal.trait.bias_fun,
-#'                                            scans.to.do = 3)
+#'                                            scans.to.do = 1:10)
 #' para.focal.net.bias<- simu_samplingParam(Adj,total_scan,mode = "max",
 #'                                          focal.scan_param = function(n,Adj) {colSums(Adj*Adj)},
 #'                                          scans.to.do = 20)
@@ -141,7 +150,7 @@
 #' simu_scan(Adj,total_scan,sampling.param = para.focal.net.bias)
 simu_scan <-
   function(Adj = NULL,
-           total_scan = NULL,
+           total_scan = NULL,scans.to.do = NULL,
            mode = c("directed","undirected","max","min","upper","lower","plus","vector"),
            sampling.param = NULL) {
     if (!is.null(sampling.param)) {
@@ -154,9 +163,16 @@ simu_scan <-
         mode <- sampling.param$mode
         obs.prob <- sampling.param$obs.prob
         focal <- sampling.param$focal
+        if(!is.null(scans.to.do)) {
+          if(scans.to.do != sampling.param$scans.to.do) {
+            warning("Inputted `scans.to.do` different from the one stored in `sampling.param`.\nThe latter has been used.")
+          }
+        }
+        scans.to.do <- sampling.param$scans.to.do
       }
     } else {
       mode <- match.arg(mode)
+      if (is.null(scans.to.do)) {scans.to.do <- 1} # in case nothing is provided at all, still only performs a single scan
     }
 
     # Check if `Adj` has been passed as a `presenceProb` object or not, retrieve
@@ -175,21 +191,12 @@ simu_scan <-
     }
 
     # use the class "scan" object generator to
-    scan <- generate_scan(presence.prob)
+    scan <- generate_scan(presence.prob = presence.prob,scans.to.do = scans.to.do)
 
     # output either the theoretical scan or applies sample_from_scan
     if (is.null(sampling.param)) {
       scan
     } else {
-      if (is.null(sampling.param)) {
-        sampling.param <-
-          generate_samplingParam(
-            method = method,
-            mode = mode,
-            obs.prob = obs.prob,
-            focal = focal
-          ) # should return an error in case of missing parameters given the chosen method
-      }
       generate_empiScan(scan = scan, sampling.param = sampling.param)
     }
   }
