@@ -1,4 +1,4 @@
-# outline algorithm ----
+# left over bits of code ----
 
 
 minimize_NA<- function(scan){
@@ -23,33 +23,95 @@ minimize_NA<- function(scan){
 
 
 
-# manual tests to see if apply_mode does what it should, including on weighted networks ---------------
+# manual tests to see if `apply_mode` does what it should, including on weighted networks ---------------
 
+# Not needed anymore because now `apply_mode` works on the `theoretical.scan` part of `scan` object to produce `empiScan` objects
+# test.scan.NA<- matrix(c(0,1,NA,0,NA,
+#                         NA,0,1,1,NA,
+#                         0,1,0,0,1,
+#                         0,0,1,0,0,
+#                         NA,1,0,0,0),nrow = 5,byrow = TRUE,dimnames = list(letters[1:5],letters[1:5]))
 
-test.scan.NA<- matrix(c(c(0,1,NA,0,NA),
-                        c(NA,0,1,1,NA),
-                        c(0,1,0,0,1),
-                        c(0,0,1,0,0),
-                        c(NA,1,0,0,0)),nrow = 5,byrow = TRUE,dimnames = list(letters[1:5],letters[1:5]))
-
-test<- matrix(c(0,1,0,1,
+# handcrafted example that contain all potential problematic symmetrization issue
+test.raw.scan<- matrix(c(0,1,0,1,
                 0,0,0,0,
                 1,0,0,1,
                 1,0,1,0),nrow = 4,byrow = TRUE,dimnames = list(letters[1:4],letters[1:4]))
 
-apply_mode(test,"directed")
-apply_mode(test,"undirected")
-apply_mode(test,"max")
-apply_mode(test,"min")
-apply_mode(test,"plus")
+apply_mode(test.raw.scan,"directed")
+apply_mode(test.raw.scan,"undirected")
+apply_mode(test.raw.scan,"max")
+apply_mode(test.raw.scan,"min")
+apply_mode(test.raw.scan,"plus")
 
-test.weighted<- matrix(c(0,20,5,3,
+# handcrafted example that contain all potential problematic symmetrization issue
+test.raw.scan.weighted<- matrix(c(0,20,5,3,
                          10,0,2,0,
                          30,2,0,0,
                          3,0,1,0),nrow = 4,byrow = TRUE,dimnames = list(letters[1:4],letters[1:4]))
 
-apply_mode(test.weighted,"directed")
-apply_mode(test.weighted,"undirected")
-apply_mode(test.weighted,"max")
-apply_mode(test.weighted,"min")
-apply_mode(test.weighted,"plus")
+apply_mode(test.raw.scan.weighted,"directed")
+apply_mode(test.raw.scan.weighted,"undirected")
+apply_mode(test.raw.scan.weighted,"max")
+apply_mode(test.raw.scan.weighted,"min")
+apply_mode(test.raw.scan.weighted,"plus")
+
+
+# Usage example (as of 0.3.0.9000) for single scans -----------------------
+
+#' The user should mostly interact with `simu_X()` functions. As of now, the
+#' user should first define sampling parameters of class `samplingParam` through
+#' `simu_samplingParam()`, and then input them into `simu_scan()` to produce
+#' simulated empirical scans.
+
+set.seed(42)
+
+n<- 5;nodes<- letters[1:n];total_scan<- 42;
+Adj<- matrix(data = 0,nrow = n,ncol = n,dimnames = list(nodes,nodes))
+Adj[non.diagonal(Adj)]<- sample(0:total_scan,n*(n-1),replace = TRUE)
+Adj
+
+# by default will simulate a directed theoretical scan
+plot(simu_scan(Adj,total_scan))
+
+# but other mode can be used:
+simu_scan(Adj,total_scan,mode = "min")
+
+
+# Users can generate sampling parameters through `simu_samplingParam` to use in
+# `simu_scan`
+para.group.constant<- simu_samplingParam(Adj,total_scan,mode =
+                                         "max",group.scan_param = 0.42)
+simu_scan(Adj,total_scan,sampling.param = para.group.constant)
+
+# Users can also define functions to use trait- or network- based sampling
+# biases for group-scan sampling (cf. ?simu_samplingParam)
+obs.prob.trait.bias_fun<- function(i,j,Adj) {i+j} # comparable to a dyad-trait-based bias
+para.group.trait.bias<- simu_samplingParam(Adj,total_scan,mode ="directed",
+                                           group.scan_param = obs.prob.trait.bias_fun)
+para.group.net.bias<- simu_samplingParam(Adj,total_scan,mode =
+                                         "max",group.scan_param = function(i,j,Adj) {Adj*Adj})
+
+simu_scan(Adj,total_scan,sampling.param = para.group.trait.bias)
+simu_scan(Adj,total_scan,sampling.param = para.group.net.bias)
+
+# or for biases regarding which focals to draw for focal-scan sampling (cf.
+# ?simu_samplingParam)
+focal.trait.bias_fun<- function(n,Adj) {1:n} # comparable to a dyad-trait-based bias
+para.focal.trait.bias<- simu_samplingParam(Adj,
+                                           total_scan,mode = "directed",
+                                           focal.scan_param = focal.trait.bias_fun,
+                                           scans.to.do = 3:20)
+para.focal.net.bias<- simu_samplingParam(Adj,total_scan,mode = "max",
+                                         focal.scan_param = function(n,Adj) {colSums(Adj*Adj)},
+                                         scans.to.do = 20)
+
+simu_scan(Adj,total_scan,sampling.param = para.focal.trait.bias)
+
+
+
+simu_samplingParam(Adj,total_scan,focal.scan_param = "even")
+simu_samplingParam(Adj,total_scan,mode = "max",group.scan_param = 0.42)
+simu_samplingParam(Adj,total_scan,mode = "min",
+                   group.scan_param = 0.42,
+                   focal.scan_param = "random",scans.to.do = 1:4)
