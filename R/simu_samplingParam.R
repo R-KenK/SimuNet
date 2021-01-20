@@ -149,7 +149,8 @@ simu_samplingParam <-
       method = method,
       mode = mode,
       obs.prob = obs.prob,
-      focal = focal
+      focal = focal,
+      scans.to.do = scans.to.do
     )
   }
 

@@ -1,5 +1,10 @@
 # SimuNet (development version)
 
+# SimuNet 0.4.0.9000
+* Included `scans.to.do` variable (a scan index _or_ a vector of `1:total_scan`) in wrappers and nested functions to generate `scan` and `empiScan` objects. Now `scans.to.do` is stored in several internal and output objects
+* Vectorized wrappers and nested functions to produce lists of scans (`raw.scan`, `theoretical.scan`, `group.scan` or `focal.scan` empirical scans)
+* Updated several print methods to display vectorized or list components of `scan`, `empiScan` and `samplingParam` objects, truncate them when required to not overload output
+
 # SimuNet 0.3.0.9000
 * Added a wrapper to `generate_samplingParam`. User should interact with `simu_samplingParam` to create `samplingParam` objects for their simulations.
 * Vectorized the `focal` and `scans.to.do` (which now replace `scan.number` for more transparency) components of `focal` objects. Next version should also vectorize some components of `samplingParam`, `obsProb`, `scan`, and `empiScan` objects

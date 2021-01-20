@@ -22,19 +22,34 @@ determine_Adj.subfun<- function(mode){
 #' Make Adjacency fit the selected mode
 #' Internal use.
 #'
-#' @param raw.scan a raw (directed by default) binary adjacency matrix, pre-theoretical, to which the chosen `mode` is to be applied
+#' @param raw.scan a list of (directed by default) binary adjacency matrix, pre-theoretical, to which the chosen `mode` is to be applied
 #' @param mode Character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
 #'
-#' @return an adjacency matrix fitting the chosen `mode` is to be applied
+#' @return an list of adjacency matrix fitting the chosen `mode` is to be applied
 #' @noRd
 apply_mode<- function(raw.scan,mode = c("directed", "undirected", "max","min", "upper", "lower", "plus","vector")){
   switch(mode,
          "undirected" = , # as in `igraph`, consider this mode to be the same as `max`
-         "max" = ifelse(raw.scan >= t(raw.scan),raw.scan,t(raw.scan)),
-         "min" = ifelse(raw.scan <= t(raw.scan),raw.scan,t(raw.scan)),
+         "max" = lapply(
+           raw.scan,
+           function(scan) {
+             ifelse(scan >= t(scan),scan,t(scan))
+           }
+         ),
+         "min" = lapply(
+           raw.scan,
+           function(scan) {
+             ifelse(scan <= t(scan),scan,t(scan))
+           }
+         ),
          "plus" = {  # WHAT DOES THIS MEAN FOR BINARY SCANS?
-           not.na<- !is.na(raw.scan) & !is.na(t(raw.scan))
-           ifelse(not.na,raw.scan+t(raw.scan),NA)
+           lapply(
+             raw.scan,
+             function(scan) {
+               not.na<- !is.na(scan) & !is.na(t(scan))
+               ifelse(not.na,scan+t(scan),NA)
+             }
+           )
          },
          "directed" = ,
          "upper" = ,
