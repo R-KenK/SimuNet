@@ -13,11 +13,11 @@
 #' }
 #' @return an `samplingParam` object (S3 class) containing:
 #' \itemize{
-#'   \item{method: inputted `method`}
-#'   \item{mode: inputted `mode`}
-#'   \item{scans.to.do: inputted `scans.to.do`}
-#'   \item{obs.prob: inputted `obs.prob`}
-#'   \item{focal: inputted `focal`}
+#'   \item{`method`: inputted `method`}
+#'   \item{`mode`: inputted `mode`}
+#'   \item{`scans.to.do`: inputted `scans.to.do`}
+#'   \item{`obs.prob`: inputted `obs.prob`}
+#'   \item{`focal`: inputted `focal`}
 #' }
 #' @export
 #'
