@@ -74,10 +74,10 @@ using a `presenceProb` object.}
 depending if `sampling.param` are provided, either:
  \itemize{
    \item{a `scan` object (S3 class) containing:
-     \item{`raw.scan`: a list of raw binary adjacency matrix shaped like the
+     \item{`raw.scan.list`: a list of raw binary adjacency matrix shaped like the
      `Adj` contained in `presence.prob`, considered directed in the
      algorithm}
-     \item{`theoretical.scan`: a list of binary adjacency matrix, where all
+     \item{`theoretical.scan.list`: a list of binary adjacency matrix, where all
      ties were observed but the `mode` has been applied}
      \item{`scan.type`: character scalar. `generate_scan` sets it to
      "theoretical", `sample_from_scan` will set it to "empirical" and append
@@ -93,17 +93,17 @@ depending if `sampling.param` are provided, either:
      data contained in `presence.prob`}
    }
    \item{an `empiScan` object (S3 class) containing:
-     \item{`raw.scan`: a list of binary adjacency matrix, considered directed
+     \item{`raw.scan.list`: a list of binary adjacency matrix, considered directed
      in the algorithm}
-     \item{`theoretical.scan`: a list of binary adjacency matrix, where all
+     \item{`theoretical.scan.list`: a list of binary adjacency matrix, where all
      ties were observed but the `mode` has been applied}
      \item{`scan.type`: set to `"empirical"` by `sample_from_scan`}
      \item{`method`: from inputted `sampling.param`}
      \item{`scans.to.do`: from inputted `sampling.param`}
-     \item{`group.scan`: a list of adjacency matrix, where the observation
+     \item{`group.scan.list`: a list of adjacency matrix, where the observation
      probability `obs.prob` from `sampling.param` of each dyad has been
      applied. `NULL` if `method = "focal"`}
-     \item{`focal.scan`: a list of adjacency matrix, where only the selected
+     \item{`focal.scan.list`: a list of adjacency matrix, where only the selected
      `focal` from `sampling.param` is visible. `NULL` if `method = "group"`}
      \item{`Adj`: `Adj` data contained in `presence.prob`}
      \item{`total_scan`: `total_scan` data contained in `presence.prob`}
