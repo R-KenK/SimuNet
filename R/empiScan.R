@@ -65,12 +65,9 @@ generate_empiScan <- function(scan, sampling.param) {
   scan <- list(
     raw.scan.list = scan$raw.scan.list,
     theoretical.scan.list = scan$theoretical.scan.list,
-    theoretical.scan.sum = scan$theoretical.scan.sum,
     group.scan.list = group.scan.list,
-    group.scan.sum = group.scan.sum,
     obs.prob = obs.prob,
     focal.scan.list = focal.scan.list,
-    focal.scan.sum = focal.scan.sum,
     focal = focal,
     scan.type = "empirical",
     Adj = scan$Adj,
@@ -88,15 +85,7 @@ generate_empiScan <- function(scan, sampling.param) {
 #' @export
 #' @noRd
 print.empiScan <- function(x, ...) {
-  if (length(x$scans.to.do) == 1) {
-    if (x$scans.to.do == "all") {
-      scans.to.do <- 1:x$total_scan
-    } else {
-      scans.to.do <- x$scans.to.do
-    }
-  } else {
-    scans.to.do <- x$scans.to.do
-  }
+  scans.to.do <- explicit_scan.to.do(x)
   n <- length(scans.to.do)
   # print the general simulation infos
   if (n >= 15) {
@@ -107,7 +96,7 @@ print.empiScan <- function(x, ...) {
   } else {
     scans.to.do <- scans.to.do
   }
-  cat("\nScans performed: ",scans.to.do,sep=" ")
+  cat("\nScan(s) performed: ",scans.to.do,sep=" ")
   cat("\n\nScan type: theoretical, mode: ", x$mode, "\n\n", sep = "")
 
   # display the theoretical scans
@@ -171,34 +160,32 @@ print.empiScan <- function(x, ...) {
 #' @export
 #' @noRd
 summary.empiScan <- function(object,...) {
-  if (length(object$scans.to.do) == 1) {
-    if (object$scans.to.do == "all") {
-      scans.to.do <- 1:object$total_scan
-    } else {
-      scans.to.do <- object$scans.to.do
-    }
-  } else {
-    scans.to.do <- object$scans.to.do
-  }
+  scans.to.do <- explicit_scan.to.do(object)
   theoretical.sum <- sum_scan.list(object$theoretical.scan.list)
+  theoretical.sampled <- sum_scan.sampled(object,method = "theoretical")
   mode <- object$mode
   scans.to.do <- object$scans.to.do
   if (!is.null(object$group.scan.list)) {
     group.scan.na.resolved <- resolve_NA(empirical.scan.list = object$group.scan.list,mode = mode)
     group.sum <- sum_scan.list(group.scan.na.resolved)
+    group.sampled <- sum_scan.sampled(object,method = "group")
   } else {
-    group.sum <- group.scan.list <- obs.prob <- NULL
+    group.sum <- group.sampled <- group.scan.list <- obs.prob <- NULL
   }
   if (!is.null(object$focal.scan.list)) {
-    focal.scan.na.resolved <- resolve_NA(empirical.scan.list = focal.scan.list,mode = mode)
+    focal.scan.na.resolved <- resolve_NA(empirical.scan.list = object$focal.scan.list,mode = mode)
     focal.sum <- sum_scan.list(focal.scan.na.resolved)
+    focal.sampled <- sum_scan.sampled(object,method = "focal")
   } else {
-    focal.sum <- focal.scan.list <- focal <- NULL
+    focal.sum <- focal.sampled <- focal.scan.list <- focal <- NULL
   }
   scan.summary <- list(
     theoretical.sum = theoretical.sum,
+    theoretical.sampled = theoretical.sampled,
     group.sum = group.sum,
+    group.sampled = group.sampled,
     focal.sum = focal.sum,
+    focal.sampled = focal.sampled,
     scans.to.do = scans.to.do,
     mode = mode#,
     # here store: theoretical.sampled.sum, group.sampled.sum, and focal.sampled.sum
@@ -212,16 +199,18 @@ summary.empiScan <- function(object,...) {
 #' @export
 #' @noRd
 print.summary.empiScan<- function(x,...){
-  print.scan(x,...)
-  if (!is.null(x$group.scan.sum)) {
+  print.summary.scan(x,...)
+  if (!is.null(x$group.sum)) {
     cat("Group-scan sampling method weighted adjacency matrix:\n")
-    print.default(x$group.scan.sum,...)
-    cat(paste0("\nobtained after summing ", length(x$scans.to.do), " binary scans (mode = \"", x$mode,"\")", "\n\n")) # adapt when group.sampled.sum implemented
+    print.default(x$group.sum,...)
+    cat(paste0("\nobtained after the following per-edge sampling matrix:", "\n\n"))
+    print.default(x$group.sampled,...)
   }
-  if (!is.null(x$focal.scan.sum)) {
+  if (!is.null(x$focal.sum)) {
     cat("Focal-scan sampling method weighted adjacency matrix:\n")
-    print.default(x$focal.scan.sum,...)
-    cat(paste0("\nobtained after summing ", length(x$scans.to.do), " binary scans (mode = \"", x$mode,"\")", "\n\n")) # adapt when focal.sampled.sum implemented
+    print.default(x$focal.sum,...)
+    cat(paste0("\nobtained after the following per-edge sampling matrix:", "\n\n"))
+    print.default(x$focal.sampled,...)
   }
 }
 
