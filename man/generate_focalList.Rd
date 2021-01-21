@@ -14,7 +14,7 @@ generate_focalList(
 \arguments{
 \item{Adj}{square integers matrix of occurrences of dyads.}
 
-\item{total_scan}{integer, sampling effort. Note that 1/total_scan should be relatively small, increasingly small with increasing precision. Optional if using presence.prob.}
+\item{total_scan}{integer, sampling effort. Note that 1/total_scan should be relatively small, increasingly small with increasing precision.}
 
 \item{focal.prob_fun}{either:
 \itemize{

@@ -112,6 +112,7 @@ simu_samplingParam <-
       "group" = {
         obs.prob <-
           generate_obsProb(Adj = Adj,
+                           total_scan = total_scan,
                            mode = mode,
                            obs.prob_fun = group.scan_param)
         focal <- NULL
@@ -131,6 +132,7 @@ simu_samplingParam <-
       "both" = {
         obs.prob <-
           generate_obsProb(Adj = Adj,
+                           total_scan = total_scan,
                            mode = mode,
                            obs.prob_fun = group.scan_param)
         focal.list <-
