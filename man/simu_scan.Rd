@@ -141,10 +141,10 @@ summary(theo.scans)
 
 
 # Users can generate sampling parameters through `simu_samplingParam` to use in
-# `simu_scan`
+# `simu_scan`, in which case `Adj` and `total_scan` arguments are optional.
 para.group.constant<- simu_samplingParam(Adj,total_scan,mode =
                                          "min",group.scan_param = 0.42)
-group.constant.scans <- simu_scan(Adj,total_scan,sampling.param = para.group.constant)
+group.constant.scans <- simu_scan(sampling.param = para.group.constant)
 group.constant.scans
 
 # `summary()` methods can be used to sum up scans contained in an `empiScan`
@@ -153,7 +153,7 @@ group.constant.scans
 summary(group.constant.scans)
 
 # Users can also define functions to use trait- or network- based sampling
-# biases for group-scan sampling (cf. ?simu_samplingParam)
+# biases for group-scan sampling (cf. `?simu_samplingParam`)
 obs.prob.trait.bias_fun<- function(i,j,Adj) {i+j} # comparable to a dyad-trait-based bias
 para.group.trait.bias<- simu_samplingParam(Adj,total_scan,mode ="directed",
                                            group.scan_param = obs.prob.trait.bias_fun,
@@ -161,11 +161,11 @@ para.group.trait.bias<- simu_samplingParam(Adj,total_scan,mode ="directed",
 para.group.net.bias<- simu_samplingParam(Adj,total_scan,mode =
                                          "max",group.scan_param = function(i,j,Adj) {Adj*Adj})
 
-simu_scan(Adj,total_scan,sampling.param = para.group.trait.bias)
-simu_scan(Adj,total_scan,sampling.param = para.group.net.bias)
+simu_scan(sampling.param = para.group.trait.bias)
+simu_scan(sampling.param = para.group.net.bias)
 
 # or for biases regarding which focals to draw for focal-scan sampling (cf.
-# ?simu_samplingParam)
+# `?simu_samplingParam`)
 focal.trait.bias_fun<- function(n,Adj) {1:n} # comparable to a dyad-trait-based bias
 para.focal.trait.bias<- simu_samplingParam(Adj,
                                            total_scan,mode = "directed",
@@ -177,4 +177,16 @@ para.focal.net.bias<- simu_samplingParam(Adj,total_scan,mode = "max",
 
 simu_scan(Adj,total_scan,sampling.param = para.focal.trait.bias)
 simu_scan(Adj,total_scan,sampling.param = para.focal.net.bias)
+
+# Users can also perform both group-scan and focal-scan sampling methods at the
+# same time by inputting both a `group.scan_param` and a `focal.scan_param` when
+# creating their sampling parameter object
+para.both.no.bias <- simu_samplingParam(Adj,
+                                        total_scan,mode = "min",
+                                        group.scan_param = 0.9,
+                                        focal.scan_param = "even",
+                                        scans.to.do = "all")
+simu.both <- simu_scan(sampling.param = para.both.no.bias)
+simu.both
+summary(simu.both)
 }
