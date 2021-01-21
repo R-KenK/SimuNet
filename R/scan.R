@@ -54,17 +54,9 @@ generate_scan<- function(presence.prob,scans.to.do){
 #' @export
 #' @noRd
 print.scan<- function(x,...){
-  if (length(x$scans.to.do) == 1) {
-    if (x$scans.to.do == "all") {
-      scans.to.do <- 1:x$total_scan
-    } else {
-      scans.to.do <- x$scans.to.do
-    }
-  } else {
-    scans.to.do <- x$scans.to.do
-  }
+  scans.to.do <- explicit_scan.to.do(x)
   n <- length(scans.to.do)
-  # print the general simulation infos
+  # print the general simulation info
   if (n >= 15) {
     scans.to.do <- paste(do.call(paste,as.list(scans.to.do)[1:5]),
                          "...",
@@ -73,7 +65,7 @@ print.scan<- function(x,...){
   } else {
     scans.to.do <- scans.to.do
   }
-  cat("\nScans performed: ",scans.to.do,sep=" ")
+  cat("\nScan(s) performed: ",scans.to.do,sep=" ")
   cat("\nScan type: ",x$scan.type,", mode: ",x$mode,"\n\n",sep = "")
   n <- length(x$theoretical.scan.list)
   if (n >= 10) {
@@ -92,23 +84,16 @@ print.scan<- function(x,...){
 #' @export
 #' @noRd
 summary.scan <- function(object,...) {
-  if (length(object$scans.to.do) == 1) {
-    if (object$scans.to.do == "all") {
-      scans.to.do <- 1:object$total_scan
-    } else {
-      scans.to.do <- object$scans.to.do
-    }
-  } else {
-    scans.to.do <- object$scans.to.do
-  }
+  scans.to.do <- explicit_scan.to.do(object)
   mode <- object$mode
   theoretical.sum <- sum_scan.list(object$theoretical.scan.list)
+  theoretical.sampled <- sum_scan.sampled(object,method = "theoretical")
+
   scan.summary <- list(
     theoretical.sum = theoretical.sum,
+    theoretical.sampled = theoretical.sampled,
     scans.to.do = scans.to.do,
     mode = mode
-    # ,
-    # here store: theoretical.sampled.sum
     # more things can be added here# more things can be added here
   )
   class(scan.summary) <- "summary.scan"
