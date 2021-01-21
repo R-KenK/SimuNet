@@ -35,11 +35,9 @@ generate_scan<- function(presence.prob,scans.to.do){
   if(length(scans.to.do) == 1) {if(scans.to.do == "all") {scans.to.do <- 1:presence.prob$total_scan}}
   raw.scan.list <- draw_raw.scan.list(presence.prob = presence.prob,scans.to.do = scans.to.do)
   theoretical.scan.list <- apply_mode(raw.scan.list = raw.scan.list,mode = presence.prob$mode)
-  theoretical.scan.sum <- sum_scan.list(theoretical.scan.list)
   scan<- list(
     raw.scan.list = raw.scan.list,
     theoretical.scan.list = theoretical.scan.list,
-    theoretical.scan.sum = theoretical.scan.sum,
     scan.type = "theoretical",
     Adj = presence.prob$Adj,
     total_scan = presence.prob$total_scan,
@@ -88,6 +86,53 @@ print.scan<- function(x,...){
   } else {
     print.default(x$theoretical.scan.list,...)
   }
+}
+
+#' Summary method for `scan` objects
+#' @export
+#' @noRd
+summary.scan <- function(object,...) {
+  if (length(object$scans.to.do) == 1) {
+    if (object$scans.to.do == "all") {
+      scans.to.do <- 1:object$total_scan
+    } else {
+      scans.to.do <- object$scans.to.do
+    }
+  } else {
+    scans.to.do <- object$scans.to.do
+  }
+  mode <- object$mode
+  theoretical.sum <- sum_scan.list(object$theoretical.scan.list)
+  scan.summary <- list(
+    theoretical.sum = theoretical.sum,
+    scans.to.do = scans.to.do,
+    mode = mode
+    # ,
+    # here store: theoretical.sampled.sum
+    # more things can be added here# more things can be added here
+  )
+  class(scan.summary) <- "summary.scan"
+  scan.summary
+  # more info to be displayed
+}
+
+#' Print method for `summary.scan` objects
+#' @export
+#' @noRd
+print.summary.scan<- function(x,...){
+  cat("Theoretical weighted adjacency matrix:\n")
+  print.default(x$theoretical.sum,...)
+  cat(paste0("\nobtained after summing ", length(x$scans.to.do), " binary scans (mode = \"", x$mode,"\")", "\n\n"))
+}
+
+#' Plot method for `scan` objects
+#' @importFrom igraph graph_from_adjacency_matrix
+#' @importFrom igraph plot.igraph
+#' @export
+#' @noRd
+plot.scan<- function(x,...){
+  x<- igraph::graph_from_adjacency_matrix(x$theoretical,mode = x$mode,weighted = x$weighted)
+  igraph::plot.igraph(x,...,main = "theoretical")
 }
 
 #' Plot method for `scan` objects

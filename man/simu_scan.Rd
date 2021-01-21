@@ -131,14 +131,26 @@ Adj
 simu_scan(Adj,total_scan)
 
 # but other mode can be used, as well as more scans:
-simu_scan(Adj,total_scan,mode = "min",scans.to.do = 1:3)
+theo.scans <- simu_scan(Adj,total_scan,mode = "min",scans.to.do = 1:3)
+theo.scans
+
+# `summary()` methods can be used to sum up scans contained in a `scan` object
+# (and can be accessed in the `$theoretical.sum` of the object returned by
+# `summary()`)
+summary(theo.scans)
 
 
 # Users can generate sampling parameters through `simu_samplingParam` to use in
 # `simu_scan`
 para.group.constant<- simu_samplingParam(Adj,total_scan,mode =
                                          "min",group.scan_param = 0.42)
-simu_scan(Adj,total_scan,sampling.param = para.group.constant)
+group.constant.scans <- simu_scan(Adj,total_scan,sampling.param = para.group.constant)
+group.constant.scans
+
+# `summary()` methods can be used to sum up scans contained in an `empiScan`
+# object (and can be accessed in the `$group.sum` or `$focal.sum` of the object
+# returned by `summary()`)
+summary(group.constant.scans)
 
 # Users can also define functions to use trait- or network- based sampling
 # biases for group-scan sampling (cf. ?simu_samplingParam)

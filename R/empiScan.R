@@ -167,6 +167,65 @@ print.empiScan <- function(x, ...) {
   }
 }
 
+#' Summary method for `empiScan` objects
+#' @export
+#' @noRd
+summary.empiScan <- function(object,...) {
+  if (length(object$scans.to.do) == 1) {
+    if (object$scans.to.do == "all") {
+      scans.to.do <- 1:object$total_scan
+    } else {
+      scans.to.do <- object$scans.to.do
+    }
+  } else {
+    scans.to.do <- object$scans.to.do
+  }
+  theoretical.sum <- sum_scan.list(object$theoretical.scan.list)
+  mode <- object$mode
+  scans.to.do <- object$scans.to.do
+  if (!is.null(object$group.scan.list)) {
+    group.scan.na.resolved <- resolve_NA(empirical.scan.list = object$group.scan.list,mode = mode)
+    group.sum <- sum_scan.list(group.scan.na.resolved)
+  } else {
+    group.sum <- group.scan.list <- obs.prob <- NULL
+  }
+  if (!is.null(object$focal.scan.list)) {
+    focal.scan.na.resolved <- resolve_NA(empirical.scan.list = focal.scan.list,mode = mode)
+    focal.sum <- sum_scan.list(focal.scan.na.resolved)
+  } else {
+    focal.sum <- focal.scan.list <- focal <- NULL
+  }
+  scan.summary <- list(
+    theoretical.sum = theoretical.sum,
+    group.sum = group.sum,
+    focal.sum = focal.sum,
+    scans.to.do = scans.to.do,
+    mode = mode#,
+    # here store: theoretical.sampled.sum, group.sampled.sum, and focal.sampled.sum
+    # more things can be added here
+  )
+  class(scan.summary) <- c("summary.empiScan","summary.scan")
+  scan.summary
+}
+
+#' Print method for `summary.empiScan` objects
+#' @export
+#' @noRd
+print.summary.empiScan<- function(x,...){
+  print.scan(x,...)
+  if (!is.null(x$group.scan.sum)) {
+    cat("Group-scan sampling method weighted adjacency matrix:\n")
+    print.default(x$group.scan.sum,...)
+    cat(paste0("\nobtained after summing ", length(x$scans.to.do), " binary scans (mode = \"", x$mode,"\")", "\n\n")) # adapt when group.sampled.sum implemented
+  }
+  if (!is.null(x$focal.scan.sum)) {
+    cat("Focal-scan sampling method weighted adjacency matrix:\n")
+    print.default(x$focal.scan.sum,...)
+    cat(paste0("\nobtained after summing ", length(x$scans.to.do), " binary scans (mode = \"", x$mode,"\")", "\n\n")) # adapt when focal.sampled.sum implemented
+  }
+}
+
+
 #' Test if object if a `empiScan` object
 #'
 #' @param scan an object to test.
