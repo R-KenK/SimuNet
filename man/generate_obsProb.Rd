@@ -4,10 +4,18 @@
 \alias{generate_obsProb}
 \title{Generator for `obsProb` objects}
 \usage{
-generate_obsProb(Adj, mode, obs.prob_fun = "random", Adj.subfun = NULL)
+generate_obsProb(
+  Adj,
+  total_scan,
+  mode,
+  obs.prob_fun = "random",
+  Adj.subfun = NULL
+)
 }
 \arguments{
 \item{Adj}{square integers matrix of occurrences of dyads.}
+
+\item{total_scan}{integer, sampling effort. Note that 1/total_scan should be relatively small, increasingly small with increasing precision.}
 
 \item{mode}{Character scalar, specifies how igraph should interpret the
 supplied matrix. Default here is directed. Possible values are: directed,
@@ -33,6 +41,7 @@ an `obsProb` object (S3 class) containing:
   \item{`P`: a [0,1] numeric matrix of probability of observation (using the
   "group" scan sampling `method`) of each dyad.}
   \item{`Adj`: inputted `Adj`}
+  \item{`total_scan`: inputted `total_scan`}
   \item{`obs.prob_type`: character scalar, either:
     \item{`"constant"`: if all dyad have the same probability of being
     sampled or not.}
@@ -55,15 +64,15 @@ Adj<- matrix(data = 0,nrow = n,ncol = n,dimnames = list(nodes,nodes))
 Adj[non.diagonal(Adj)]<- sample(0:total_scan,n*(n-1),replace = TRUE)
 Adj
 
-generate_obsProb(Adj,"directed",obs.prob_fun = "random")
-generate_obsProb(Adj,"directed",obs.prob_fun = 0.3)
+generate_obsProb(Adj,total_scan,"directed",obs.prob_fun = "random")
+generate_obsProb(Adj,total_scan,"directed",obs.prob_fun = 0.3)
 
 # using a user-defined function:
 user_function.ij<- function(i,j,Adj) {i+j} # comparable to a dyad-trait-based bias
 user_function.Adj<- function(i,j,Adj) {Adj*Adj} # comparable to a network-based bias
 
-generate_obsProb(Adj,"directed",obs.prob_fun = "random")
-generate_obsProb(Adj,"directed",obs.prob_fun = user_function.ij)
-generate_obsProb(Adj,"directed",obs.prob_fun = user_function.Adj)
+generate_obsProb(Adj,total_scan,"directed",obs.prob_fun = "random")
+generate_obsProb(Adj,total_scan,"directed",obs.prob_fun = user_function.ij)
+generate_obsProb(Adj,total_scan,"directed",obs.prob_fun = user_function.Adj)
 
 }

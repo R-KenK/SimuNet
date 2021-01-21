@@ -25,7 +25,7 @@ minimize_NA<- function(scan){
 
 # manual tests to see if `apply_mode` does what it should, including on weighted networks ---------------
 
-# Not needed anymore because now `apply_mode` works on the `theoretical.scan` part of `scan` object to produce `empiScan` objects
+# Not needed anymore because now `apply_mode` works on the `theoretical.scan.list` part of `scan` object to produce `empiScan` objects
 # test.scan.NA<- matrix(c(0,1,NA,0,NA,
 #                         NA,0,1,1,NA,
 #                         0,1,0,0,1,

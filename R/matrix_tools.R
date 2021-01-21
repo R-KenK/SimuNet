@@ -42,6 +42,35 @@ diagonal<- function(M,output=c("matrix.logical","vector.values")) {
          "vector.values" = M[logicals])
 }
 
+#' TO WRITE
+#'
+#' TO WRITE
+#'
+#' @param x matrix or other R object with `length(dim(x)) == 2`
+#' @param value TO WRITE
+#'
+#' @return TO WRITE
+#' @export
+#'
+#' @examples
+#' M <- matrix(sample(1:10,16,replace = TRUE),4,4)
+#' M
+#' non.diagonal(M) <- runif(12,0,1)
+#' M
+#' non.diagonal(M) <- 42
+#' M
+`non.diagonal<-` <- function(x,value) {
+  dx <- dim(x)
+  if (length(dx) != 2L)
+    stop("only matrix non-diagonals can be replaced")
+  len.i <- prod(dx) - min(dx)
+  len.v <- length(value)
+  if (len.v != 1L && len.v != len.i)
+    stop("replacement non-diagonal has wrong length")
+  x[non.diagonal(x)] <- value
+  x
+}
+
 #' Identify coordinates of non null non diagonal elements of a matrix
 #'
 #' @param M a square matrix

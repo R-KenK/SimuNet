@@ -1,5 +1,14 @@
 # SimuNet (development version)
 
+# SimuNet 0.5.0.9000
+* Renamed more explicitely the `X.scan` components of scan and empiScan object, to make way for `X.sum` and `X.sampled` new matrices (cf. below).
+* The `summary`method used on `scan` and `empiScan` objects can now be used to create objects of new `summary.scan` and `summary.empiScan` objects, storing `X.sum` and `X.sampled` (X being `"theoretical"`, `"group"`, or `"focal"`), and with dedicated print methods
+* `Adj` and `total_scan` arguments are now optional when `sampling.param` is passed when using `simu_scan`
+* Added several required function for this purpose:
+    * `sum_scan.list` is an equivalent of previous `sum_up.scan(s)`, but cleaner. It sums up any list of scans counting `NA`s as zeros.
+    * added `resolve_NA`,  which is called before `sum_scan.list` in the case of empirical scans. Moved all `NA`s related functions to `empirical_NA_tools.R`
+    * added `sum_scan.sampled` and `count_NA` functions to also count sampled (non-`NA`) edges
+
 # SimuNet 0.4.0.9000
 * Included `scans.to.do` variable (a scan index _or_ a vector of `1:total_scan`) in wrappers and nested functions to generate `scan` and `empiScan` objects. Now `scans.to.do` is stored in several internal and output objects
 * Vectorized wrappers and nested functions to produce lists of scans (`raw.scan`, `theoretical.scan`, `group.scan` or `focal.scan` empirical scans)

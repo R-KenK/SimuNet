@@ -22,31 +22,31 @@ determine_Adj.subfun<- function(mode){
 #' Make Adjacency fit the selected mode
 #' Internal use.
 #'
-#' @param raw.scan a list of (directed by default) binary adjacency matrix, pre-theoretical, to which the chosen `mode` is to be applied
+#' @param raw.scan.list a list of (directed by default) binary adjacency matrix, pre-theoretical, to which the chosen `mode` is to be applied
 #' @param mode Character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
 #'
 #' @return an list of adjacency matrix fitting the chosen `mode` is to be applied
 #' @noRd
-apply_mode<- function(raw.scan,mode = c("directed", "undirected", "max","min", "upper", "lower", "plus","vector")){
+apply_mode<- function(raw.scan.list,mode = c("directed", "undirected", "max","min", "upper", "lower", "plus","vector")){
   switch(mode,
          "undirected" = , # as in `igraph`, consider this mode to be the same as `max`
          "max" = lapply(
-           raw.scan,
+           raw.scan.list,
            function(scan) {
              ifelse(scan >= t(scan),scan,t(scan))
            }
          ),
          "min" = lapply(
-           raw.scan,
+           raw.scan.list,
            function(scan) {
              ifelse(scan <= t(scan),scan,t(scan))
            }
          ),
          "plus" = {  # WHAT DOES THIS MEAN FOR BINARY SCANS?
            lapply(
-             raw.scan,
+             raw.scan.list,
              function(scan) {
-               not.na<- !is.na(scan) & !is.na(t(scan))
+               not.na <- !is.na(scan) & !is.na(t(scan))
                ifelse(not.na,scan+t(scan),NA)
              }
            )
@@ -54,41 +54,7 @@ apply_mode<- function(raw.scan,mode = c("directed", "undirected", "max","min", "
          "directed" = ,
          "upper" = ,
          "lower" =  ,
-         "vector" = raw.scan
+         "vector" = raw.scan.list
   )
-}
-
-#' Replace NAs by zeros in vectors/matrices
-#'
-#' @param X a vector or matrix
-#'
-#' @return similarly dimensioned vector or matrix with zeros instead of NAs
-#' @noRd
-zero_NA<- function(X){
-  ifelse(!is.na(X),X,0)
-}
-
-#' Replace NAs by a set value in vectors/matrices
-#'
-#' @param X a vector or matrix
-#' @param value a numeric scalar
-#'
-#' @return similarly dimensioned vector or matrix with `value` instead of NAs
-#' @noRd
-replace_NA<- function(X,value){
-  ifelse(!is.na(X),X,value)
-}
-
-#' Compare elements of a matrix with its transposed
-#' wrapper using `zero_NA`
-#'
-#' @param X a numeric matrix
-#' @param comp.fun a function to compare X with t(X), in this order. Default is superior or equal
-#' @param manage_NA.fun a function to replace `NA`s in `X` with a value. Default is `zero_NA` to replace them with zeros (recycled code)
-#'
-#' @return a logical matrix
-#' @noRd
-compare_with_transposed<- function(X,comp.fun = `>=`,manage_NA.fun = zero_NA){
-  comp.fun(manage_NA.fun(X),manage_NA.fun(t(X)))
 }
 

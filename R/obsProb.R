@@ -3,6 +3,7 @@
 #' Generator for `obsProb` objects
 #'
 #' @param Adj square integers matrix of occurrences of dyads.
+#' @param total_scan integer, sampling effort. Note that 1/total_scan should be relatively small, increasingly small with increasing precision.
 #' @param mode Character scalar, specifies how igraph should interpret the
 #'   supplied matrix. Default here is directed. Possible values are: directed,
 #'   undirected, upper, lower, max, min, plus. Added vector too. See details
@@ -24,6 +25,7 @@
 #'   \item{`P`: a [0,1] numeric matrix of probability of observation (using the
 #'   "group" scan sampling `method`) of each dyad.}
 #'   \item{`Adj`: inputted `Adj`}
+#'   \item{`total_scan`: inputted `total_scan`}
 #'   \item{`obs.prob_type`: character scalar, either:
 #'     \item{`"constant"`: if all dyad have the same probability of being
 #'     sampled or not.}
@@ -45,18 +47,19 @@
 #' Adj[non.diagonal(Adj)]<- sample(0:total_scan,n*(n-1),replace = TRUE)
 #' Adj
 #'
-#' generate_obsProb(Adj,"directed",obs.prob_fun = "random")
-#' generate_obsProb(Adj,"directed",obs.prob_fun = 0.3)
+#' generate_obsProb(Adj,total_scan,"directed",obs.prob_fun = "random")
+#' generate_obsProb(Adj,total_scan,"directed",obs.prob_fun = 0.3)
 #'
 #' # using a user-defined function:
 #' user_function.ij<- function(i,j,Adj) {i+j} # comparable to a dyad-trait-based bias
 #' user_function.Adj<- function(i,j,Adj) {Adj*Adj} # comparable to a network-based bias
 #'
-#' generate_obsProb(Adj,"directed",obs.prob_fun = "random")
-#' generate_obsProb(Adj,"directed",obs.prob_fun = user_function.ij)
-#' generate_obsProb(Adj,"directed",obs.prob_fun = user_function.Adj)
+#' generate_obsProb(Adj,total_scan,"directed",obs.prob_fun = "random")
+#' generate_obsProb(Adj,total_scan,"directed",obs.prob_fun = user_function.ij)
+#' generate_obsProb(Adj,total_scan,"directed",obs.prob_fun = user_function.Adj)
 #'
 generate_obsProb <- function(Adj,
+                             total_scan,
                              mode,
                              obs.prob_fun = "random",
                              Adj.subfun = NULL) {
@@ -78,6 +81,7 @@ generate_obsProb <- function(Adj,
       Adj = Adj
     ),
     Adj = Adj,
+    total_scan = total_scan,
     obs.prob_type = obs.prob_type,
     obs.prob_fun = obs.prob_fun
   )

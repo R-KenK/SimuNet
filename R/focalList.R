@@ -3,7 +3,7 @@
 #' Generator for `focalList` objects
 #'
 #' @param Adj square integers matrix of occurrences of dyads.
-#' @param total_scan integer, sampling effort. Note that 1/total_scan should be relatively small, increasingly small with increasing precision. Optional if using presence.prob.
+#' @param total_scan integer, sampling effort. Note that 1/total_scan should be relatively small, increasingly small with increasing precision.
 #' @param focal.prob_fun either:
 #' \itemize{
 #'   \item{Special case `"even"` (default) tries to even out the `focal.list` as much as possible before drawing randomly following a uniform distribution}

@@ -15,23 +15,21 @@
 #' @return an `empiScan` object (S3 class), inheriting from `scan` object,
 #'   containing:
 #' \itemize{
-#'   \item{`raw.scan`: a list of binary adjacency matrix, considered directed in
+#'   \item{`raw.scan.list`: a list of binary adjacency matrix, considered directed in
 #'   the algorithm}
-#'   \item{`theoretical.scan`: a list of binary adjacency matrix, where all ties
+#'   \item{`theoretical.scan.list`: a list of binary adjacency matrix, where all ties
 #'   were observed but the `mode` has been applied}
 #'   \item{`scan.type`: set to `"empirical"` by `sample_from_scan`}
 #'   \item{`method`: from inputted `sampling.param`}
 #'   \item{`scans.to.do`: from inputted `sampling.param`}
-#'   \item{`group.scan`: a list of adjacency matrix, where the observation
+#'   \item{`group.scan.list`: a list of adjacency matrix, where the observation
 #'   probability `obs.prob` from `sampling.param` of each dyad has been applied.
 #'   `NULL` if `method = "focal"`}
-#'   \item{`focal.scan`: a list of adjacency matrix, where only the selected
+#'   \item{`focal.scan.list`: a list of adjacency matrix, where only the selected
 #'   `focal` from `sampling.param` is visible. `NULL` if `method = "group"`}
 #'   \item{`Adj`: `Adj` data contained in `presence.prob`}
 #'   \item{`total_scan`: `total_scan` data contained in `presence.prob`}
 #'   \item{`mode`: `mode` data contained in `presence.prob`}
-#'   \item{`weighted`: logical, at this stage can only be `TRUE` if `mode =
-#'   plus` (some edges can become `2`)}
 #'   \item{`Adj.subfun`: `Adj.subfun` data contained in `presence.prob`}
 #'   \item{`presence.prob`: `presence.prob$P` (only the probability matrix) data
 #'   contained in `presence.prob`}
@@ -39,22 +37,46 @@
 #' @noRd
 generate_empiScan <- function(scan, sampling.param) {
   scan$scan.type <- "empirical"
-  scan$method <- sampling.param$method
-  scan$scans.to.do <- sampling.param$scans.to.do
+  method <- sampling.param$method
+  mode <- scan$mode
+  scans.to.do <- sampling.param$scans.to.do
   if (!is.null(sampling.param$obs.prob)) {
-    scan$group.scan <-
+    group.scan.list <-
       sample_from_scan(scan = scan,
                        sampling.param = sampling.param,
                        method = "group")
-    scan$obs.prob <- sampling.param$obs.prob
+    group.scan.na.resolved <- resolve_NA(empirical.scan.list = group.scan.list,mode = mode)
+    group.scan.sum <- sum_scan.list(group.scan.na.resolved)
+    obs.prob <- sampling.param$obs.prob
+  } else {
+    group.scan.sum <- group.scan.list <- obs.prob <- NULL
   }
   if (!is.null(sampling.param$focal)) {
-    scan$focal.scan <-
+    focal.scan.list <-
       sample_from_scan(scan = scan,
                        sampling.param = sampling.param,
                        method = "focal")
-    scan$focal <- sampling.param$focal
+    focal.scan.na.resolved <- resolve_NA(empirical.scan.list = focal.scan.list,mode = mode)
+    focal.scan.sum <- sum_scan.list(focal.scan.na.resolved)
+    focal <- sampling.param$focal
+  } else {
+    focal.scan.sum <- focal.scan.list <- focal <- NULL
   }
+  scan <- list(
+    raw.scan.list = scan$raw.scan.list,
+    theoretical.scan.list = scan$theoretical.scan.list,
+    group.scan.list = group.scan.list,
+    obs.prob = obs.prob,
+    focal.scan.list = focal.scan.list,
+    focal = focal,
+    scan.type = "empirical",
+    Adj = scan$Adj,
+    total_scan = scan$total_scan,
+    scans.to.do = scan$scans.to.do,
+    mode = mode,
+    Adj.subfun = scan$Adj.subfun,
+    presence.prob = scan$presence.prob # in here it is not a presenceProb object anymore, to avoid storing redundant variables
+  )
   class(scan) <- c("empiScan", "scan")
   scan
 }
@@ -63,33 +85,34 @@ generate_empiScan <- function(scan, sampling.param) {
 #' @export
 #' @noRd
 print.empiScan <- function(x, ...) {
-  n <- length(x$scans.to.do)
+  scans.to.do <- explicit_scan.to.do(x)
+  n <- length(scans.to.do)
   # print the general simulation infos
-  if(n >= 15) {
-    scans.to.do <- paste(do.call(paste,as.list(x$scans.to.do)[1:5]),
+  if (n >= 15) {
+    scans.to.do <- paste(do.call(paste,as.list(scans.to.do)[1:5]),
                          "...",
-                         do.call(paste,as.list(x$scans.to.do)[(n-4):n])
+                         do.call(paste,as.list(scans.to.do)[(n-4):n])
     )
   } else {
-    scans.to.do <- x$scans.to.do
+    scans.to.do <- scans.to.do
   }
-  cat("\nScans performed: ",scans.to.do,sep=" ")
+  cat("\nScan(s) performed: ",scans.to.do,sep=" ")
   cat("\n\nScan type: theoretical, mode: ", x$mode, "\n\n", sep = "")
 
   # display the theoretical scans
-  if(n >= 10) {
-    print.default(x$theoretical.scan[1:3],...)
+  if (n >= 10) {
+    print.default(x$theoretical.scan.list[1:3],...)
     cat("... (",n-5," more scans)\n\n\n",sep = "")
     cat("[[",n-1,"]]\n",sep = "")
-    print.default(x$theoretical.scan[[(n-1)]],...)
+    print.default(x$theoretical.scan.list[[(n-1)]],...)
     cat("[[",n,"]]\n",sep = "")
-    print.default(x$theoretical.scan[[n]],...)
+    print.default(x$theoretical.scan.list[[n]],...)
   } else {
-    print.default(x$theoretical.scan,...)
+    print.default(x$theoretical.scan.list,...)
   }
 
   # display the optional group scans
-  if (!is.null(x$group.scan)) {
+  if (!is.null(x$group.scan.list)) {
     cat(
       "\n\nScan type: group scan, mode: ",
       x$mode,
@@ -98,20 +121,20 @@ print.empiScan <- function(x, ...) {
       "\n\n",
       sep = ""
     )
-    if(n >= 10) {
-      print.default(x$group.scan[1:3],...)
+    if (n >= 10) {
+      print.default(x$group.scan.list[1:3],...)
       cat("... (",n-5," more scans)\n\n\n",sep = "")
       cat("[[",n-1,"]]\n",sep = "")
-      print.default(x$group.scan[[(n-1)]],...)
+      print.default(x$group.scan.list[[(n-1)]],...)
       cat("[[",n,"]]\n",sep = "")
-      print.default(x$group.scan[[n]],...)
+      print.default(x$group.scan.list[[n]],...)
     } else {
-      print.default(x$group.scan, ...)
+      print.default(x$group.scan.list, ...)
     }
   }
 
   # display the optional focal scans
-  if (!is.null(x$focal.scan)) {
+  if (!is.null(x$focal.scan.list)) {
     cat(
       "\n\nScan type: focal scan, mode: ",
       x$mode,
@@ -120,18 +143,77 @@ print.empiScan <- function(x, ...) {
       "\n\n",
       sep = ""
     )
-    if(n >= 10) {
-      print.default(x$focal.scan[1:3],...)
+    if (n >= 10) {
+      print.default(x$focal.scan.list[1:3],...)
       cat("... (",n-5," more scans)\n\n\n",sep = "")
       cat("[[",n-1,"]]\n",sep = "")
-      print.default(x$focal.scan[[(n-1)]],...)
+      print.default(x$focal.scan.list[[(n-1)]],...)
       cat("[[",n,"]]\n",sep = "")
-      print.default(x$focal.scan[[n]],...)
+      print.default(x$focal.scan.list[[n]],...)
     } else {
-      print.default(x$focal.scan, ...)
+      print.default(x$focal.scan.list, ...)
     }
   }
 }
+
+#' Summary method for `empiScan` objects
+#' @export
+#' @noRd
+summary.empiScan <- function(object,...) {
+  scans.to.do <- explicit_scan.to.do(object)
+  theoretical.sum <- sum_scan.list(object$theoretical.scan.list)
+  theoretical.sampled <- sum_scan.sampled(object,method = "theoretical")
+  mode <- object$mode
+  scans.to.do <- object$scans.to.do
+  if (!is.null(object$group.scan.list)) {
+    group.scan.na.resolved <- resolve_NA(empirical.scan.list = object$group.scan.list,mode = mode)
+    group.sum <- sum_scan.list(group.scan.na.resolved)
+    group.sampled <- sum_scan.sampled(object,method = "group")
+  } else {
+    group.sum <- group.sampled <- group.scan.list <- obs.prob <- NULL
+  }
+  if (!is.null(object$focal.scan.list)) {
+    focal.scan.na.resolved <- resolve_NA(empirical.scan.list = object$focal.scan.list,mode = mode)
+    focal.sum <- sum_scan.list(focal.scan.na.resolved)
+    focal.sampled <- sum_scan.sampled(object,method = "focal")
+  } else {
+    focal.sum <- focal.sampled <- focal.scan.list <- focal <- NULL
+  }
+  scan.summary <- list(
+    theoretical.sum = theoretical.sum,
+    theoretical.sampled = theoretical.sampled,
+    group.sum = group.sum,
+    group.sampled = group.sampled,
+    focal.sum = focal.sum,
+    focal.sampled = focal.sampled,
+    scans.to.do = scans.to.do,
+    mode = mode#,
+    # here store: theoretical.sampled.sum, group.sampled.sum, and focal.sampled.sum
+    # more things can be added here
+  )
+  class(scan.summary) <- c("summary.empiScan","summary.scan")
+  scan.summary
+}
+
+#' Print method for `summary.empiScan` objects
+#' @export
+#' @noRd
+print.summary.empiScan<- function(x,...){
+  print.summary.scan(x,...)
+  if (!is.null(x$group.sum)) {
+    cat("Group-scan sampling method weighted adjacency matrix:\n")
+    print.default(x$group.sum,...)
+    cat(paste0("\nobtained after the following per-edge sampling matrix:", "\n\n"))
+    print.default(x$group.sampled,...)
+  }
+  if (!is.null(x$focal.sum)) {
+    cat("Focal-scan sampling method weighted adjacency matrix:\n")
+    print.default(x$focal.sum,...)
+    cat(paste0("\nobtained after the following per-edge sampling matrix:", "\n\n"))
+    print.default(x$focal.sampled,...)
+  }
+}
+
 
 #' Test if object if a `empiScan` object
 #'
@@ -153,7 +235,7 @@ plot.empiScan <-
   function(x, ...) {
     # Need a way to make it print two in case of method = "both"
     x <-
-      igraph::graph_from_adjacency_matrix(x$theoretical.scan,
+      igraph::graph_from_adjacency_matrix(x$theoretical.scan.list,
                                           mode = x$mode,
                                           weighted = x$weighted)
     igraph::plot.igraph(x, ...)
@@ -203,10 +285,10 @@ sample_from_scan <- function(scan, sampling.param, method) {
 #'   (turned into `NA`)
 #' @noRd
 group_sample <- function(scan, obs.prob) {
-  # set the sampled scan to be like the `raw.scan` one (i.e. this is a binary
+  # set the sampled scan to be like the `raw.scan.list` one (i.e. this is a binary
   # _directed_ adjacency matrix)
   observed <-
-    scan$theoretical.scan
+    scan$theoretical.scan.list
   # subset obs.prob like the adjacency matrix (i.e. triangular matrix) into a
   # vector of observation probabilities
   obs.P <-
@@ -235,10 +317,10 @@ group_sample <- function(scan, obs.prob) {
 #'   column turned into `NA`
 #' @noRd
 focal_sample <- function(scan, focal) {
-  # set the sampled scan to be like the `raw.scan` one (i.e. this is a binary
+  # set the sampled scan to be like the `raw.scan.list` one (i.e. this is a binary
   # _directed_ adjacency matrix)
   observed <-
-    scan$theoretical.scan
+    scan$theoretical.scan.list
   lapply(
     seq_along(observed),
     function(s) {
