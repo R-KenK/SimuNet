@@ -30,8 +30,6 @@
 #'   \item{`Adj`: `Adj` data contained in `presence.prob`}
 #'   \item{`total_scan`: `total_scan` data contained in `presence.prob`}
 #'   \item{`mode`: `mode` data contained in `presence.prob`}
-#'   \item{`weighted`: logical, at this stage can only be `TRUE` if `mode =
-#'   plus` (some edges can become `2`)}
 #'   \item{`Adj.subfun`: `Adj.subfun` data contained in `presence.prob`}
 #'   \item{`presence.prob`: `presence.prob$P` (only the probability matrix) data
 #'   contained in `presence.prob`}
@@ -39,22 +37,49 @@
 #' @noRd
 generate_empiScan <- function(scan, sampling.param) {
   scan$scan.type <- "empirical"
-  scan$method <- sampling.param$method
-  scan$scans.to.do <- sampling.param$scans.to.do
+  method <- sampling.param$method
+  mode <- scan$mode
+  scans.to.do <- sampling.param$scans.to.do
   if (!is.null(sampling.param$obs.prob)) {
-    scan$group.scan.list <-
+    group.scan.list <-
       sample_from_scan(scan = scan,
                        sampling.param = sampling.param,
                        method = "group")
-    scan$obs.prob <- sampling.param$obs.prob
+    group.scan.na.resolved <- resolve_NA(empirical.scan.list = group.scan.list,mode = mode)
+    group.scan.sum <- sum_scan.list(group.scan.na.resolved)
+    obs.prob <- sampling.param$obs.prob
+  } else {
+    group.scan.sum <- group.scan.list <- obs.prob <- NULL
   }
   if (!is.null(sampling.param$focal)) {
-    scan$focal.scan.list <-
+    focal.scan.list <-
       sample_from_scan(scan = scan,
                        sampling.param = sampling.param,
                        method = "focal")
-    scan$focal <- sampling.param$focal
+    focal.scan.na.resolved <- resolve_NA(empirical.scan.list = focal.scan.list,mode = mode)
+    focal.scan.sum <- sum_scan.list(focal.scan.na.resolved)
+    focal <- sampling.param$focal
+  } else {
+    focal.scan.sum <- focal.scan.list <- focal <- NULL
   }
+  scan <- list(
+    raw.scan.list = scan$raw.scan.list,
+    theoretical.scan.list = scan$theoretical.scan.list,
+    theoretical.scan.sum = scan$theoretical.scan.sum,
+    group.scan.list = group.scan.list,
+    group.scan.sum = group.scan.sum,
+    obs.prob = obs.prob,
+    focal.scan.list = focal.scan.list,
+    focal.scan.sum = focal.scan.sum,
+    focal = focal,
+    scan.type = "empirical",
+    Adj = scan$Adj,
+    total_scan = scan$total_scan,
+    scans.to.do = scan$scans.to.do,
+    mode = mode,
+    Adj.subfun = scan$Adj.subfun,
+    presence.prob = scan$presence.prob # in here it is not a presenceProb object anymore, to avoid storing redundant variables
+  )
   class(scan) <- c("empiScan", "scan")
   scan
 }

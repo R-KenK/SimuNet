@@ -25,8 +25,6 @@
 #'   \item{`total_scan`: `total_scan` data contained in `presence.prob`}
 #'   \item{`scans.to.do`: inputted `scans.to.do`}
 #'   \item{`mode`: `mode` data contained in `presence.prob`}
-#'   \item{`weighted`: logical, at this stage can only be `TRUE` if `mode =
-#'   plus` (some edges can become `2`)}
 #'   \item{`Adj.subfun`: `Adj.subfun` data contained in `presence.prob`}
 #'   \item{`presence.prob`: `presence.prob$P` (only the probability matrix) data
 #'   contained in `presence.prob`}
@@ -35,16 +33,18 @@
 #' @noRd
 generate_scan<- function(presence.prob,scans.to.do){
   if(length(scans.to.do) == 1) {if(scans.to.do == "all") {scans.to.do <- 1:presence.prob$total_scan}}
-  raw.scan.list<- draw_raw.scan.list(presence.prob = presence.prob,scans.to.do = scans.to.do)
+  raw.scan.list <- draw_raw.scan.list(presence.prob = presence.prob,scans.to.do = scans.to.do)
+  theoretical.scan.list <- apply_mode(raw.scan.list = raw.scan.list,mode = presence.prob$mode)
+  theoretical.scan.sum <- sum_scan.list(theoretical.scan.list)
   scan<- list(
     raw.scan.list = raw.scan.list,
-    theoretical.scan.list = apply_mode(raw.scan.list = raw.scan.list,mode = presence.prob$mode),
+    theoretical.scan.list = theoretical.scan.list,
+    theoretical.scan.sum = theoretical.scan.sum,
     scan.type = "theoretical",
     Adj = presence.prob$Adj,
     total_scan = presence.prob$total_scan,
     scans.to.do = scans.to.do,
     mode = presence.prob$mode,
-    weighted = ifelse(presence.prob$mode == "plus",FALSE,TRUE), # only case for which an edge can be > 1
     Adj.subfun = presence.prob$Adj.subfun,
     presence.prob = presence.prob$P # in here it is not a presenceProb object anymore, to avoid storing redundant variables
   )
