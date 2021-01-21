@@ -46,7 +46,7 @@ apply_mode<- function(raw.scan.list,mode = c("directed", "undirected", "max","mi
            lapply(
              raw.scan.list,
              function(scan) {
-               not.na<- !is.na(scan) & !is.na(t(scan))
+               not.na <- !is.na(scan) & !is.na(t(scan))
                ifelse(not.na,scan+t(scan),NA)
              }
            )
@@ -55,6 +55,62 @@ apply_mode<- function(raw.scan.list,mode = c("directed", "undirected", "max","mi
          "upper" = ,
          "lower" =  ,
          "vector" = raw.scan.list
+  )
+}
+
+#' Make Adjacency fit the selected mode
+#' Internal use.
+#'
+#' @param empirical.scan.list a list of binary adjacency matrix potentially containing `NA`s, in which some `NA`s' value can actually be resolved depending on the chosen mode: `scan[i,j] = NA & scan[j,i] = 0 => scan[i,j] = 0` when `mode = "min"`, and `scan[i,j] = NA & scan[j,i] = 1 => scan[i,j] = 1` when `mode = "max"`
+#' @param mode Character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
+#'
+#' @return an list of adjacency matrix fitting the chosen `mode` is to be applied
+#' @noRd
+resolve_NA <- function(empirical.scan.list,mode = c("directed", "undirected", "max","min", "upper", "lower", "plus","vector")){
+  switch(mode,
+         "undirected" = , # as in `igraph`, consider this mode to be the same as `max`
+         "max" = lapply(
+           empirical.scan.list,
+           function(scan) {
+             ifelse(
+               is.na(scan) | is.na(t(scan)),
+               ifelse(
+                 scan == 1 | t(scan) == 1,
+                 1,
+                 NA),
+               scan
+             )
+           }
+         ),
+         "min" = lapply(
+           empirical.scan.list,
+           function(scan) {
+             ifelse(
+               is.na(scan) | is.na(t(scan)),
+               ifelse(
+                 scan == 0 | t(scan) == 0,
+                 0,
+                 NA),
+               scan
+             )
+           }
+         ),
+         "plus" = {  # WHAT DOES THIS MEAN FOR BINARY SCANS?
+           lapply(
+             empirical.scan.list,
+             function(scan) {
+               ifelse(
+                 is.na(scan) | is.na(t(scan)),
+                 NA,
+                 scan
+               )
+             }
+           )
+         },
+         "directed" = ,
+         "upper" = ,
+         "lower" =  ,
+         "vector" = empirical.scan.list
   )
 }
 
