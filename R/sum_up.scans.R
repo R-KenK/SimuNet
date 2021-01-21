@@ -1,26 +1,26 @@
-# #' Sum up and flatten list of binary scans
-# #' Internal use. Sum up binary adjacency matrices or focal vectors according to the method used. sum_up.scan*s*() is a wrapper for sum_up.scan() that returns summed_up scans for the differnet requested methods0
-# #'
-# #' @param scan_list list of binary adjacency matrices, binary focal vectors, or both, outputed by iterating do.scan()
-# #' @param scaled logical, specifies if adjacency data should be scaled by sampling effort.
-# #' @param use.rare.opti logical: should the optimization for rare event be used?
-# #' @param obs.prob either :
-# #' \itemize{
-# #'  \item{"a dyad observation probability matrix (P.obs)"}{of same dimension as Adj}
-# #'  \item{"a dyad observation vector"}{subsetted similarly as Adj (through the non.diagonal() function for instance)}
-# #'  \item{"a systematic dyad observation (P.obs constant for all i,j)"}{should be in [0,1], assumed to be the case when only one value is inputed)}
-# #' }
-# #' @param method Character scalar, specify if the function should use a whole group or a focal scan sampling method (or both).
-# #' @param mode Character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
-# #' @param focal.list Character vector, indicate the list of focals to consider throughout the scans.
-# #'
-# #' @return An integer adjacency matrix, or a list of two if method = "both". Now returns NAs for dyad scaled with no observation at all.
-# #' @export
-# #'
-# #' @examples
-# #' #Internal use for readability
+# Sum up and flatten list of binary scans
+# Internal use. Sum up binary adjacency matrices or focal vectors according to the method used. sum_up.scan*s*() is a wrapper for sum_up.scan() that returns summed_up scans for the differnet requested methods0
+#
+# @param scan_list list of binary adjacency matrices, binary focal vectors, or both, outputed by iterating do.scan()
+# @param scaled logical, specifies if adjacency data should be scaled by sampling effort.
+# @param use.rare.opti logical: should the optimization for rare event be used?
+# @param obs.prob either :
+# \itemize{
+#  \item{"a dyad observation probability matrix (P.obs)"}{of same dimension as Adj}
+#  \item{"a dyad observation vector"}{subsetted similarly as Adj (through the non.diagonal() function for instance)}
+#  \item{"a systematic dyad observation (P.obs constant for all i,j)"}{should be in [0,1], assumed to be the case when only one value is inputed)}
+# }
+# @param method Character scalar, specify if the function should use a whole group or a focal scan sampling method (or both).
+# @param mode Character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
+# @param focal.list Character vector, indicate the list of focals to consider throughout the scans.
+#
+# @return An integer adjacency matrix, or a list of two if method = "both". Now returns NAs for dyad scaled with no observation at all.
+# @export
+#
+# @examples
+# #Internal use for readability
 # sum_up.scans<- function(scan_list,scaled=FALSE,use.rare.opti=FALSE,obs.prob = NULL,focal.list = NULL,
-#                         method = c("theoretical","group","focal","both"),mode = c("directed", "undirected", "max","min", "upper", "lower", "plus","vector")){
+#                        method = c("theoretical","group","focal","both"),mode = c("directed", "undirected", "max","min", "upper", "lower", "plus","vector")){
 #   method<- match.arg(method);
 #   mode<- match.arg(mode);
 #   switch(method,
@@ -51,27 +51,27 @@
 #   )
 # }
 
-# #' Sum up and flatten list of binary scans
-# #' Internal use. Sum up binary adjacency matrices or focal vectors according to the method used. sum_up.scan*s*() is a wrapper for sum_up.scan() that returns summed_up scans for the differnet requested methods0
-# #'
-# #' @param scan_list list of binary adjacency matrices, binary focal vectors, or both, outputed by iterating do.scan()
-# #' @param method Character scalar, specify if the function should use a whole group or a focal scan sampling method (or both).
-# #' @param mode Character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
-# #' @param scaled logical, specifies if adjacency data should be scaled by sampling effort.
-# #' @param use.rare.opti logical: should the optimization for rare event be used?
-# #' @param obs.prob either :
-# #' \itemize{
-# #'  \item{"a dyad observation probability matrix (P.obs)"}{of same dimension as Adj}
-# #'  \item{"a dyad observation vector"}{subsetted similarly as Adj (through the non.diagonal() function for instance)}
-# #'  \item{"a systematic dyad observation (P.obs constant for all i,j)"}{should be in [0,1], assumed to be the case when only one value is inputed)}
-# #' }
-# #' @param focal.list Character vector, indicate the list of focals to consider throughout the scans.
-# #'
-# #' @return An integer adjacency matrix, or a list of two if method = "both". Now returns NAs for dyad scaled with no observation at all.
-# #' @export
-# #'
-# #' @examples
-# #' #Internal use for readability
+# Sum up and flatten list of binary scans
+# Internal use. Sum up binary adjacency matrices or focal vectors according to the method used. sum_up.scan*s*() is a wrapper for sum_up.scan() that returns summed_up scans for the differnet requested methods0
+#
+# @param scan_list list of binary adjacency matrices, binary focal vectors, or both, outputed by iterating do.scan()
+# @param method Character scalar, specify if the function should use a whole group or a focal scan sampling method (or both).
+# @param mode Character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
+# @param scaled logical, specifies if adjacency data should be scaled by sampling effort.
+# @param use.rare.opti logical: should the optimization for rare event be used?
+# @param obs.prob either :
+# \itemize{
+#  \item{"a dyad observation probability matrix (P.obs)"}{of same dimension as Adj}
+#  \item{"a dyad observation vector"}{subsetted similarly as Adj (through the non.diagonal() function for instance)}
+#  \item{"a systematic dyad observation (P.obs constant for all i,j)"}{should be in [0,1], assumed to be the case when only one value is inputed)}
+# }
+# @param focal.list Character vector, indicate the list of focals to consider throughout the scans.
+#
+# @return An integer adjacency matrix, or a list of two if method = "both". Now returns NAs for dyad scaled with no observation at all.
+# @export
+#
+# @examples
+# #Internal use for readability
 # sum_up.scan<- function(scan_list,method,mode = NULL,scaled,use.rare.opti = FALSE,obs.prob = NULL,focal.list = NULL){
 #  if(use.rare.opti) {n.zeros<- attr(scan_list,"n.zeros")} else {n.zeros<- 0}
 #
@@ -99,30 +99,30 @@
 #   summed_up.method
 # }
 
-# #' Get number of edge observations (for group scans with unobservable individuals)
-# #' quantify actual edge-wise sampling effort, considering that some weren't observable in all group scans.Internal use.
-# #'
-# #' @param scan_list list of binary group scans, with NAs when the dyad was not observable.
-# #' @param diag integer (mostly), value to replace the diagonal of the output matrix with. Use NULL if you consider self-loop (untested).
-# #' @param use.rare.opti logical: should the optimization for rare event be used?
-# #' @param obs.prob either :
-# #' \itemize{
-# #'  \item{"a dyad observation probability matrix (P.obs)"}{of same dimension as Adj}
-# #'  \item{"a dyad observation vector"}{subsetted similarly as Adj (through the non.diagonal() function for instance)}
-# #'  \item{"a systematic dyad observation (P.obs constant for all i,j)"}{should be in [0,1], assumed to be the case when only one value is inputed)}
-# #' }
-# #' @param n.zeros integer, the attribute outputed by `simulate_zeros.non.zeros`, representing the number of full-zero scans. Used only when use.rare.opti=TRUE
-# #' @param mode Character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
-# #' @param focal.list Character vector, indicate the list of focals to consider throughout the scans.
-# #' @param method Character scalar, specify if the function should use a whole group or a focal scan sampling method (or both).
-# #'
-# #' @importFrom stats rbinom
-# #'
-# #' @return a square matrix with element quantifying how many time a dyad has been sampled
-# #' @export
-# #'
-# #' @examples
-# #' #internal use.
+# Get number of edge observations (for group scans with unobservable individuals)
+# quantify actual edge-wise sampling effort, considering that some weren't observable in all group scans.Internal use.
+#
+# @param scan_list list of binary group scans, with NAs when the dyad was not observable.
+# @param diag integer (mostly), value to replace the diagonal of the output matrix with. Use NULL if you consider self-loop (untested).
+# @param use.rare.opti logical: should the optimization for rare event be used?
+# @param obs.prob either :
+# \itemize{
+#  \item{"a dyad observation probability matrix (P.obs)"}{of same dimension as Adj}
+#  \item{"a dyad observation vector"}{subsetted similarly as Adj (through the non.diagonal() function for instance)}
+#  \item{"a systematic dyad observation (P.obs constant for all i,j)"}{should be in [0,1], assumed to be the case when only one value is inputed)}
+# }
+# @param n.zeros integer, the attribute outputed by `simulate_zeros.non.zeros`, representing the number of full-zero scans. Used only when use.rare.opti=TRUE
+# @param mode Character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
+# @param focal.list Character vector, indicate the list of focals to consider throughout the scans.
+# @param method Character scalar, specify if the function should use a whole group or a focal scan sampling method (or both).
+#
+# @importFrom stats rbinom
+#
+# @return a square matrix with element quantifying how many time a dyad has been sampled
+# @export
+#
+# @examples
+# #internal use.
 # n.observed_edges<- function(scan_list,mode,diag=NULL,use.rare.opti=FALSE,obs.prob=NULL,focal.list = NULL,n.zeros = 0,method=NULL){
 #   n<- nrow(scan_list[[1]]);
 #   if(!is.null(rownames(scan_list[[1]]))){
