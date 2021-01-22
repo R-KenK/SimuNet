@@ -88,10 +88,12 @@ summary.scan <- function(object,...) {
   mode <- object$mode
   theoretical.sum <- sum_scan.list(object$theoretical.scan.list)
   theoretical.sampled <- sum_scan.sampled(object,method = "theoretical")
+  theoretical.scaled <- theoretical.sum/ifelse(theoretical.sampled != 0,theoretical.sampled,1)
 
   scan.summary <- list(
     theoretical.sum = theoretical.sum,
     theoretical.sampled = theoretical.sampled,
+    theoretical.scaled = theoretical.scaled,
     scans.to.do = scans.to.do,
     mode = mode
     # more things can be added here# more things can be added here

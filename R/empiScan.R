@@ -163,32 +163,37 @@ summary.empiScan <- function(object,...) {
   scans.to.do <- explicit_scan.to.do(object)
   theoretical.sum <- sum_scan.list(object$theoretical.scan.list)
   theoretical.sampled <- sum_scan.sampled(object,method = "theoretical")
+  theoretical.scaled <- theoretical.sum/ifelse(theoretical.sampled != 0,theoretical.sampled,1)
   mode <- object$mode
   scans.to.do <- object$scans.to.do
   if (!is.null(object$group.scan.list)) {
     group.scan.na.resolved <- resolve_NA(empirical.scan.list = object$group.scan.list,mode = mode)
     group.sum <- sum_scan.list(group.scan.na.resolved)
     group.sampled <- sum_scan.sampled(object,method = "group")
+    group.scaled <- group.sum/ifelse(group.sampled != 0,group.sampled,1)
   } else {
-    group.sum <- group.sampled <- group.scan.list <- obs.prob <- NULL
+    group.scaled <- group.sum <- group.sampled <- group.scan.list <- obs.prob <- NULL
   }
   if (!is.null(object$focal.scan.list)) {
     focal.scan.na.resolved <- resolve_NA(empirical.scan.list = object$focal.scan.list,mode = mode)
     focal.sum <- sum_scan.list(focal.scan.na.resolved)
     focal.sampled <- sum_scan.sampled(object,method = "focal")
+    focal.scaled <- focal.sum/ifelse(focal.sampled != 0,focal.sampled,1)
   } else {
-    focal.sum <- focal.sampled <- focal.scan.list <- focal <- NULL
+    focal.scaled <- focal.sum <- focal.sampled <- focal.scan.list <- focal <- NULL
   }
   scan.summary <- list(
     theoretical.sum = theoretical.sum,
     theoretical.sampled = theoretical.sampled,
+    theoretical.scaled = theoretical.scaled,
     group.sum = group.sum,
     group.sampled = group.sampled,
+    group.scaled = group.scaled,
     focal.sum = focal.sum,
     focal.sampled = focal.sampled,
+    focal.scaled = focal.scaled,
     scans.to.do = scans.to.do,
     mode = mode#,
-    # here store: theoretical.sampled.sum, group.sampled.sum, and focal.sampled.sum
     # more things can be added here
   )
   class(scan.summary) <- c("summary.empiScan","summary.scan")
