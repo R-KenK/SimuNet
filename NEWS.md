@@ -1,5 +1,8 @@
 # SimuNet (development version)
 
+# SimuNet 0.6.0.9000
+* Added track of `X.scaled` (X being `"theoretical"`, `"group"`, or `"focal"`) for `summary.scan` and `summary.empiScan` objects
+
 # SimuNet 0.5.0.9000
 * Renamed more explicitely the `X.scan` components of scan and empiScan object, to make way for `X.sum` and `X.sampled` new matrices (cf. below).
 * The `summary`method used on `scan` and `empiScan` objects can now be used to create objects of new `summary.scan` and `summary.empiScan` objects, storing `X.sum` and `X.sampled` (X being `"theoretical"`, `"group"`, or `"focal"`), and with dedicated print methods
