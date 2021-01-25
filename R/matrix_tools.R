@@ -42,22 +42,24 @@ diagonal<- function(M,output=c("matrix.logical","vector.values")) {
          "vector.values" = M[logicals])
 }
 
-#' TO WRITE
-#'
-#' TO WRITE
+#' Reassign values in the non diagonal part of a matrix
+#' similar use as its `diag(x)` and `diag(x) <- value` equivalent
 #'
 #' @param x matrix or other R object with `length(dim(x)) == 2`
-#' @param value TO WRITE
+#' @param value scalar or vector of values to replace the non diagonal part of `x` with. Filled in by increasing row then by increasing column,
 #'
-#' @return TO WRITE
+#' @return a matrix with similar dimensions as `x` where the non-diagonal parts have been replaced by the value in `value`
 #' @export
 #'
 #' @examples
+#' set.seed(42)
 #' M <- matrix(sample(1:10,16,replace = TRUE),4,4)
 #' M
-#' non.diagonal(M) <- runif(12,0,1)
+#' non.diagonal(M) <- round(runif(12,0,1))
 #' M
 #' non.diagonal(M) <- 42
+#' M
+#' non.diagonal(M) <- 1:12
 #' M
 `non.diagonal<-` <- function(x,value) {
   dx <- dim(x)

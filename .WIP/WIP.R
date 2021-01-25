@@ -115,3 +115,66 @@ simu_samplingParam(Adj,total_scan,mode = "max",group.scan_param = 0.42)
 simu_samplingParam(Adj,total_scan,mode = "min",
                    group.scan_param = 0.42,
                    focal.scan_param = "random",scans.to.do = 1:4)
+
+
+# Testing with Mamiko -----------------------------------------------------
+
+#' TO WRITE
+#'
+#' @param path TO WRITE
+#' @param output TO WRITE
+#' @param type TO WRITE
+#'
+#' @return TO WRITE
+#' @noRd
+import_from_graphml<- function(path,output = c("graph","adjacency"),type = c("both", "upper", "lower")){
+  output <- match.arg(output)
+  G <- igraph::read_graph(path,format = "graphml")
+  switch(output,
+         "graph" = G,
+         "adjacency" = {
+           Adj <- igraph::get.adjacency(G,type = type,attr = "weight",sparse = FALSE);
+           if(!is.null(igraph::vertex_attr(G,"name")) | !is.null(igraph::vertex_attr(G,"id"))) {
+             if(is.null(igraph::vertex_attr(G,"name"))) {
+               rownames(Adj) <- igraph::vertex_attr(G,"id")
+             } else {
+               rownames(Adj) <- igraph::vertex_attr(G,"name")
+             }
+             colnames(Adj) <- rownames(Adj)
+           } else {
+             rownames(Adj) <- as.character(1:nrow(Adj));colnames(Adj)<- as.character(1:ncol(Adj))
+           }
+           Adj
+         }
+  )
+}
+
+Adj <- import_from_graphml("C:/R/Git/asnr/Networks/Mammalia/bats_foodsharing_weighted/vampirebats_carter_mouth_licking_attribute.graphml",
+                           "adjacency",
+                           "upper")
+source("C:/R/Git/asnr/Networks/Mammalia/bats_foodsharing_weighted/total_scan.R")
+total_scan
+
+theo <- simu_scan(Adj,total_scan,scans.to.do = "all",mode = "upper")
+theo.sum <- summary(theo)
+theo.sum$theoretical.scaled
+plot(Adj,theo.sum$theoretical.sum)
+
+# unbiased random group-scan
+para.group <- simu_samplingParam(Adj,total_scan,mode = "upper",scans.to.do = "all",group.scan_param = "random")
+group <- simu_scan(sampling.param = para.group)
+group.sum <- summary(group)
+plot(Adj,group.sum$theoretical.sum)
+plot(group.sum$theoretical.scaled,group.sum$group.scaled)
+
+# unbiased random group-scan & even focal scan
+para.both <- simu_samplingParam(Adj,total_scan,mode = "upper",scans.to.do = "all",group.scan_param = "random",focal.scan_param = "even")
+both <- simu_scan(sampling.param = para.both)
+both.sum <- summary(both)
+plot(Adj[upper.tri(Adj)],
+     both.sum$theoretical.sum[upper.tri(both.sum$theoretical.sum)])
+
+plot(both.sum$theoretical.scaled[upper.tri(both.sum$theoretical.scaled)],
+     both.sum$group.scaled[upper.tri(both.sum$group.scaled)])
+plot(both.sum$theoretical.scaled[upper.tri(both.sum$theoretical.scaled)],
+     both.sum$focal.scaled[upper.tri(both.sum$focal.scaled)])

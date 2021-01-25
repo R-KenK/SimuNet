@@ -1,10 +1,10 @@
-#' TO WRITE
-#' Internal use.
+#' Replace `NA`s with known values when they can be determined
+#' Internal use. When the `"min"` or `"max"` algorithm is chosen to convert directed networks into undirected one, some `NA`s can be deduced from their transposed values (cf. below).
 #'
 #' @param empirical.scan.list a list of binary adjacency matrix potentially containing `NA`s, in which some `NA`s' value can actually be resolved depending on the chosen mode: `scan[i,j] = NA & scan[j,i] = 0 => scan[i,j] = 0` when `mode = "min"`, and `scan[i,j] = NA & scan[j,i] = 1 => scan[i,j] = 1` when `mode = "max"`
 #' @param mode Character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
 #'
-#' @return TO WRITE
+#' @return a list of binary adjacency matrix where resolvable `NA`s are changed depending on the chosen mode: `scan[i,j] = NA & scan[j,i] = 0 => scan[i,j] = 0` when `mode = "min"`, and `scan[i,j] = NA & scan[j,i] = 1 => scan[i,j] = 1` when `mode = "max"`
 #' @noRd
 resolve_NA <- function(empirical.scan.list,mode = c("directed", "undirected", "max","min", "upper", "lower", "plus","vector")){
   switch(mode,
@@ -53,14 +53,14 @@ resolve_NA <- function(empirical.scan.list,mode = c("directed", "undirected", "m
          "vector" = empirical.scan.list
   )
 }
-#' TO WRITE
-#' TO WRITE
+#' Count observed edges (non-`NA`s) for each edge in list of scans
+#' Internal use. Used to determine the sampling effort across all scans performed
 #'
-#' @param scan.list TO WRITE
+#' @param scan.list a list of binary adjacency matrices, where an unobserved dyad (whether it is theoretically 0 or 1) is `NA`
 #'
-#' @return TO WRITE
+#' @return an integer matrix representing the sampling effort for each dyad
 #' @noRd
-count_NA <- function(scan.list) {
+count_nonNA <- function(scan.list) {
   scan.sampled <- Reduce("+",
                          lapply(
                            scan.list,
