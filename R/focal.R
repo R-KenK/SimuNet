@@ -36,10 +36,10 @@ generate_focal<- function(focal.list,
                           scans.to.do){
   if (length(scans.to.do) == 1) {
     if (scans.to.do == "all") {
-      scans.to.do<- 1:focal.list$total_scan
+      scans.to.do <- 1:focal.list$total_scan
     }
   }
-  if (any(scans.to.do > focal.list$total_scan)) {stop("Inputted `scans.to.do` involves number(s) higher than `total_scan`.")}
+  if (any(scans.to.do > focal.list$total_scan)) {stop("Inputted `scans.to.do` involves number(s) higher than `total_scan`.")} # PERHAPS TO REMOVE LATER IF IN FACT UNDESIRABLE
 
   focal<- list(
     focal = focal.list$focals[scans.to.do],
@@ -54,12 +54,15 @@ generate_focal<- function(focal.list,
 #' @export
 #' @noRd
 print.focal<- function(x,...){
+  focal <- shorten_vec.to.print(x$focal)
+  foc.names <- shorten_vec.to.print(names(x$focal))
+  scans.to.do <- explicit_scans.to.do(x)
+  scans.to.do <- shorten_vec.to.print(scans.to.do)
   cat(
-    paste0(
-      ifelse(!is.null(names(x$focal)),"\n  node name: ",""),names(x$focal), # won't display anything if nodes don't have names
-      "\n node index: ",x$focal,
-      "\nscan number: ",x$scans.to.do," out of ",x$focal.list$total_scan,"\n"
-    ),sep = ""
+    ifelse(!is.null(names(x$focal)),"\n  node name: ",""),foc.names, # won't display anything if nodes don't have names
+    "\n node index: ",focal,
+    "\nscan number: ",scans.to.do," out of ",x$focal.list$total_scan,"\n",
+    sep = " "
   )
 }
 

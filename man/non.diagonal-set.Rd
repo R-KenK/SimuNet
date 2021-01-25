@@ -2,26 +2,31 @@
 % Please edit documentation in R/matrix_tools.R
 \name{non.diagonal<-}
 \alias{non.diagonal<-}
-\title{TO WRITE}
+\title{Reassign values in the non diagonal part of a matrix
+similar use as its `diag(x)` and `diag(x) <- value` equivalent}
 \usage{
 non.diagonal(x) <- value
 }
 \arguments{
 \item{x}{matrix or other R object with `length(dim(x)) == 2`}
 
-\item{value}{TO WRITE}
+\item{value}{scalar or vector of values to replace the non diagonal part of `x` with. Filled in by increasing row then by increasing column,}
 }
 \value{
-TO WRITE
+a matrix with similar dimensions as `x` where the non-diagonal parts have been replaced by the value in `value`
 }
 \description{
-TO WRITE
+Reassign values in the non diagonal part of a matrix
+similar use as its `diag(x)` and `diag(x) <- value` equivalent
 }
 \examples{
+set.seed(42)
 M <- matrix(sample(1:10,16,replace = TRUE),4,4)
 M
-non.diagonal(M) <- runif(12,0,1)
+non.diagonal(M) <- round(runif(12,0,1))
 M
 non.diagonal(M) <- 42
+M
+non.diagonal(M) <- 1:12
 M
 }

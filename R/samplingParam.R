@@ -30,13 +30,15 @@
 #' Adj[non.diagonal(Adj)]<- sample(0:total_scan,n*(n-1),replace = TRUE)
 #' Adj
 #'
-#' obs.prob.random<- generate_obsProb(Adj,total_scan,"directed",obs.prob_fun = "random")
-#' obs.prob.constant<- generate_obsProb(Adj,total_scan,"directed",obs.prob_fun = .42)
-#' focal.list<- generate_focalList(Adj,total_scan,focal.prob_fun = "even",all.sampled = TRUE)
-#' focal<- generate_focal(focal.list,10)
+#' obs.prob.random <- generate_obsProb(Adj,total_scan,"directed",obs.prob_fun = "random")
+#' obs.prob.constant <- generate_obsProb(Adj,total_scan,"directed",obs.prob_fun = .42)
+#' focal.list <- generate_focalList(Adj,total_scan,focal.prob_fun = "even",all.sampled = TRUE)
+#' focal <- generate_focal(focal.list,10)
 #'
 #' generate_samplingParam(method = "group",obs.prob = obs.prob.random,scans.to.do = 10:30)
 #' generate_samplingParam(method = "focal",focal = focal)
+#' generate_samplingParam(method = "both",obs.prob = obs.prob.constant,
+#'                         focal = focal.list,scans.to.do = 10:30)
 #' generate_samplingParam(method = "both",obs.prob = obs.prob.constant,
 #'                         focal = focal.list,scans.to.do = "all")
 generate_samplingParam<- function(method = c("group","focal","both"),mode = c("directed","undirected","max","min","upper","lower","plus","vector"),
@@ -71,15 +73,7 @@ print.samplingParam<- function(x,...){
            "\nigraph network mode: ",x$mode),
     sep = ""
   )
-  n <- length(x$scans.to.do)
-  if(n >= 15) {
-    scans.to.do <- paste(do.call(paste,as.list(x$scans.to.do)[1:5]),
-                        "...",
-                        do.call(paste,as.list(x$scans.to.do)[(n-4):n])
-    )
-  } else {
-    scans.to.do <- x$scans.to.do
-  }
+  scans.to.do <- shorten_vec.to.print(x$scans.to.do)
   cat("\nscans to do: ",scans.to.do,sep=" ")
   if(!is.null(x$obs.prob)) {
     cat("\n\nGroup-scan sampling details:\n  obs.prob:\n")

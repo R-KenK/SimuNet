@@ -54,7 +54,7 @@ generate_scan<- function(presence.prob,scans.to.do){
 #' @export
 #' @noRd
 print.scan<- function(x,...){
-  scans.to.do <- explicit_scan.to.do(x)
+  scans.to.do <- explicit_scans.to.do(x)
   n <- length(scans.to.do)
   # print the general simulation info
   if (n >= 15) {
@@ -67,24 +67,14 @@ print.scan<- function(x,...){
   }
   cat("\nScan(s) performed: ",scans.to.do,sep=" ")
   cat("\nScan type: ",x$scan.type,", mode: ",x$mode,"\n\n",sep = "")
-  n <- length(x$theoretical.scan.list)
-  if (n >= 10) {
-    print.default(x$theoretical.scan.list[1:3],...)
-    cat("... (",n-5," more scans)\n\n\n",sep = "")
-    cat("[[",n-1,"]]\n",sep = "")
-    print.default(x$theoretical.scan.list[[(n-1)]],...)
-    cat("[[",n,"]]\n",sep = "")
-    print.default(x$theoretical.scan.list[[n]],...)
-  } else {
-    print.default(x$theoretical.scan.list,...)
-  }
+  shorten_list.to.print(x$theoretical.scan.list)
 }
 
 #' Summary method for `scan` objects
 #' @export
 #' @noRd
 summary.scan <- function(object,...) {
-  scans.to.do <- explicit_scan.to.do(object)
+  scans.to.do <- explicit_scans.to.do(object)
   mode <- object$mode
   theoretical.sum <- sum_scan.list(object$theoretical.scan.list)
   theoretical.sampled <- sum_scan.sampled(object,method = "theoretical")
@@ -106,9 +96,14 @@ summary.scan <- function(object,...) {
 #' Print method for `summary.scan` objects
 #' @export
 #' @noRd
-print.summary.scan<- function(x,...){
+print.summary.scan<- function(x,scaled = FALSE,...){
   cat("Theoretical weighted adjacency matrix:\n")
-  print.default(x$theoretical.sum,...)
+  if (scaled) {
+    to.print <- x$theoretical.scaled
+  } else {
+    to.print <- x$theoretical.sum
+  }
+  print.default(to.print,...)
   cat(paste0("\nobtained after summing ", length(x$scans.to.do), " binary scans (mode = \"", x$mode,"\")", "\n\n"))
 }
 

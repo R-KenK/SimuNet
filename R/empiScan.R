@@ -85,7 +85,7 @@ generate_empiScan <- function(scan, sampling.param) {
 #' @export
 #' @noRd
 print.empiScan <- function(x, ...) {
-  scans.to.do <- explicit_scan.to.do(x)
+  scans.to.do <- explicit_scans.to.do(x)
   n <- length(scans.to.do)
   # print the general simulation infos
   if (n >= 15) {
@@ -100,16 +100,7 @@ print.empiScan <- function(x, ...) {
   cat("\n\nScan type: theoretical, mode: ", x$mode, "\n\n", sep = "")
 
   # display the theoretical scans
-  if (n >= 10) {
-    print.default(x$theoretical.scan.list[1:3],...)
-    cat("... (",n-5," more scans)\n\n\n",sep = "")
-    cat("[[",n-1,"]]\n",sep = "")
-    print.default(x$theoretical.scan.list[[(n-1)]],...)
-    cat("[[",n,"]]\n",sep = "")
-    print.default(x$theoretical.scan.list[[n]],...)
-  } else {
-    print.default(x$theoretical.scan.list,...)
-  }
+  shorten_list.to.print(x$theoretical.scan.list)
 
   # display the optional group scans
   if (!is.null(x$group.scan.list)) {
@@ -121,16 +112,7 @@ print.empiScan <- function(x, ...) {
       "\n\n",
       sep = ""
     )
-    if (n >= 10) {
-      print.default(x$group.scan.list[1:3],...)
-      cat("... (",n-5," more scans)\n\n\n",sep = "")
-      cat("[[",n-1,"]]\n",sep = "")
-      print.default(x$group.scan.list[[(n-1)]],...)
-      cat("[[",n,"]]\n",sep = "")
-      print.default(x$group.scan.list[[n]],...)
-    } else {
-      print.default(x$group.scan.list, ...)
-    }
+    shorten_list.to.print(x$group.scan.list)
   }
 
   # display the optional focal scans
@@ -143,16 +125,7 @@ print.empiScan <- function(x, ...) {
       "\n\n",
       sep = ""
     )
-    if (n >= 10) {
-      print.default(x$focal.scan.list[1:3],...)
-      cat("... (",n-5," more scans)\n\n\n",sep = "")
-      cat("[[",n-1,"]]\n",sep = "")
-      print.default(x$focal.scan.list[[(n-1)]],...)
-      cat("[[",n,"]]\n",sep = "")
-      print.default(x$focal.scan.list[[n]],...)
-    } else {
-      print.default(x$focal.scan.list, ...)
-    }
+    shorten_list.to.print(x$focal.scan.list)
   }
 }
 
@@ -160,7 +133,7 @@ print.empiScan <- function(x, ...) {
 #' @export
 #' @noRd
 summary.empiScan <- function(object,...) {
-  scans.to.do <- explicit_scan.to.do(object)
+  scans.to.do <- explicit_scans.to.do(object)
   theoretical.sum <- sum_scan.list(object$theoretical.scan.list)
   theoretical.sampled <- sum_scan.sampled(object,method = "theoretical")
   theoretical.scaled <- theoretical.sum/ifelse(theoretical.sampled != 0,theoretical.sampled,1)
