@@ -76,9 +76,13 @@ generate_focalList<- function(Adj,total_scan,
 #' @export
 #' @noRd
 print.focalList<- function(x,...){
-  if(!is.null(names(x$focals))){cat("  node name: ",names(x$focals),"\n")}
-  cat(" node index: ",x$focals)
-  # print.default(x$focals,...)
+  focals <- shorten_vec.to.print(x$focals)
+  if(!is.null(names(x$focals))){
+    foc.names <- shorten_vec.to.print(names(x$focals))
+    cat("  node name: ",foc.names,"\n")
+  }
+  cat(" node index: ",focals)
+  # print.default(focals,...)
 }
 
 #' Test if object if a `focalList` object
