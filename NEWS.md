@@ -1,4 +1,5 @@
-# SimuNet (development version)
+# SimuNet 1.0.0
+* v1.0.0 Release of a fully functional and documented version of this network simulation framework, including a shift toward OOP internally
 
 # SimuNet 0.6.0.9000
 * Added track of `X.scaled` (X being `"theoretical"`, `"group"`, or `"focal"`) for `summary.scan` and `summary.empiScan` objects
