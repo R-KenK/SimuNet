@@ -1,3 +1,5 @@
+# SimuNet 1.0.1
+
 # SimuNet 1.0.0
 * v1.0.0 Release of a fully functional and documented version of this network simulation framework, including a shift toward OOP internally
 
