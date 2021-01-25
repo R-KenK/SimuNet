@@ -105,40 +105,40 @@
 # }
 
 
-#' Simulate which scan returns an all-zeros matrix
-#'
-#' @param total_scan integer, sampling effort
-#' @param presence.prob presence probability matrix (or vector)
-#'
-#' @return a list of NULL representing the non-zero scan to run with an attribute `n.zero` being the number of full-zero scans,and `non.zero.pos` TO EDIT?
-#' @export
-#' @importFrom stats rbinom
-#'
-#' @examples
-#' # Internal use
-simulate_zeros.non.zeros<- function(total_scan,presence.prob){
-  zero.non.zero.list<- stats::rbinom(total_scan,1,1-prod(1-presence.prob))==1
-  zero.non.zero.table<- table(ifelse(zero.non.zero.list,"n.non.zeros","n.zeros"));
-  scan_list<- vector(mode="list",length = zero.non.zero.table["n.non.zeros"])
-  attr(scan_list,"n.zeros")<- zero.non.zero.table["n.zeros"]
-  attr(scan_list,"non.zero.list")<- which(zero.non.zero.list)
-  scan_list
-}
+# #' Simulate which scan returns an all-zeros matrix
+# #'
+# #' @param total_scan integer, sampling effort
+# #' @param presence.prob presence probability matrix (or vector)
+# #'
+# #' @return a list of NULL representing the non-zero scan to run with an attribute `n.zero` being the number of full-zero scans,and `non.zero.pos` TO EDIT?
+# #' @export
+# #' @importFrom stats rbinom
+# #'
+# #' @examples
+# #' # Internal use
+# simulate_zeros.non.zeros<- function(total_scan,presence.prob){
+#   zero.non.zero.list<- stats::rbinom(total_scan,1,1-prod(1-presence.prob))==1
+#   zero.non.zero.table<- table(ifelse(zero.non.zero.list,"n.non.zeros","n.zeros"));
+#   scan_list<- vector(mode="list",length = zero.non.zero.table["n.non.zeros"])
+#   attr(scan_list,"n.zeros")<- zero.non.zero.table["n.zeros"]
+#   attr(scan_list,"non.zero.list")<- which(zero.non.zero.list)
+#   scan_list
+# }
 
-#' Determine step-by-step conditional probabilities for non-zeros scans
-#' Internal use. Returns the CDF of the probability that the i-th dyad (with probability presence.prob[i]) is the first to yield a 1.
-#'
-#' @param presence.prob presence probability matrix (or vector)
-#'
-#' @return a cumulative distribution function of the probability that the i-th dyad (with probability presence.prob[i]) is the first to yield a 1
-#' @export
-#'
-#' @details Workflow is as follows: first simulate.zeros.non.zeros() determines which scans are all-zeros and which are non-zeros. Then for non zeros, at a random order each dyad is drawn in order with conditional probability that: (1) there is at least one tie (tie) in the scan, and (2) all the previous coins were zeros. Once the first one is drawn, the rest are drawn with their regular probabilities. In details, cumulative density probability of each dyad (in a given random order) to be the first one to be a 1 is calculated, and a random draw determine which one is first, set the previous ones to zero, and draw the rest normally. cf. Supplmenentary material X.
-#'
-#' @examples
-#' # Internal use.
-adjust.conditional.prob<- function(presence.prob){
-  prob.all.zeros<- 1-prod(1-presence.prob)
-  previous.are.zeros<- c(1,cumprod(1-presence.prob[1:(length(presence.prob)-1)]))
-  sapply(1:length(presence.prob),function(i) presence.prob[i]/prob.all.zeros*previous.are.zeros[i])
-}
+# #' Determine step-by-step conditional probabilities for non-zeros scans
+# #' Internal use. Returns the CDF of the probability that the i-th dyad (with probability presence.prob[i]) is the first to yield a 1.
+# #'
+# #' @param presence.prob presence probability matrix (or vector)
+# #'
+# #' @return a cumulative distribution function of the probability that the i-th dyad (with probability presence.prob[i]) is the first to yield a 1
+# #' @export
+# #'
+# #' @details Workflow is as follows: first simulate.zeros.non.zeros() determines which scans are all-zeros and which are non-zeros. Then for non zeros, at a random order each dyad is drawn in order with conditional probability that: (1) there is at least one tie (tie) in the scan, and (2) all the previous coins were zeros. Once the first one is drawn, the rest are drawn with their regular probabilities. In details, cumulative density probability of each dyad (in a given random order) to be the first one to be a 1 is calculated, and a random draw determine which one is first, set the previous ones to zero, and draw the rest normally. cf. Supplmenentary material X.
+# #'
+# #' @examples
+# #' # Internal use.
+# adjust.conditional.prob<- function(presence.prob){
+#   prob.all.zeros<- 1-prod(1-presence.prob)
+#   previous.are.zeros<- c(1,cumprod(1-presence.prob[1:(length(presence.prob)-1)]))
+#   sapply(1:length(presence.prob),function(i) presence.prob[i]/prob.all.zeros*previous.are.zeros[i])
+# }
