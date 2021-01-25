@@ -128,21 +128,21 @@ simu_samplingParam(Adj,total_scan,mode = "min",
 #' @return TO WRITE
 #' @noRd
 import_from_graphml<- function(path,output = c("graph","adjacency"),type = c("both", "upper", "lower")){
-  output<- match.arg(output)
-  G<- igraph::read_graph(path,format = "graphml")
+  output <- match.arg(output)
+  G <- igraph::read_graph(path,format = "graphml")
   switch(output,
          "graph" = G,
          "adjacency" = {
-           Adj<- igraph::get.adjacency(G,type = type,attr = "weight",sparse = FALSE);
+           Adj <- igraph::get.adjacency(G,type = type,attr = "weight",sparse = FALSE);
            if(!is.null(igraph::vertex_attr(G,"name")) | !is.null(igraph::vertex_attr(G,"id"))) {
              if(is.null(igraph::vertex_attr(G,"name"))) {
-               rownames(Adj)<- igraph::vertex_attr(G,"id")
+               rownames(Adj) <- igraph::vertex_attr(G,"id")
              } else {
-               rownames(Adj)<- igraph::vertex_attr(G,"name")
+               rownames(Adj) <- igraph::vertex_attr(G,"name")
              }
-             colnames(Adj)<- rownames(Adj)
+             colnames(Adj) <- rownames(Adj)
            } else {
-             rownames(Adj)<- as.character(1:nrow(Adj));colnames(Adj)<- as.character(1:ncol(Adj))
+             rownames(Adj) <- as.character(1:nrow(Adj));colnames(Adj)<- as.character(1:ncol(Adj))
            }
            Adj
          }
@@ -157,6 +157,7 @@ total_scan
 
 theo <- simu_scan(Adj,total_scan,scans.to.do = "all",mode = "upper")
 theo.sum <- summary(theo)
+theo.sum$theoretical.scaled
 plot(Adj,theo.sum$theoretical.sum)
 
 # unbiased random group-scan
@@ -164,7 +165,7 @@ para.group <- simu_samplingParam(Adj,total_scan,mode = "upper",scans.to.do = "al
 group <- simu_scan(sampling.param = para.group)
 group.sum <- summary(group)
 plot(Adj,group.sum$theoretical.sum)
-plot(group.sum$theoretical.sum,group.sum$group.scaled)
+plot(group.sum$theoretical.scaled,group.sum$group.scaled)
 
 # unbiased random group-scan & even focal scan
 para.both <- simu_samplingParam(Adj,total_scan,mode = "upper",scans.to.do = "all",group.scan_param = "random",focal.scan_param = "even")
