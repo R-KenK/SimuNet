@@ -144,16 +144,18 @@ summary.empiScan <- function(object,...) {
     group.sum <- sum_scan.list(group.scan.na.resolved)
     group.sampled <- sum_scan.sampled(object,method = "group")
     group.scaled <- group.sum/ifelse(group.sampled != 0,group.sampled,1)
+    obs.prob_type <- object$obs.prob$obs.prob_type
   } else {
-    group.scaled <- group.sum <- group.sampled <- group.scan.list <- obs.prob <- NULL
+    obs.prob_type <- group.scaled <- group.sum <- group.sampled <- group.scan.list <- obs.prob <- NULL
   }
   if (!is.null(object$focal.scan.list)) {
     focal.scan.na.resolved <- resolve_NA(empirical.scan.list = object$focal.scan.list,mode = mode)
     focal.sum <- sum_scan.list(focal.scan.na.resolved)
     focal.sampled <- sum_scan.sampled(object,method = "focal")
     focal.scaled <- focal.sum/ifelse(focal.sampled != 0,focal.sampled,1)
+    focal.prob_type <- object$focal$focal.list$focal.prob_type
   } else {
-    focal.scaled <- focal.sum <- focal.sampled <- focal.scan.list <- focal <- NULL
+    focal.prob_type <- focal.scaled <- focal.sum <- focal.sampled <- focal.scan.list <- focal <- NULL
   }
   scan.summary <- list(
     theoretical.sum = theoretical.sum,
@@ -162,9 +164,11 @@ summary.empiScan <- function(object,...) {
     group.sum = group.sum,
     group.sampled = group.sampled,
     group.scaled = group.scaled,
+    obs.prob_type = obs.prob_type,
     focal.sum = focal.sum,
     focal.sampled = focal.sampled,
     focal.scaled = focal.scaled,
+    focal.prob_type = focal.prob_type,
     scans.to.do = scans.to.do,
     mode = mode#,
     # more things can be added here
@@ -192,6 +196,134 @@ print.summary.empiScan<- function(x,...){
   }
 }
 
+#' Plot method for `empiScan` objects
+#' @export
+#' @noRd
+plot.empiScan<- function(x,method = c("both","theoretical","group","focal"),...){
+  method <- match.arg(method)
+  x.summary <- summary.empiScan(x)
+  plot.summary.empiScan(x.summary,method = method,...)
+}
+
+#' Plot method for `scan` objects
+#' @importFrom igraph graph_from_adjacency_matrix
+#' @importFrom igraph plot.igraph
+#' @importFrom igraph layout_with_fr
+#' @importFrom graphics layout
+#' @importFrom graphics par
+#' @export
+#' @noRd
+plot.summary.empiScan <- function(x,
+                                 method = c("both","theoretical","group","focal"),
+                                 scaled = FALSE,
+                                 vertex.size = NULL,
+                                 vertex.size.mul = nrow(x$theoretical.sum)/2,
+                                 vertex.size.min = 3,
+                                 vertex.size.fun = compute.strength,
+                                 layout = NULL,
+                                 ...){
+  method <- match.arg(method)
+
+  switch(method,
+         "theoretical" = {
+           plot.summary.scan(x,
+                             scaled = scaled,
+                             vertex.size = vertex.size,
+                             vertex.size.mul = vertex.size.mul,
+                             vertex.size.min = vertex.size.min,
+                             vertex.size.fun = vertex.size.fun,
+                             layout = layout,
+                             ...)
+         },
+         "group" = ,
+         "focal" = {
+           plot_empirical(x = x,
+                          method = method,scaled = scaled,
+                          vertex.size = vertex.size,
+                          vertex.size.mul = vertex.size.mul,
+                          vertex.size.min = vertex.size.min,
+                          vertex.size.fun = vertex.size.fun,
+                          layout = layout,
+                          ...)
+         },
+         "both" = {
+           # graphics::par(mar=c(5,1,2,1))
+           graphics::layout(matrix(c(0,1,1,0,2,2,3,3), 2, 4, byrow = TRUE))
+           if (scaled) {theoretical.adj <- x$theoretical.scaled} else {theoretical.adj <- x$theoretical.sum}
+           if (is.null(layout) | is.function(layout)) {
+             x.G <- igraph::graph_from_adjacency_matrix(theoretical.adj,mode = x$mode,weighted = TRUE)
+             layout <- layout(x.G)
+           }
+           plot.summary.scan(x,
+                             scaled = scaled,
+                             vertex.size = vertex.size,
+                             vertex.size.mul = vertex.size.mul,
+                             vertex.size.min = vertex.size.min,
+                             vertex.size.fun = vertex.size.fun,
+                             layout = layout,
+                             ...)
+           # par(mar=c(1,2,1,2))
+           plot_empirical(x = x,
+                          method = "group",scaled = scaled,
+                          vertex.size = vertex.size,
+                          vertex.size.mul = vertex.size.mul,
+                          vertex.size.min = vertex.size.min,
+                          vertex.size.fun = vertex.size.fun,
+                          layout = layout,
+                          ...)
+           plot_empirical(x = x,
+                          method = "focal",scaled = scaled,
+                          vertex.size = vertex.size,
+                          vertex.size.mul = vertex.size.mul,
+                          vertex.size.min = vertex.size.min,
+                          vertex.size.fun = vertex.size.fun,
+                          layout = layout,
+                          ...)
+           # par(mar = c(5,4,4,2))
+           graphics::layout(matrix(c(1,1,1), 1, 1, byrow = TRUE))
+           graphics::par(mar=c(5,4,4,2))
+         }
+  )
+}
+
+#' Plot method for `scan` objects
+#' @importFrom igraph graph_from_adjacency_matrix
+#' @importFrom igraph plot.igraph
+#' @noRd
+plot_empirical<- function(x,
+                          method = c("group","focal"),
+                          scaled = FALSE,
+                          vertex.size = NULL,
+                          vertex.size.mul = nrow(x$theoretical.sum)/2,
+                          vertex.size.min = 3,
+                          vertex.size.fun = compute.strength,
+                          ...){
+  method <- match.arg(method)
+  if (scaled) {empirical.adj <- x[[paste0(method,".scaled")]]} else {empirical.adj <- x[[paste0(method,".sum")]]}
+  total_scan <- max(x$theoretical.sampled,na.rm = TRUE)
+  max.adj <- max(empirical.adj,na.rm = TRUE)
+  x.G <- igraph::graph_from_adjacency_matrix(empirical.adj,mode = x$mode,weighted = TRUE)
+  if (is.null(vertex.size)) {
+    vertex.size <- vertex.size.fun(x.G,mode = x$mode)
+    vertex.size <- (vertex.size.mul * (vertex.size / max(vertex.size))) + vertex.size.min
+  }
+  switch(method,
+         "group" = {
+           X.prob_type <- x$obs.prob_type
+           X.sentence <- " type of edge observation probability "
+         },
+         "focal" = {
+           X.prob_type <- x$focal.prob_type
+           X.sentence <- " type of focal sampling probability "
+         }
+  )
+
+  igraph::plot.igraph(x.G,...,main = paste0("Scan type: ",method," scan sampling"),
+                      sub = paste0("relying on a ",X.prob_type,X.sentence,"(mode = \"", x$mode,"\")"),
+                      vertex.size = vertex.size
+  )
+}
+
 
 #' Test if object if a `empiScan` object
 #'
@@ -203,21 +335,6 @@ print.summary.empiScan<- function(x,...){
 is.empiScan <- function(scan) {
   inherits(scan, "empiScan")
 }
-
-#' Plot method for `scan` objects
-#' @importFrom igraph graph_from_adjacency_matrix
-#' @importFrom igraph plot.igraph
-#' @export
-#' @noRd
-plot.empiScan <-
-  function(x, ...) {
-    # Need a way to make it print two in case of method = "both"
-    x <-
-      igraph::graph_from_adjacency_matrix(x$theoretical.scan.list,
-                                          mode = x$mode,
-                                          weighted = x$weighted)
-    igraph::plot.igraph(x, ...)
-  }
 
 #' Empirically sample from a theoretical scan
 #'
