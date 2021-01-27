@@ -31,7 +31,7 @@
 #' Adj
 #'
 #' obs.prob.random <- generate_obsProb(Adj,total_scan,"directed",obs.prob_fun = "random")
-#' obs.prob.constant <- generate_obsProb(Adj,total_scan,"directed",obs.prob_fun = .42)
+#' obs.prob.constant <- generate_obsProb(Adj,total_scan,"upper",obs.prob_fun = .42)
 #' focal.list <- generate_focalList(Adj,total_scan,focal.prob_fun = "even",all.sampled = TRUE)
 #' focal <- generate_focal(focal.list,10)
 #'
@@ -43,17 +43,17 @@
 #'                         focal = focal.list,scans.to.do = "all")
 generate_samplingParam<- function(method = c("group","focal","both"),mode = c("directed","undirected","max","min","upper","lower","plus","vector"),
                                    obs.prob = NULL,focal = NULL,scans.to.do = "all" ){
-  method<- match.arg(method);
-  mode<- match.arg(mode);
+  method <- match.arg(method);
+  mode <- match.arg(mode);
 
   check_if_required_param_present(method = method,obs.prob = obs.prob,focal = focal)
 
-  if(is.focalList(focal)) {
-    if(is.null(scans.to.do)) {stop("Please provide a `scans.to.do` if a `focalList` object is passed through `focal`.")}
+  if (is.focalList(focal)) {
+    if (is.null(scans.to.do)) {stop("Please provide a `scans.to.do` if a `focalList` object is passed through `focal`.")}
     focal<- generate_focal(focal.list = focal,scans.to.do = scans.to.do)
   }
 
-  sampling.param<- list(
+  sampling.param <- list(
     method = method,
     mode = mode,
     scans.to.do = scans.to.do,

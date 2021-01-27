@@ -50,7 +50,7 @@ Adj[non.diagonal(Adj)]<- sample(0:total_scan,n*(n-1),replace = TRUE)
 Adj
 
 obs.prob.random <- generate_obsProb(Adj,total_scan,"directed",obs.prob_fun = "random")
-obs.prob.constant <- generate_obsProb(Adj,total_scan,"directed",obs.prob_fun = .42)
+obs.prob.constant <- generate_obsProb(Adj,total_scan,"upper",obs.prob_fun = .42)
 focal.list <- generate_focalList(Adj,total_scan,focal.prob_fun = "even",all.sampled = TRUE)
 focal <- generate_focal(focal.list,10)
 

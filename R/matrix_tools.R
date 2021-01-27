@@ -91,7 +91,7 @@ non.zero.non.diag<- function(M) {which(M>0&!diagonal(M),arr.ind = TRUE,useNames 
 #'
 #' @return the sum of X and Y, replacing `NA`s by zeros
 #' @noRd
-matrix_sum_na.rm<-function(X,Y) {ifelse(!is.na(X),X,0)+ifelse(!is.na(Y),Y,0)}
+matrix_sum_na.rm<-function(X,Y) {ifelse(!is.na(X),X,0L)+ifelse(!is.na(Y),Y,0L)}
 
 
 
@@ -107,8 +107,8 @@ binary_adjacency_mode<- function(Adj,mode = c("directed", "undirected", "max","m
   mode<- match.arg(mode)
   switch(mode,
          "undirected" = ,
-         "max" = ifelse(Adj+t(Adj)>=1,1,0), #conserve a connection between nodes if there's one in either directions (either adjacency triangle)
-         "min" = ifelse(Adj+t(Adj)==2,1,0), #only conserve a connection between nodes who have one in both directions (each adjacency triangle)
+         "max" = ifelse(Adj+t(Adj)>=1,1L,0L), #conserve a connection between nodes if there's one in either directions (either adjacency triangle)
+         "min" = ifelse(Adj+t(Adj)==2,1L,0L), #only conserve a connection between nodes who have one in both directions (each adjacency triangle)
          "plus" = Adj+t(Adj),
          "directed" = ,
          "upper" = ,

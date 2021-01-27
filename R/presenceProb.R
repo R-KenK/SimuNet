@@ -38,13 +38,13 @@
 #' Adj
 #'
 #' generate_presenceProb(Adj,total_scan,mode = "directed")
-generate_presenceProb<- function(Adj,total_scan,mode,
+generate_presenceProb <- function(Adj,total_scan,mode,
                                   Adj.subfun = NULL){
-  if(is.null(Adj.subfun)){
-    Adj.subfun<- determine_Adj.subfun(mode = mode)
+  if (is.null(Adj.subfun)) {
+    Adj.subfun <- determine_Adj.subfun(mode = mode)
   }
 
-  presence.prob<- list(
+  presence.prob <- list(
     P = binary.prob(Adj = Adj,total_scan = total_scan,Adj.subfun = Adj.subfun),
     Adj = Adj,
     total_scan = total_scan,
@@ -57,10 +57,13 @@ generate_presenceProb<- function(Adj,total_scan,mode,
 }
 
 #' Print method for `presenceProb` objects
+#' @importFrom Matrix Matrix
+#' @importFrom Matrix printSpMatrix
 #' @export
 #' @noRd
-print.presenceProb<- function(x,...){
-  print.default(x$P,...)
+print.presenceProb <- function(x,...){
+  P <- Matrix::Matrix(x$P,sparse = TRUE)
+  Matrix::printSpMatrix(P,digits = 3,note.dropping.colnames = FALSE,align = "right")
   cat("  mode: ",x$mode)
 }
 
@@ -71,7 +74,7 @@ print.presenceProb<- function(x,...){
 #' @return logical, TRUE if the inputted object is a `presenceProb` object.
 #'
 #' @noRd
-is.presenceProb<- function(x){
+is.presenceProb <- function(x){
   inherits(x,"presenceProb")
 }
 
@@ -95,16 +98,13 @@ is.presenceProb<- function(x){
 #' @return matrix of probability of presence for each dyad
 #'
 #' @noRd
-binary.prob<- function(Adj,total_scan,
-                       mode = c("directed", "undirected", "max","min", "upper", "lower", "plus","vector"),
+binary.prob <- function(Adj,total_scan,
                        Adj.subfun = NULL){
-  if(total_scan<max(Adj)) {stop("total_scan provided incompatible with the maximum value found in the provided adjacency matrix.")}
-  mode<- match.arg(mode)
-
-  bin.P<- Adj
-  min_resol<- 1/total_scan;
-  prob.scaled<- (Adj[Adj.subfun(Adj)]*(1-2*min_resol)/total_scan)+min_resol;
-  bin.P[Adj.subfun(bin.P)]<- prob.scaled
+  if (total_scan < max(Adj)) {stop("total_scan provided incompatible with the maximum value found in the provided adjacency matrix.")}
+  bin.P <- Adj
+  min_resol <- 1 / total_scan;
+  prob.scaled <- (Adj[Adj.subfun(Adj)] * (1 - 2 * min_resol) / total_scan) + min_resol;
+  bin.P[Adj.subfun(bin.P)] <- prob.scaled
   bin.P
 }
 

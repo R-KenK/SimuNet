@@ -182,7 +182,7 @@ simu_scan(Adj,total_scan,sampling.param = para.focal.net.bias)
 # same time by inputting both a `group.scan_param` and a `focal.scan_param` when
 # creating their sampling parameter object
 para.both.no.bias <- simu_samplingParam(Adj,
-                                        total_scan,mode = "min",
+                                        total_scan,mode = "upper",
                                         group.scan_param = 0.9,
                                         focal.scan_param = "even",
                                         scans.to.do = "all")

@@ -94,16 +94,18 @@ summary.scan <- function(object,...) {
 }
 
 #' Print method for `summary.scan` objects
+#' @importFrom Matrix Matrix
+#' @importFrom Matrix printSpMatrix
 #' @export
 #' @noRd
 print.summary.scan<- function(x,scaled = FALSE,...){
   cat("Theoretical weighted adjacency matrix:\n")
   if (scaled) {
-    to.print <- x$theoretical.scaled
+    to.print <- Matrix::Matrix(x$theoretical.scaled,sparse = TRUE)
   } else {
-    to.print <- x$theoretical.sum
+    to.print <- Matrix::Matrix(x$theoretical.sum,sparse = TRUE)
   }
-  print.default(to.print,...)
+  Matrix::printSpMatrix(to.print,digits = 3,note.dropping.colnames = FALSE,align = "right")
   cat(paste0("\nobtained after summing ", length(x$scans.to.do), " binary scans (mode = \"", x$mode,"\")", "\n\n"))
 }
 
@@ -209,7 +211,7 @@ draw_raw.scan.list <- function(presence.prob,scans.to.do){
   raw.scan.list <-
     rep(
       list( # required for rep to output a list
-        matrix(0,nrow = n,ncol = n,dimnames = list(nodes_names,nodes_names))  # structure the scan as a matrix filled with zeros
+        matrix(0L,nrow = n,ncol = n,dimnames = list(nodes_names,nodes_names))  # structure the scan as a matrix filled with zeros
       ),
       length(scans.to.do)
     )

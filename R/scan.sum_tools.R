@@ -19,7 +19,7 @@ sum_scan.list<- function(scan.list){
 #' @noRd
 sum_scan.sampled<- function(scan,method = c("theoretical","group","focal")) {
   method <- match.arg(method)
-  switch(method,
+  X.sampled <- switch(method,
          "theoretical" = {
            theoretical.sampled <- scan$Adj
            non.diagonal(theoretical.sampled) <- length(explicit_scans.to.do(scan))
@@ -28,6 +28,8 @@ sum_scan.sampled<- function(scan,method = c("theoretical","group","focal")) {
          "group" = count_nonNA(scan$group.scan.list),
          "focal" = count_nonNA(scan$focal.scan.list)
   )
+  X.sampled[!scan$Adj.subfun(X.sampled)] <- 0
+  X.sampled
 }
 
 #' Explicit the vector of scans to do

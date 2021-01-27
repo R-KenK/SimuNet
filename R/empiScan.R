@@ -183,16 +183,20 @@ summary.empiScan <- function(object,...) {
 print.summary.empiScan<- function(x,...){
   print.summary.scan(x,...)
   if (!is.null(x$group.sum)) {
+    group.sum <- Matrix::Matrix(x$group.sum,sparse = TRUE)
+    group.sampled <- Matrix::Matrix(x$group.sampled,sparse = TRUE)
     cat("Group-scan sampling method weighted adjacency matrix:\n")
-    print.default(x$group.sum,...)
+    Matrix::printSpMatrix(group.sum,digits = 3,note.dropping.colnames = FALSE)
     cat(paste0("\nobtained after the following per-edge sampling matrix:", "\n\n"))
-    print.default(x$group.sampled,...)
+    Matrix::printSpMatrix(group.sampled,digits = 3,note.dropping.colnames = FALSE)
   }
   if (!is.null(x$focal.sum)) {
+    focal.sum <- Matrix::Matrix(x$focal.sum,sparse = TRUE)
+    focal.sampled <- Matrix::Matrix(x$focal.sampled,sparse = TRUE)
     cat("Focal-scan sampling method weighted adjacency matrix:\n")
-    print.default(x$focal.sum,...)
+    Matrix::printSpMatrix(focal.sum,digits = 3,note.dropping.colnames = FALSE)
     cat(paste0("\nobtained after the following per-edge sampling matrix:", "\n\n"))
-    print.default(x$focal.sampled,...)
+    Matrix::printSpMatrix(focal.sampled,digits = 3,note.dropping.colnames = FALSE)
   }
 }
 
@@ -420,10 +424,11 @@ focal_sample <- function(scan, focal) {
     seq_along(observed),
     function(s) {
       obs <- observed[[s]]
+
       foc <- focal$focal[s]
       # set other rows and columns than those of the `focal` to `NA`
-      obs[-foc,-foc] <-
-        NA
+      obs[-foc,-foc] <- NA
+      obs[!scan$Adj.subfun(obs)] <- 0
       obs
     }
   )

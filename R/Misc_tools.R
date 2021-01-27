@@ -172,26 +172,41 @@ shorten_vec.to.print <- function(v,threshold = 15,before = 5,after = 5) {
   }
 }
 
+#' Print list element in custom format
+#'
+#' @param l a list
+#' @param i the index of the element to print
+#'
+#' @importFrom Matrix Matrix
+#' @importFrom Matrix printSpMatrix
+#'
+#' @return
+#' @noRd
 print_list_element <- function(l,i) {
   cat("[[",i,"]]\n",sep = "")
-  print.default(l[[i]])
+  l[[i]] <- Matrix::Matrix(l[[i]],sparse = TRUE)
+  Matrix::printSpMatrix(l[[i]],digits = 3,note.dropping.colnames = FALSE,align = "right")
   cat("\n")
   invisible(l)
 }
 
 
+#' Wrapper to shorten vectors to print with ellipsis
+#'
+#' @param l a list to print
+#' @param threshold the length of x above which the vector should be shortened with an ellipsis before being printed
+#' @param before number of elements to display before the ellipsis
+#' @param after number of elements to display after the ellipsis
+#'
+#' @return either v or a shortened version of v to display
+#' @noRd
 shorten_list.to.print <- function(l,threshold = 10,before = 3,after = 2) {
   n <- length(l)
   if (n >= threshold) {
-    print.default(l[1:before])
+    lapply(1:before,function(i) print_list_element(l,i))
     cat("... (",n-before," more scans)\n\n\n",sep = "")
-    lapply(
-      (n-after+1):n,
-      function(i) {
-        print_list_element(l,i)
-      }
-    )
+    lapply((n-after+1):n,function(i) print_list_element(l,i))
   } else {
-    print.default(l)
+    lapply(1:n,function(i) print_list_element(l,i))
   }
 }
