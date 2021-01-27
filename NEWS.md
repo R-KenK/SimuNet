@@ -1,4 +1,9 @@
+# SimuNet 1.1.0
+* implemented a plot method for `scan` and `empiScan` objects. Internal code probably cleanable, but working for now:  
+    `plot()` can be used either on a `scan`/`empiScan` object (which will be passed through `summary()`) or on a `summary.scan`/`summary.empiScan` one. Notable `plot` arguments available: `method` to choose within `c("both","theoretical","group","focal")` for `empiScan` objects. Special case of the `layout` argument used to pass igraphs `layout` or `layout_` functions internally. This way, a layout is determined before calling `plot.igraph` (wrapped in `plot_emprical`) in the case of `method = "both"`, to ensure that all networks rely on the same layout to ease visual comparison.
+
 # SimuNet 1.0.1
+* fixed some ugly print outputs for long `focalList` objects
 
 # SimuNet 1.0.0
 * v1.0.0 Release of a fully functional and documented version of this network simulation framework, including a shift toward OOP internally

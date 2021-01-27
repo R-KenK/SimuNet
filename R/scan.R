@@ -108,23 +108,86 @@ print.summary.scan<- function(x,scaled = FALSE,...){
 }
 
 #' Plot method for `scan` objects
-#' @importFrom igraph graph_from_adjacency_matrix
-#' @importFrom igraph plot.igraph
 #' @export
 #' @noRd
 plot.scan<- function(x,...){
-  x<- igraph::graph_from_adjacency_matrix(x$theoretical,mode = x$mode,weighted = x$weighted)
-  igraph::plot.igraph(x,...,main = "theoretical")
+  x.summary <- summary.scan(x)
+  plot.summary.scan(x.summary,...)
 }
 
-#' Plot method for `scan` objects
+#' Plot method for `summary.scan` objects
 #' @importFrom igraph graph_from_adjacency_matrix
 #' @importFrom igraph plot.igraph
 #' @export
 #' @noRd
-plot.scan<- function(x,...){
-  x<- igraph::graph_from_adjacency_matrix(x$theoretical,mode = x$mode,weighted = x$weighted)
-  igraph::plot.igraph(x,...,main = "theoretical")
+plot.summary.scan<- function(x,scaled = FALSE,vertex.size = NULL,vertex.size.mul = nrow(x$theoretical.sum)/2,vertex.size.min = 3,vertex.size.fun = compute.strength,...){
+  if (scaled) {theoretical.adj <- x$theoretical.scaled} else {theoretical.adj <- x$theoretical.sum}
+  total_scan <- max(x$theoretical.sampled,na.rm = TRUE)
+  max.adj <- max(theoretical.adj,na.rm = TRUE)
+  x.G <- igraph::graph_from_adjacency_matrix(theoretical.adj,mode = x$mode,weighted = TRUE)
+  if (is.null(vertex.size)) {
+    vertex.size <- vertex.size.fun(x.G,mode = x$mode)
+    vertex.size <- (vertex.size.mul * (vertex.size / max(vertex.size))) + vertex.size.min
+  }
+  igraph::plot.igraph(x.G,...,main = "Scan type: theoretical",
+                      sub = paste0("obtained after summing ", total_scan, " binary scans (mode = \"", x$mode,"\")"),
+                      vertex.size = vertex.size
+                      )
+}
+
+#' Compute node degree from graph or adjacency matrix
+#'
+#' @param graph an igraph object (or an adjacency matrix)
+#' @param mode optional, only if `graph` is an adjacency matrix. Othewise character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
+#'
+#' @importFrom igraph graph_from_adjacency_matrix
+#' @importFrom igraph degree
+#' @importFrom igraph vertex_attr
+
+#' @return a vector of degree values for each node
+#' @noRd
+compute.deg<- function(graph,mode=NULL){
+  if(is.matrix(graph)){graph<- igraph::graph_from_adjacency_matrix(graph,mode = mode,weighted = TRUE,add.colnames = TRUE)}
+  deg<- igraph::degree(graph)
+  if(!is.null(names(deg))) {names(deg)<- igraph::vertex_attr(graph)[[1]]} # dirty: does not actually test if the order of the vertex centrality is the same as the name, but I suspect igraph does that by default...
+  deg
+}
+
+#' Compute node strength from graph or adjacency matrix
+#'
+#' @param graph an igraph object (or an adjacency matrix)
+#' @param mode optional, only if `graph` is an adjacency matrix. Otherwise character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
+#'
+#' @importFrom igraph graph_from_adjacency_matrix
+#' @importFrom igraph strength
+#' @importFrom igraph vertex_attr
+#'
+#' @return a vector of strength values for each node
+#' @noRd
+compute.strength<- function(graph,mode = NULL){
+  if (is.matrix(graph)) {graph <- igraph::graph_from_adjacency_matrix(graph,mode = mode,weighted = TRUE,add.colnames = TRUE)}
+  stren <- igraph::strength(graph)
+  if (!is.null(names(stren))) {names(stren) <- igraph::vertex_attr(graph)[[1]]} # dirty: does not actually test if the order of the vertex centrality is the same as the name, but I suspect igraph does that by default...
+  stren
+}
+
+#' Compute eigenvector centrality values from graph or adjacency matrix
+#'
+#' @param graph an igraph object (or an adjacency matrix)
+#' @param mode optional, only if `graph` is an adjacency matrix. Othewise character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
+
+#' @importFrom igraph graph_from_adjacency_matrix
+#' @importFrom igraph strength
+#' @importFrom igraph vertex_attr
+#' @importFrom igraph E
+#'
+#' @return a vector of eigenvector centrality values for each node
+#' @noRd
+compute.EV<- function(graph,mode = NULL){
+  if (is.matrix(graph)) {graph <- igraph::graph_from_adjacency_matrix(graph,mode = mode,weighted = TRUE,add.colnames = TRUE)}
+  EV <- igraph::eigen_centrality(graph, weights = igraph::E(graph)$weight,scale = FALSE)$vector
+  if (!is.null(names(EV))) {names(EV) <- igraph::vertex_attr(graph)[[1]]} # dirty: does not actually test if the order of the vertex centrality is the same as the name, but I suspect igraph does that by default...
+  EV
 }
 
 #' Draw raw binary scan(s) from presence.prob
