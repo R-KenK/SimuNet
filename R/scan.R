@@ -209,7 +209,7 @@ draw_raw.scan.list <- function(presence.prob,scans.to.do){
   raw.scan.list <-
     rep(
       list( # required for rep to output a list
-        matrix(0,nrow = n,ncol = n,dimnames = list(nodes_names,nodes_names))  # structure the scan as a matrix filled with zeros
+        matrix(0L,nrow = n,ncol = n,dimnames = list(nodes_names,nodes_names))  # structure the scan as a matrix filled with zeros
       ),
       length(scans.to.do)
     )

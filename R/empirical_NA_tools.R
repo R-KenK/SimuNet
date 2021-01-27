@@ -16,7 +16,7 @@ resolve_NA <- function(empirical.scan.list,mode = c("directed", "undirected", "m
                is.na(scan) | is.na(t(scan)),
                ifelse(
                  scan == 1 | t(scan) == 1,
-                 1,
+                 1L,
                  NA),
                scan
              )
@@ -29,7 +29,7 @@ resolve_NA <- function(empirical.scan.list,mode = c("directed", "undirected", "m
                is.na(scan) | is.na(t(scan)),
                ifelse(
                  scan == 0 | t(scan) == 0,
-                 0,
+                 0L,
                  NA),
                scan
              )
@@ -65,11 +65,11 @@ count_nonNA <- function(scan.list) {
                          lapply(
                            scan.list,
                            function(scan) {
-                             ifelse(!is.na(scan),1,0) # counting part of the algorithm
+                             ifelse(!is.na(scan),1L,0L) # counting part of the algorithm
                            }
                          )
   )
-  diag(scan.sampled) <- 0
+  diag(scan.sampled) <- 0L
   scan.sampled
 }
 
@@ -80,7 +80,7 @@ count_nonNA <- function(scan.list) {
 #' @return similarly dimensioned vector or matrix with zeros instead of NAs
 #' @noRd
 zero_NA<- function(X){
-  ifelse(!is.na(X),X,0)
+  ifelse(!is.na(X),X,0L)
 }
 
 #' Replace NAs by a set value in vectors/matrices

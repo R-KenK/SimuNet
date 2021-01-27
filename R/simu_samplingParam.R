@@ -106,6 +106,7 @@ simu_samplingParam <-
 
     method <-
       determine_method(group.scan_param = group.scan_param, focal.scan_param = focal.scan_param)
+    mode(Adj) <- "integer"
 
     switch(
       method,

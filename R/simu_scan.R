@@ -211,6 +211,7 @@ simu_scan <-
     # other variable otherwise if needed
     if (!is.presenceProb(Adj)) {
       Adj.subfun <- determine_Adj.subfun(mode)
+      mode(Adj) <- "integer"  # helps storing derived objects or elements as integer matrix to save on memory allocation
       presence.prob <-
         generate_presenceProb(
           Adj = Adj,
