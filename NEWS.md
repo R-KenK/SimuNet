@@ -1,3 +1,10 @@
+# SimuNet (development version)
+
+# SimuNet 1.2.0.9000
+* Switched internally to integer matrices instead of numeric matrices: significant improvement of -10% computation time and -30% memory allocation on a `n = 21` `total_scan = 9000` empirical network
+* Added dependency/reliance on the `Matrix` package, notably for its printing of sparse matrices
+* Improved handling of triangular matrices. `presenProb` and `obsProb` objects now rightfully store triangular matrices and supposedly only the required random draw are performed (TO CHECK BEFORE TRUE RELEASE)
+
 # SimuNet 1.1.0
 * implemented a plot method for `scan` and `empiScan` objects. Internal code probably cleanable, but working for now:  
     `plot()` can be used either on a `scan`/`empiScan` object (which will be passed through `summary()`) or on a `summary.scan`/`summary.empiScan` one. Notable `plot` arguments available: `method` to choose within `c("both","theoretical","group","focal")` for `empiScan` objects. Special case of the `layout` argument used to pass igraphs `layout` or `layout_` functions internally. This way, a layout is determined before calling `plot.igraph` (wrapped in `plot_emprical`) in the case of `method = "both"`, to ensure that all networks rely on the same layout to ease visual comparison.
