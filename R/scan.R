@@ -94,16 +94,18 @@ summary.scan <- function(object,...) {
 }
 
 #' Print method for `summary.scan` objects
+#' @importFrom Matrix Matrix
+#' @importFrom Matrix printSpMatrix
 #' @export
 #' @noRd
 print.summary.scan<- function(x,scaled = FALSE,...){
   cat("Theoretical weighted adjacency matrix:\n")
   if (scaled) {
-    to.print <- x$theoretical.scaled
+    to.print <- Matrix::Matrix(x$theoretical.scaled,sparse = TRUE)
   } else {
-    to.print <- x$theoretical.sum
+    to.print <- Matrix::Matrix(x$theoretical.sum,sparse = TRUE)
   }
-  print.default(to.print,...)
+  Matrix::printSpMatrix(to.print,digits = 3,note.dropping.colnames = FALSE,align = "right")
   cat(paste0("\nobtained after summing ", length(x$scans.to.do), " binary scans (mode = \"", x$mode,"\")", "\n\n"))
 }
 

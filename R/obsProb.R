@@ -78,10 +78,12 @@ generate_obsProb <- function(Adj,
       obs.prob_type = obs.prob_type,
       n = n,
       nodes_names = nodes_names,
-      Adj = Adj
+      Adj = Adj,
+      Adj.subfun = Adj.subfun
     ),
     Adj = Adj,
     total_scan = total_scan,
+    mode = mode,
     obs.prob_type = obs.prob_type,
     obs.prob_fun = obs.prob_fun
   )
@@ -91,10 +93,13 @@ generate_obsProb <- function(Adj,
 }
 
 #' Print method for `obsProb` objects
+#' @importFrom Matrix Matrix
+#' @importFrom Matrix printSpMatrix
 #' @export
 #' @noRd
 print.obsProb <- function(x, ...) {
-  print.default(x$P, ...)
+  P <- Matrix::Matrix(x$P,sparse = TRUE)
+  Matrix::printSpMatrix(P,digits = 3,note.dropping.colnames = FALSE,align = "right")
 }
 
 #' Test if object if a `obsProb` object
@@ -170,7 +175,8 @@ calculate_obs.prob <-
            obs.prob_type,
            n,
            nodes_names,
-           Adj) {
+           Adj,
+           Adj.subfun) {
     P <- switch(
       obs.prob_type,
       "constant" = matrix(obs.prob_fun, n, n, dimnames = list(nodes_names, nodes_names)),
@@ -208,7 +214,7 @@ calculate_obs.prob <-
       },
       stop("`obs.prob_fun` class not recognized.")
     )
-    diag(P) <- 0
+    P[!Adj.subfun(P)] <- 0
     P
   }
 
