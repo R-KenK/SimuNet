@@ -22,4 +22,5 @@ Imports:
     snow,
     stats,
     igraph,
-    Matrix
+    Matrix,
+    httr
