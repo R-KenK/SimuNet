@@ -14,7 +14,7 @@ navbar:
 output_dir: "."
 output:
   html_document:
-    theme: minimal
-    highlight: textmate
+    theme: sandstone
+    highlight: zenburn
 #    include:
 #      after_body: _footer.html

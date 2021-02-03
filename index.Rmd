@@ -8,21 +8,8 @@ output:
     toc_float: true 
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+Welcome to SimuNet! An R package designed for your empirical (social) network simulation needs!  
+  
+This website is currently in construction, and the package itself is still evolving pretty quickly.  
 
-# This website
-is under construction
-
-## but it should be
-soon updated
-
-## with some
-tutorial
-
-## after I figure out
-the different functionnalities
-
-# Hopefully this should help SimuNet users
-getting used to the framework
+Stay tuned for more!
