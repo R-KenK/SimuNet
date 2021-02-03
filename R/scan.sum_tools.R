@@ -28,7 +28,7 @@ sum_scan.sampled<- function(scan,method = c("theoretical","group","focal")) {
          "group" = count_nonNA(scan$group.scan.list),
          "focal" = count_nonNA(scan$focal.scan.list)
   )
-  X.sampled[!scan$Adj.subfun(X.sampled)] <- 0
+  X.sampled[!scan$Adj.subfun(X.sampled)] <- 0L
   X.sampled
 }
 
