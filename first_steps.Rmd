@@ -1,7 +1,5 @@
 ---
 title: "SimuNet - First steps"
-author: "Kenneth Keuk"
-date: "02/02/2021"
 output: 
   html_document: 
     toc: true
@@ -105,4 +103,6 @@ plot(G,
   
 # Introducing SimuNet  
 ## Basic functionalities  
-SimuNet's goal is to randomly generate weighted (social) networks by simulating how each final weight has been in fact obtained after summing binary events.
+SimuNet's goal is to randomly generate weighted (social) networks by simulating how each final weight has been in fact obtained after summing binary events.  
+  
+INSERT INFOGRAPHIC?
