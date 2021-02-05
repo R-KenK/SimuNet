@@ -60,7 +60,7 @@ resolve_NA <- function(empirical.scan.list,mode = c("directed", "undirected", "m
 #'
 #' @return an integer matrix representing the sampling effort for each dyad
 #' @noRd
-count_nonNA <- function(scan.list) {
+count_nonNA <- function(scan.list,Adj.subfun) {
   scan.sampled <- Reduce("+",
                          lapply(
                            scan.list,
@@ -69,7 +69,7 @@ count_nonNA <- function(scan.list) {
                            }
                          )
   )
-  diag(scan.sampled) <- 0L
+  scan.sampled[Adj.subfun(scan.sampled)] <- 0L
   scan.sampled
 }
 

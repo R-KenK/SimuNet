@@ -178,6 +178,8 @@ summary.empiScan <- function(object,...) {
 }
 
 #' Print method for `summary.empiScan` objects
+#' @importFrom Matrix Matrix
+#' @importFrom Matrix printSpMatrix
 #' @export
 #' @noRd
 print.summary.empiScan<- function(x,...){
@@ -401,7 +403,8 @@ group_sample <- function(scan, obs.prob) {
       # set the missed observation to `NA`
       s[scan$Adj.subfun(s)][missed] <-
         NA
-      s
+      s # standard
+      # Matrix::pack(as.matrix(s)) # Matrix.packed
     }
   )
 }
@@ -429,7 +432,8 @@ focal_sample <- function(scan, focal) {
       # set other rows and columns than those of the `focal` to `NA`
       obs[-foc,-foc] <- NA
       obs[!scan$Adj.subfun(obs)] <- 0
-      obs
+      obs # standard
+      # Matrix::pack(as.matrix(obs)) # Matrix.packed
     }
   )
 }

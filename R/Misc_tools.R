@@ -184,7 +184,8 @@ shorten_vec.to.print <- function(v,threshold = 15,before = 5,after = 5) {
 #' @noRd
 print_list_element <- function(l,i) {
   cat("[[",i,"]]\n",sep = "")
-  l[[i]] <- Matrix::Matrix(l[[i]],sparse = TRUE)
+  # l[[i]] <- Matrix::Matrix(l[[i]],sparse = TRUE)
+  l[[i]] <- Matrix::Matrix(unpack_snPackMat(l[[i]]),sparse = TRUE)
   Matrix::printSpMatrix(l[[i]],digits = 3,note.dropping.colnames = FALSE,align = "right")
   cat("\n")
   invisible(l)
