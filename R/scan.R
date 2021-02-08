@@ -101,11 +101,10 @@ summary.scan <- function(object,...) {
 print.summary.scan<- function(x,scaled = FALSE,...){
   cat("Theoretical weighted adjacency matrix:\n")
   if (scaled) {
-    to.print <- Matrix::Matrix(x$theoretical.scaled,sparse = TRUE)
+    use_printSpMatrix(x$theoretical.scaled)
   } else {
-    to.print <- Matrix::Matrix(x$theoretical.sum,sparse = TRUE)
+    use_printSpMatrix(x$theoretical.sum)
   }
-  Matrix::printSpMatrix(to.print,digits = 3,note.dropping.colnames = FALSE,align = "right")
   cat(paste0("\nobtained after summing ", length(x$scans.to.do), " binary scans (mode = \"", x$mode,"\")", "\n\n"))
 }
 
@@ -211,16 +210,16 @@ draw_raw.scan.list <- function(presence.prob,scans.to.do){
   raw.scan.list <-
     rep(
       list( # required for rep to output a list
-        matrix(0,nrow = n,ncol = n,dimnames = list(nodes_names,nodes_names))  # structure the scan as a matrix filled with zeros
+        matrix(0L,nrow = n,ncol = n,dimnames = list(nodes_names,nodes_names))  # structure the scan as a matrix filled with zeros
       ),
       length(scans.to.do)
     )
   lapply(
     raw.scan.list,
     function(s) {
-      s[presence.prob$Adj.subfun(s)]<- stats::rbinom(p,1,presence.P.vec)  # core of the randomization: draw a (raw.scan.list) tie or not for each (relevant, cf. triangular matrices or undirected) dyad according to its presence probability
+      s[presence.prob$Adj.subfun(s)]<- stats::rbinom(p,1L,presence.P.vec)  # core of the randomization: draw a (raw.scan.list) tie or not for each (relevant, cf. triangular matrices or undirected) dyad according to its presence probability
       # Matrix::pack(s,upperTri = TRUE) # Matrix.packed
-      generate_snPackMat(s,mode = presence.prob$mode) # Matrix.packed
+      generate_snPackMat(s,Adj.subfun = presence.prob$Adj.subfun,mode = presence.prob$mode) # SimuNet.packed
       # s # standard
     }
   )

@@ -70,7 +70,12 @@ count_nonNA <- function(scan.list,Adj.subfun) {
                          )
   )
   scan.sampled[Adj.subfun(scan.sampled)] <- 0L
-  scan.sampled
+  if (is.snPackMat(scan.list[[1]])) {
+    scan.list[[1]]$M <- scan.sampled
+    unpack_snPackMat(scan.list[[1]])
+  } else {
+    scan.sampled
+  }
 }
 
 #' Replace NAs by zeros in vectors/matrices

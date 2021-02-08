@@ -185,20 +185,16 @@ summary.empiScan <- function(object,...) {
 print.summary.empiScan<- function(x,...){
   print.summary.scan(x,...)
   if (!is.null(x$group.sum)) {
-    group.sum <- Matrix::Matrix(x$group.sum,sparse = TRUE)
-    group.sampled <- Matrix::Matrix(x$group.sampled,sparse = TRUE)
     cat("Group-scan sampling method weighted adjacency matrix:\n")
-    Matrix::printSpMatrix(group.sum,digits = 3,note.dropping.colnames = FALSE)
+    use_printSpMatrix(x$group.sum)
     cat(paste0("\nobtained after the following per-edge sampling matrix:", "\n\n"))
-    Matrix::printSpMatrix(group.sampled,digits = 3,note.dropping.colnames = FALSE)
+    use_printSpMatrix(x$group.sampled)
   }
   if (!is.null(x$focal.sum)) {
-    focal.sum <- Matrix::Matrix(x$focal.sum,sparse = TRUE)
-    focal.sampled <- Matrix::Matrix(x$focal.sampled,sparse = TRUE)
     cat("Focal-scan sampling method weighted adjacency matrix:\n")
-    Matrix::printSpMatrix(focal.sum,digits = 3,note.dropping.colnames = FALSE)
+    use_printSpMatrix(x$focal.sum)
     cat(paste0("\nobtained after the following per-edge sampling matrix:", "\n\n"))
-    Matrix::printSpMatrix(focal.sampled,digits = 3,note.dropping.colnames = FALSE)
+    use_printSpMatrix(x$focal.sampled)
   }
 }
 
@@ -401,10 +397,12 @@ group_sample <- function(scan, obs.prob) {
       missed <-
         stats::rbinom(length(obs.P), 1, obs.P) == 0
       # set the missed observation to `NA`
+      s <- unpack_snPackMat(s)
       s[scan$Adj.subfun(s)][missed] <-
         NA
       s # standard
       # Matrix::pack(as.matrix(s)) # Matrix.packed
+      generate_snPackMat(M = s,Adj.subfun = scan$Adj.subfun,mode = scan$mode) # Matrix.packed
     }
   )
 }
@@ -427,13 +425,15 @@ focal_sample <- function(scan, focal) {
     seq_along(observed),
     function(s) {
       obs <- observed[[s]]
+      obs <- unpack_snPackMat(obs)
 
       foc <- focal$focal[s]
       # set other rows and columns than those of the `focal` to `NA`
       obs[-foc,-foc] <- NA
-      obs[!scan$Adj.subfun(obs)] <- 0
+      obs[!scan$Adj.subfun(obs)] <- 0L
       obs # standard
       # Matrix::pack(as.matrix(obs)) # Matrix.packed
+      generate_snPackMat(M = obs,Adj.subfun = scan$Adj.subfun,mode = scan$mode) # Matrix.packed
     }
   )
 }

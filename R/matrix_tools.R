@@ -91,7 +91,15 @@ non.zero.non.diag<- function(M) {which(M>0&!diagonal(M),arr.ind = TRUE,useNames 
 #'
 #' @return the sum of X and Y, replacing `NA`s by zeros
 #' @noRd
-matrix_sum_na.rm <- function(X,Y) {ifelse(!is.na(X),X,0L) + ifelse(!is.na(Y),Y,0L)}
+matrix_sum_na.rm <- function(X,Y) {
+  if (is.snPackMat(X) & is.snPackMat(Y)) {
+    X$M <- ifelse(!is.na(X),X$M,0L) + ifelse(!is.na(Y),Y$M,0L) # reuses `x` simply to avoid creating new internal variables
+    X
+  } else {
+    ifelse(!is.na(X),X,0L) + ifelse(!is.na(Y),Y,0L)
+  }
+}
+
 
 
 

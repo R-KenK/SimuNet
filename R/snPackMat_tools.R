@@ -77,7 +77,7 @@ unpack_snPackMat <- function(M) {
 #' @export
 #' @noRd
 print.snPackMat <- function(x,...) {
-  print(unpack_snPackMat(x),...)
+  use_printSpMatrix(unpack_snPackMat(x),...)
 }
 
 #' Operators method for `snPackMat` objects
@@ -119,3 +119,9 @@ is.snPackMat <- function(x) {
   inherits(x, "snPackMat")
 }
 
+#'‘Not Available’ / Missing Values of a `snPackMat` object
+#' @export
+#' @noRd
+is.na.snPackMat <- function(x) {
+  is.na(x$M)
+}

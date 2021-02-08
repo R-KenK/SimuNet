@@ -3,6 +3,7 @@
 S3method(Math,snPackMat)
 S3method(Ops,snPackMat)
 S3method(Summary,snPackMat)
+S3method(is.na,snPackMat)
 S3method(plot,empiScan)
 S3method(plot,scan)
 S3method(plot,summary.empiScan)
