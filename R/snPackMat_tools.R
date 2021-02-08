@@ -46,6 +46,7 @@ pack_snPackMat <- function(M,mode) {
 #' @return TO WRITE
 #' @noRd
 unpack_snPackMat <- function(M) {
+  if (!is.snPackMat(M)) {return(M)}
   switch(M$mode,
          "upper" = {
            unpacked <- matrix(
@@ -79,13 +80,32 @@ print.snPackMat <- function(x,...) {
   print(unpack_snPackMat(x),...)
 }
 
-#' Print method for `snPackMat` objects
+#' Operators method for `snPackMat` objects
 #' @export
 #' @noRd
 Ops.snPackMat <- function(e1,e2) {
-  M1 <- unpack_snPackMat(e1)
-  M2 <- unpack_snPackMat(e2)
-  Ops.(M1,M2)
+  e1 <- unpack_snPackMat(e1) # functional, but does not retain snPackMat class (e1 + e2 becomes a "matrix" "array')
+  e2 <- unpack_snPackMat(e2)
+  NextMethod()
+}
+
+#' Math functions method for `snPackMat` objects
+#' @export
+#' @noRd
+Math.snPackMat <- function(x,...) {
+  x <- unpack_snPackMat(x) # functional, but does not retain snPackMat class (e1 + e2 becomes a "matrix" "array')
+  NextMethod()
+}
+
+#' Summary functions method for `snPackMat` objects
+#' @export
+#' @noRd
+Summary.snPackMat <- function(...,na.rm = FALSE) {
+  args <- list(...)
+  args <- lapply(args, function(x) {
+    x <- unpack_snPackMat(x) # functional, but does not retain snPackMat class (e1 + e2 becomes a "matrix" "array')
+  })
+  do.call(.Generic, c(args, na.rm = na.rm))
 }
 
 #' Test if object if a `snPackMat` object
