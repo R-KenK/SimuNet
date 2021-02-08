@@ -185,12 +185,27 @@ shorten_vec.to.print <- function(v,threshold = 15,before = 5,after = 5) {
 print_list_element <- function(l,i) {
   cat("[[",i,"]]\n",sep = "")
   # l[[i]] <- Matrix::Matrix(l[[i]],sparse = TRUE)
-  l[[i]] <- Matrix::Matrix(unpack_snPackMat(l[[i]]),sparse = TRUE)
-  Matrix::printSpMatrix(l[[i]],digits = 3,note.dropping.colnames = FALSE,align = "right")
+  use_printSpMatrix(unpack_snPackMat(l[[i]]))
   cat("\n")
   invisible(l)
 }
 
+#' TO WRITE
+#'
+#' @param M TO WRITE
+#' @param ... TO WRITE
+#' @param sparse TO WRITE
+#' @param digits TO WRITE
+#' @param note.dropping.colnames TO WRITE
+#' @param align TO WRITE
+#'
+#' @return TO WRITE
+#' @noRd
+use_printSpMatrix <- function(M,...,sparse = TRUE, digits = 3, note.dropping.colnames = FALSE,align = "right") {
+  if (is.snPackMat(M)) {M <- unpack_snPackMat(M)}
+  M <- Matrix::Matrix(M,sparse = sparse)
+  Matrix::printSpMatrix(M,digits = digits,note.dropping.colnames = note.dropping.colnames,align = align,...)
+}
 
 #' Wrapper to shorten vectors to print with ellipsis
 #'
