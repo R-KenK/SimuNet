@@ -176,7 +176,8 @@ simu_scan <-
   function(Adj = NULL,
            total_scan = NULL,scans.to.do = NULL,
            mode = c("directed","undirected","max","min","upper","lower","plus","vector"),
-           sampling.param = NULL) {
+           sampling.param = NULL,
+           use.snPackMat = FALSE) {
     if (!is.null(sampling.param)) {
       if (is.samplingParam(sampling.param)) {
         if (!is.null(sampling.param$obs.prob)) {
@@ -224,12 +225,12 @@ simu_scan <-
     }
 
     # use the class "scan" object generator to
-    scan <- generate_scan(presence.prob = presence.prob,scans.to.do = scans.to.do)
+    scan <- generate_scan(presence.prob = presence.prob,scans.to.do = scans.to.do,use.snPackMat = use.snPackMat)
 
     # output either the theoretical scan or applies sample_from_scan
     if (is.null(sampling.param)) {
       scan
     } else {
-      generate_empiScan(scan = scan, sampling.param = sampling.param)
+      generate_empiScan(scan = scan, sampling.param = sampling.param,use.snPackMat = use.snPackMat)
     }
   }

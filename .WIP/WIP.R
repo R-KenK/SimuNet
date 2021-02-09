@@ -56,6 +56,7 @@ both <- simu_scan(sampling.param = para.both)
 both
 both.sum <- summary(both)
 both.sum
+str(both.sum)
 plot_adj_cor(Adj[upper.tri(Adj)]/9000,
              both.sum$theoretical.scaled[upper.tri(Adj)])
 
@@ -71,8 +72,14 @@ Adj <- import_from_asnr("Mammalia","bats_f",output = "adjacency",type = "upper")
 total_scan <- 9000
 
 
-theo <- simu_scan(Adj,total_scan,scans.to.do = "all",mode = "upper")
+theo <- simu_scan(Adj,total_scan,scans.to.do = "all",mode = "upper",use.snPackMat = FALSE)
 theo
+str(theo$theoretical.scan.list[[1]])
+theo.packed <- simu_scan(Adj,total_scan,scans.to.do = "all",mode = "upper",use.snPackMat = TRUE)
+theo.packed
+str(theo.packed$theoretical.scan.list[[1]])
+print(object.size(theo),units = "Mb")
+print(object.size(theo.packed),units = "Mb")
 theo.sum <- summary(theo)
 theo.sum
 str(theo.sum)
@@ -80,8 +87,9 @@ str(theo.sum)
 para.both <- simu_samplingParam(Adj,total_scan,mode = "upper",
                                 scans.to.do = "all",group.scan_param = .2,focal.scan_param = "even")
 
-both <- simu_scan(sampling.param = para.both)
+both <- simu_scan(sampling.param = para.both,use.snPackMat = FALSE)
 both
+str(both$group.scan.list[[1]])
 both.sum <- summary(both)
 both.sum
 str(both.sum)

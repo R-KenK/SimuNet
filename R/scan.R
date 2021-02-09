@@ -31,9 +31,9 @@
 #' }
 #'
 #' @noRd
-generate_scan<- function(presence.prob,scans.to.do){
+generate_scan<- function(presence.prob,scans.to.do,use.snPackMat){
   if(length(scans.to.do) == 1) {if(scans.to.do == "all") {scans.to.do <- 1:presence.prob$total_scan}}
-  raw.scan.list <- draw_raw.scan.list(presence.prob = presence.prob,scans.to.do = scans.to.do)
+  raw.scan.list <- draw_raw.scan.list(presence.prob = presence.prob,scans.to.do = scans.to.do,use.snPackMat = use.snPackMat)
   theoretical.scan.list <- apply_mode(raw.scan.list = raw.scan.list,mode = presence.prob$mode)
   scan<- list(
     raw.scan.list = raw.scan.list,
@@ -204,7 +204,7 @@ compute.EV<- function(graph,mode = NULL){
 #' @return a list of raw binary adjacency matrix shaped like the `Adj` contained in `presence.prob`
 #'
 #' @noRd
-draw_raw.scan.list <- function(presence.prob,scans.to.do){
+draw_raw.scan.list <- function(presence.prob,scans.to.do,use.snPackMat){
   n<- nrow(presence.prob$Adj);nodes_names<- rownames(presence.prob$Adj)
   presence.P.vec<- presence.prob$P[presence.prob$Adj.subfun(presence.prob$P)]; p<- length(presence.P.vec)  # subset a presence probability vector the same way Adj is subset (depends on `Adj`'s mode (cf. igraph)) <- NOW THIS IS JUST A UPPER/LOWER.TRI VS NON.DIAGONAL THING...
   raw.scan.list <-
@@ -219,8 +219,11 @@ draw_raw.scan.list <- function(presence.prob,scans.to.do){
     function(s) {
       s[presence.prob$Adj.subfun(s)]<- stats::rbinom(p,1L,presence.P.vec)  # core of the randomization: draw a (raw.scan.list) tie or not for each (relevant, cf. triangular matrices or undirected) dyad according to its presence probability
       # Matrix::pack(s,upperTri = TRUE) # Matrix.packed
-      generate_snPackMat(s,Adj.subfun = presence.prob$Adj.subfun,mode = presence.prob$mode) # SimuNet.packed
-      # s # standard
+      if (use.snPackMat) {
+        generate_snPackMat(s,Adj.subfun = presence.prob$Adj.subfun,mode = presence.prob$mode) # SimuNet.packed
+      } else {
+        s # standard
+      }
     }
   )
 }

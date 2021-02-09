@@ -35,7 +35,7 @@
 #'   contained in `presence.prob`}
 #' }
 #' @noRd
-generate_empiScan <- function(scan, sampling.param) {
+generate_empiScan <- function(scan, sampling.param,use.snPackMat) {
   scan$scan.type <- "empirical"
   method <- sampling.param$method
   mode <- scan$mode
@@ -44,7 +44,8 @@ generate_empiScan <- function(scan, sampling.param) {
     group.scan.list <-
       sample_from_scan(scan = scan,
                        sampling.param = sampling.param,
-                       method = "group")
+                       method = "group",
+                       use.snPackMat = use.snPackMat)
     group.scan.na.resolved <- resolve_NA(empirical.scan.list = group.scan.list,mode = mode)
     group.scan.sum <- sum_scan.list(group.scan.na.resolved)
     obs.prob <- sampling.param$obs.prob
@@ -55,7 +56,8 @@ generate_empiScan <- function(scan, sampling.param) {
     focal.scan.list <-
       sample_from_scan(scan = scan,
                        sampling.param = sampling.param,
-                       method = "focal")
+                       method = "focal",
+                       use.snPackMat = use.snPackMat)
     focal.scan.na.resolved <- resolve_NA(empirical.scan.list = focal.scan.list,mode = mode)
     focal.scan.sum <- sum_scan.list(focal.scan.na.resolved)
     focal <- sampling.param$focal
@@ -360,13 +362,13 @@ is.empiScan <- function(scan) {
 #' }
 #'
 #' @noRd
-sample_from_scan <- function(scan, sampling.param, method) {
+sample_from_scan <- function(scan, sampling.param, method,use.snPackMat) {
   # according to the empirical method chosen, applies some "empirical" missed
   # observation via the correct sampling method
   switch(
     method,
-    "group" = group_sample(scan = scan, obs.prob = sampling.param$obs.prob),
-    "focal" = focal_sample(scan = scan, focal = sampling.param$focal)
+    "group" = group_sample(scan = scan, obs.prob = sampling.param$obs.prob,use.snPackMat = use.snPackMat),
+    "focal" = focal_sample(scan = scan, focal = sampling.param$focal,use.snPackMat = use.snPackMat)
   )
 }
 
@@ -381,7 +383,7 @@ sample_from_scan <- function(scan, sampling.param, method) {
 #' @return a list of binary adjacency matrix with potentially some dyads not observed
 #'   (turned into `NA`)
 #' @noRd
-group_sample <- function(scan, obs.prob) {
+group_sample <- function(scan, obs.prob,use.snPackMat) {
   # set the sampled scan to be like the `raw.scan.list` one (i.e. this is a binary
   # _directed_ adjacency matrix)
   observed <-
@@ -397,12 +399,17 @@ group_sample <- function(scan, obs.prob) {
       missed <-
         stats::rbinom(length(obs.P), 1, obs.P) == 0
       # set the missed observation to `NA`
-      s <- unpack_snPackMat(s)
+      if (use.snPackMat) {
+        s <- unpack_snPackMat(s)
+      }
       s[scan$Adj.subfun(s)][missed] <-
         NA
-      s # standard
+      if (use.snPackMat) {
+        s # standard
+      } else {
+        generate_snPackMat(M = s,Adj.subfun = scan$Adj.subfun,mode = scan$mode) # Matrix.packed
+      }
       # Matrix::pack(as.matrix(s)) # Matrix.packed
-      generate_snPackMat(M = s,Adj.subfun = scan$Adj.subfun,mode = scan$mode) # Matrix.packed
     }
   )
 }
@@ -416,7 +423,7 @@ group_sample <- function(scan, obs.prob) {
 #' @return a list of binary adjacency matrix with dyads not in the `focal$focal` row and
 #'   column turned into `NA`
 #' @noRd
-focal_sample <- function(scan, focal) {
+focal_sample <- function(scan, focal,use.snPackMat) {
   # set the sampled scan to be like the `raw.scan.list` one (i.e. this is a binary
   # _directed_ adjacency matrix)
   observed <-
@@ -425,15 +432,20 @@ focal_sample <- function(scan, focal) {
     seq_along(observed),
     function(s) {
       obs <- observed[[s]]
-      obs <- unpack_snPackMat(obs)
+      if (use.snPackMat) {
+        obs <- unpack_snPackMat(obs)
+      }
 
       foc <- focal$focal[s]
       # set other rows and columns than those of the `focal` to `NA`
       obs[-foc,-foc] <- NA
       obs[!scan$Adj.subfun(obs)] <- 0L
-      obs # standard
+      if (use.snPackMat) {
+        obs # standard
+      } else {
+        generate_snPackMat(M = obs,Adj.subfun = scan$Adj.subfun,mode = scan$mode) # Matrix.packed
+      }
       # Matrix::pack(as.matrix(obs)) # Matrix.packed
-      generate_snPackMat(M = obs,Adj.subfun = scan$Adj.subfun,mode = scan$mode) # Matrix.packed
     }
   )
 }
