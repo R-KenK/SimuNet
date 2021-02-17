@@ -62,8 +62,7 @@ generate_presenceProb <- function(Adj,total_scan,mode,
 #' @export
 #' @noRd
 print.presenceProb <- function(x,...){
-  P <- Matrix::Matrix(x$P,sparse = TRUE)
-  Matrix::printSpMatrix(P,digits = 3,note.dropping.colnames = FALSE,align = "right")
+  use_printSpMatrix(x$P)
   cat("  mode: ",x$mode)
 }
 

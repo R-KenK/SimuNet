@@ -98,8 +98,7 @@ generate_obsProb <- function(Adj,
 #' @export
 #' @noRd
 print.obsProb <- function(x, ...) {
-  P <- Matrix::Matrix(x$P,sparse = TRUE)
-  Matrix::printSpMatrix(P,digits = 3,note.dropping.colnames = FALSE,align = "right")
+  use_printSpMatrix(x$P)
 }
 
 #' Test if object if a `obsProb` object
