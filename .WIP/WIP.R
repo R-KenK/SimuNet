@@ -68,128 +68,62 @@ plot_adj_cor(both.sum$theoretical.scaled[upper.tri(Adj)],
 
 #  triangular packed matrices vs regular vs vectors -----------------------
 
-Adj <- import_from_asnr("Mammalia","bats_f",output = "adjacency",type = "upper")
-total_scan <- 9000
+randomize_Adj <- function(n, total_scan,Adj.subfun = diag) {
+  set.seed(42)
+  nodes<- letters[1:n]
+  Adj<- matrix(data = 0,nrow = n,ncol = n,dimnames = list(nodes,nodes))
+  Adj[non.diagonal(Adj)] <- round(runif(n*(n-1),0,total_scan))
+  Adj[Adj.subfun(Adj)] <- NA
+  Adj
+}
 
-
-theo <- simu_scan(Adj,total_scan,scans.to.do = "all",mode = "upper",use.snPackMat = FALSE)
-theo
-str(theo$theoretical.scan.list[[1]])
-theo.packed <- simu_scan(Adj,total_scan,scans.to.do = "all",mode = "upper",use.snPackMat = TRUE)
-theo.packed
-str(theo.packed$theoretical.scan.list[[1]])
-print(object.size(theo),units = "Mb")
-print(object.size(theo.packed),units = "Mb")
-theo.sum <- summary(theo)
-theo.sum
-str(theo.sum)
-
-para.both <- simu_samplingParam(Adj,total_scan,mode = "upper",
-                                scans.to.do = "all",group.scan_param = .2,focal.scan_param = "even")
-
-both <- simu_scan(sampling.param = para.both,use.snPackMat = FALSE)
-both
-str(both$group.scan.list[[1]])
-both.sum <- summary(both)
-both.sum
-str(both.sum)
-
-bench.standard <- do.call(rbind,
-                          lapply(
-                            1:10,
-                            function(i) {
-                              cat(paste0("\r",i * 10,"%"))
-                              start <- Sys.time()
-                              theo <- simu_scan(Adj,total_scan,scans.to.do = "all",mode = "upper")
-                              theo.sum <- summary(theo)
-                              both <- simu_scan(sampling.param = para.both)
-                              both.sum <- summary(both)
-                              stop <- Sys.time()
-
-                              data.frame(
-                                i = i,
-                                method = "standard",
-                                # method = "packed",
-                                time = difftime(stop,start,units = "secs"),
-                                size.theo = format(object.size(theo),units = "Kb"),
-                                size.theo.sum = format(object.size(theo.sum),units = "Kb"),
-                                size.both = format(object.size(both),units = "Kb"),
-                                size.both.sum = format(object.size(both.sum),units = "Kb")
-                              )
-                            }
-                          )
+bench.df <- rbind_lapply(
+  c(10,30,50,100,150,200,250),
+  function(n) {
+    Adj <- randomize_Adj(n,42,function(Adj) {lower.tri(Adj,diag = TRUE)})
+    Adj.packed <- pack_snPackMat(Adj,"upper")
+    bench <- microbenchmark::microbenchmark(
+      standard = {
+        exp(Adj)
+      },
+      packed = {
+        exp(Adj.packed)
+      },
+      unit = "ns",times = 50
+    )
+    df <- data.frame(n = n,
+               method = bench$expr,
+               type = "triangle",
+               time = bench$time
+    )
+    Adj <- randomize_Adj(n,42,diag)
+    Adj.packed <- pack_snPackMat(Adj,"directed")
+    bench <- microbenchmark::microbenchmark(
+      standard = {
+        exp(Adj)
+      },
+      packed = {
+        exp(Adj.packed)
+      },
+      unit = "ns",times = 50
+    )
+    rbind(df,
+          data.frame(n = n,
+                     method = bench$expr,
+                     type = "non.diagonal",
+                     time = bench$time
+          )
+    )
+  }
 )
-#
-# bench.packed <- do.call(rbind,
-#                         lapply(
-#                           1:10,
-#                           function(i) {
-#                             cat(paste0("\r",i * 10,"%"))
-#                             start <- Sys.time()
-#                             theo <- simu_scan(Adj,total_scan,scans.to.do = "all",mode = "upper")
-#                             theo.sum <- summary(theo)
-#                             both <- simu_scan(sampling.param = para.both)
-#                             both.sum <- summary(both)
-#                             stop <- Sys.time()
-#
-#                             data.frame(
-#                               i = i,
-#                               # method = "standard",
-#                               method = "Matrix.packed",
-#                               time = difftime(stop,start,units = "secs"),
-#                               size.theo = format(object.size(theo),units = "Kb"),
-#                               size.theo.sum = format(object.size(theo.sum),units = "Kb"),
-#                               size.both = format(object.size(both),units = "Kb"),
-#                               size.both.sum = format(object.size(both.sum),units = "Kb")
-#                             )
-#                           }
-#                         )
-# )
-
-bench.homemade <- do.call(rbind,
-                        lapply(
-                          1:10,
-                          function(i) {
-                            cat(paste0("\r",i * 10,"%"))
-                            start <- Sys.time()
-                            theo <- simu_scan(Adj,total_scan,scans.to.do = "all",mode = "upper")
-                            theo.sum <- summary(theo)
-                            both <- simu_scan(sampling.param = para.both)
-                            both.sum <- summary(both)
-                            stop <- Sys.time()
-
-                            data.frame(
-                              i = i,
-                              # method = "standard",
-                              method = "SimuNet.packed",
-                              time = difftime(stop,start,units = "secs"),
-                              size.theo = format(object.size(theo),units = "Kb"),
-                              size.theo.sum = format(object.size(theo.sum),units = "Kb"),
-                              size.both = format(object.size(both),units = "Kb"),
-                              size.both.sum = format(object.size(both.sum),units = "Kb")
-                            )
-                          }
-                        )
-)
-
-bench <- rbind(bench.standard,bench.packed,bench.homemade)
-bench$time <- as.numeric(bench$time)
-
-bench$size.theo <- as.numeric(substr(bench$size.theo,1,nchar(bench$size.theo) - 3))
-bench$size.theo.sum <- as.numeric(substr(bench$size.theo.sum,1,nchar(bench$size.theo.sum) - 3))
-bench$size.both.sum <- as.numeric(substr(bench$size.both.sum,1,nchar(bench$size.both.sum) - 3))
-bench$size.both <- as.numeric(substr(bench$size.both,1,nchar(bench$size.both) - 3))
 
 library(ggplot2)
 
-ggplot(bench,aes(method, as.numeric(time), fill = method))+
-  geom_boxplot(colour = "black")+theme_bw()
-
-ggplot(bench,aes(method, size.theo, fill = method))+
-  geom_boxplot(colour = "black")+theme_bw()
-
-median(bench[bench$method == "Matrix.packed",]$time) / median(bench[bench$method == "standard",]$time)
-median(bench[bench$method == "Matrix.packed",]$size.theo) / median(bench[bench$method == "standard",]$size.theo)
-median(bench[bench$method == "Matrix.packed",]$size.theo.sum) / median(bench[bench$method == "standard",]$size.theo.sum)
-median(bench[bench$method == "Matrix.packed",]$size.both) / median(bench[bench$method == "standard",]$size.both)
-median(bench[bench$method == "Matrix.packed",]$size.both.sum) / median(bench[bench$method == "standard",]$size.both.sum)
+ggplot(bench.df,aes(n,time,colour = method))+
+  facet_grid(type~.,scales = "free_y")+
+  geom_smooth(aes(fill = method),method = "glm",formula = y ~ poly(x,degree = 2),alpha = .5)+
+  geom_boxplot(aes(fill = method,group = interaction(n,method)),alpha = .7)+
+  geom_point(fill = "white",shape = 21,alpha = .32)+
+  scale_y_continuous(limits = c(0,NA))+
+  scale_x_continuous(breaks = seq(25,from = 0, to = 300))+
+  theme_bw()
