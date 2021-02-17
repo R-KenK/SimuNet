@@ -1,4 +1,6 @@
-# SimuNet 1.3.0
+# SimuNet (development version)
+
+# SimuNet 1.3.0.9000
 * Added a homemade class of packed matrices: `snPackMat` (SimuNet Packed Matrix) that stores only a vector of the relevant data, as well as a way to unpack the matrix to a regular one. Especially designed to avoid storing empry matrix triangles and performing useless operations on them. Now `simu_scan` has an optional use.snPackMat logical argument (`FALSE` by default). Early benchmarks are promising  
 * Added two user-friendly functions to interact with the [Animal Social Network Repository](http://www.github.com/bansallab/asnr):  
     * `import_from_asnr` can mostly be used with:  
@@ -11,7 +13,6 @@
 # SimuNet 1.2.0.9000
 * Switched internally to integer matrices instead of numeric matrices: significant improvement of -10% computation time and -30% memory allocation on a `n = 21` `total_scan = 9000` empirical network
 * Added dependency/reliance on the `Matrix` package, notably for its printing of sparse matrices
-* Improved handling of triangular matrices. `presenProb` and `obsProb` objects now rightfully store triangular matrices and supposedly only the required random draw are performed (TO CHECK BEFORE TRUE RELEASE)
 
 # SimuNet 1.1.0
 * implemented a plot method for `scan` and `empiScan` objects. Internal code probably cleanable, but working for now:  
