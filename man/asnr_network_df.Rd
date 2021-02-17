@@ -2,20 +2,23 @@
 % Please edit documentation in R/asnr_tools.R
 \name{asnr_network_df}
 \alias{asnr_network_df}
-\title{TO WRITE}
+\title{Generate a data frame of all networks in the Animal Social Network Repository (asnr)}
 \usage{
 asnr_network_df(user = "bansallab", repo = "asnr")
 }
 \arguments{
-\item{user}{TO WRITE}
+\item{user}{character scalar, used to reconstruct the asnr github repository.
+Default is "bansallab".}
 
-\item{repo}{TO WRITE}
+\item{repo}{character scalar, used to reconstruct the asnr github repository.
+Default is "asnr".}
 }
 \value{
-TO WRITE
+a character data frame with the column "class", "species", and
+  "network"
 }
 \description{
-TO WRITE
+Generate a data frame of all networks in the Animal Social Network Repository (asnr)
 }
 \examples{
 asnr_network_df()

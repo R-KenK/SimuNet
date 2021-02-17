@@ -18,23 +18,36 @@ import_from_asnr(
 )
 }
 \arguments{
-\item{class}{TO WRITE}
+\item{class}{character scalar. Phylogenetic class folder of the network to
+import (e.g. "Aves","Mammalia",etc.). Supports partial matching.}
 
-\item{species}{TO WRITE}
+\item{species}{character scalar. species folder of the network to import
+(e.g. "Aves","Mammalia",etc.). Needs to match the beginning of the folder's
+name Supports partial matching.}
 
-\item{network}{TO WRITE}
+\item{network}{character scalar. Optional if the folder contains only one
+.graphml file. Otherwise the .graphml file name to import. Supports partial
+matching.}
 
-\item{url}{TO WRITE}
+\item{url}{character scalar. Optional if argument `class` and `species` (and
+`network` in the case of several graphml in one folder). URL of the
+.graphml file to import.}
 
-\item{output}{TO WRITE}
+\item{output}{character scalar. Either "graph" for an `igraph` graph object,
+or "adjacency" for an adjacency matrix}
 
-\item{type}{TO WRITE}
+\item{type}{character scalar. One of "both", "upper", and "lower". In the
+case of undirected network, "upper" or "lower" should probably be
+preferred.}
 
-\item{...}{TO WRITE}
+\item{...}{additional argument. Useful to pass a `asnr.df` argument to
+construct_full.path.}
 
-\item{default_prefix}{TO WRITE}
+\item{default_prefix}{character scalar. URL "prefix" used to retrieve the
+graphml _file_ from github.}
 
-\item{full.path}{TO WRITE}
+\item{full.path}{character scalar. Optional, can be used to input directly an
+URL to a graphml file.}
 }
 \value{
 TO WRITE
@@ -50,4 +63,8 @@ import_from_asnr("Amph","frog",output = "adj")
 # Users can also copy-paste a `.graphml`'s URL
 import_from_asnr(url = "https://github.com/bansallab/asnr/blob/master/Networks/Reptilia/
 lizard_proximity_weighted/weighted_network_social_T_rugosa.graphml")
+# To avoid multiple get querries and longer computation time, users can first
+# load a `asnr.df` data frame by calling once the `asnr_network_df` function
+asnr.df <- asnr_network_df()
+import_from_asnr("Amph","frog",output = "adj",asnr.df = asnr.df)
 }
