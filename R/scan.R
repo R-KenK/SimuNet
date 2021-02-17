@@ -26,8 +26,9 @@
 #'   \item{`scans.to.do`: inputted `scans.to.do`}
 #'   \item{`mode`: `mode` data contained in `presence.prob`}
 #'   \item{`Adj.subfun`: `Adj.subfun` data contained in `presence.prob`}
-#'   \item{`presence.prob`: `presence.prob$P` (only the probability matrix) data
-#'   contained in `presence.prob`}
+#'   \item{`presence.prob`: `presence.prob$P` (only the probability matrix) data}
+#'   \item{`use.snPackMat`: logical, if scans should be `snPackMat` objects or
+#'   regular matrices}
 #' }
 #'
 #' @noRd
@@ -44,7 +45,8 @@ generate_scan<- function(presence.prob,scans.to.do,use.snPackMat){
     scans.to.do = scans.to.do,
     mode = presence.prob$mode,
     Adj.subfun = presence.prob$Adj.subfun,
-    presence.prob = presence.prob$P # in here it is not a presenceProb object anymore, to avoid storing redundant variables
+    presence.prob = presence.prob$P, # in here it is not a presenceProb object anymore, to avoid storing redundant variables,
+    use.snPackMat = use.snPackMat
   )
   class(scan)<- "scan"
   scan
@@ -78,7 +80,7 @@ summary.scan <- function(object,...) {
   mode <- object$mode
   theoretical.sum <- sum_scan.list(object$theoretical.scan.list)
   theoretical.sampled <- sum_scan.sampled(object,method = "theoretical")
-  theoretical.scaled <- theoretical.sum/ifelse(theoretical.sampled != 0,theoretical.sampled,1)
+  theoretical.scaled <- theoretical.sum/replace_never_sampled(theoretical.sampled)
 
   scan.summary <- list(
     theoretical.sum = theoretical.sum,

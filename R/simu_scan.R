@@ -54,6 +54,11 @@
 #'   \item{obs.prob: inputted `obs.prob`}
 #'   \item{focal: inputted `focal`}
 #' }
+#' @param use.snPackMat logical. Should the SimuNet's packed matrix class be
+#'   used (default is `FALSE`). Extra feature to save on object size (useful
+#'   from 10 nodes) and calculation time (potentially) by considring matrices as
+#'   vectors without their diagonal or as a triangle (according to the chosen
+#'   igraph `mode`).
 #'
 #' @return depending if `sampling.param` are provided, either:
 #'  \itemize{
@@ -231,6 +236,6 @@ simu_scan <-
     if (is.null(sampling.param)) {
       scan
     } else {
-      generate_empiScan(scan = scan, sampling.param = sampling.param,use.snPackMat = use.snPackMat)
+      generate_empiScan(scan = scan, sampling.param = sampling.param)
     }
   }
