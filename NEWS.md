@@ -1,4 +1,12 @@
-# SimuNet (development version)
+# SimuNet 1.3.0
+* Added a homemade class of packed matrices: `snPackMat` (SimuNet Packed Matrix) that stores only a vector of the relevant data, as well as a way to unpack the matrix to a regular one. Especially designed to avoid storing empry matrix triangles and performing useless operations on them. Now `simu_scan` has an optional use.snPackMat logical argument (`FALSE` by default). Early benchmarks are promising  
+* Added two user-friendly functions to interact with the [Animal Social Network Repository](http://www.github.com/bansallab/asnr):  
+    * `import_from_asnr` can mostly be used with:  
+        * the Class and species folder (in the Networks folder of the github repository), and possibly graphml file name, as character strings  
+        * the URL of a graphml object within the repository  
+    an option allows the user to easily retrieve a igraph network object, or an adjacency matrix, from the graphml file
+    * `asnr_network_df` retrieve the list (into a dataframe) of graphml file in the asnr repository. Internally used by `import_from_asnr`
+        
 
 # SimuNet 1.2.0.9000
 * Switched internally to integer matrices instead of numeric matrices: significant improvement of -10% computation time and -30% memory allocation on a `n = 21` `total_scan = 9000` empirical network
