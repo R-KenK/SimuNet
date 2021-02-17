@@ -1,20 +1,20 @@
-# Row bind list of data frames
-# wrapper to one-function do.call rbind over a lapply list
-#
-# @param X a list. See details \link[base]{lapply}.
-# @param FUN a function to subset data frames (or data tables). See details \link[base]{lapply}.
-#
-# @return a row bound data frame
-# @export
-#
-# @examples
-# set.seed(42)
-#
-# X<- lapply(1:3,function(i) list(int = 42,df = data.frame(x = runif(10,0,1),y = runif(10,0,1))))
-# rbind_lapply(X,function(x) x$df)
-# rbind_lapply<- function(X,FUN){
-#   do.call(rbind,lapply(X = X,FUN = FUN))
-# }
+#' Row bind list of data frames
+#' wrapper to one-function do.call rbind over a lapply list
+#'
+#' @param X a list. See details \link[base]{lapply}.
+#' @param FUN a function to subset data frames (or data tables). See details \link[base]{lapply}.
+#'
+#' @return a row bound data frame
+#' @export
+#'
+#' @examples
+#' set.seed(42)
+#'
+#' X<- lapply(1:3,function(i) list(int = 42,df = data.frame(x = runif(10,0,1),y = runif(10,0,1))))
+#' rbind_lapply(X,function(x) x$df)
+rbind_lapply <- function(X,FUN){
+  do.call(rbind,lapply(X = X,FUN = FUN))
+}
 
 # Column bind list of data frames
 # wrapper to one-function do.call cbind over a lapply list
@@ -190,16 +190,16 @@ print_list_element <- function(l,i) {
   invisible(l)
 }
 
-#' TO WRITE
+#' Wrapper for using Matrix package's print method
 #'
-#' @param M TO WRITE
-#' @param ... TO WRITE
-#' @param sparse TO WRITE
-#' @param digits TO WRITE
-#' @param note.dropping.colnames TO WRITE
-#' @param align TO WRITE
+#' @param M a regular matrix
+#' @param ... additional argument for `printSpMatrix`
+#' @param sparse logical. Should a sparse matrix be printed?
+#' @param digits integer. Number of digits to display
+#' @param note.dropping.colnames logical. Should the column names be dropped?
+#' @param align character string. among "right", "left" and "center"
 #'
-#' @return TO WRITE
+#' @return print the matrix M using the Matrix package's print method
 #' @noRd
 use_printSpMatrix <- function(M,...,sparse = TRUE, digits = 3, note.dropping.colnames = FALSE,align = "right") {
   if (is.snPackMat(M)) {M <- unpack_snPackMat(M)}
