@@ -54,6 +54,11 @@
 #'   \item{obs.prob: inputted `obs.prob`}
 #'   \item{focal: inputted `focal`}
 #' }
+#' @param use.snPackMat logical. Should the SimuNet's packed matrix class be
+#'   used (default is `FALSE`). Extra feature to save on object size (useful
+#'   from 10 nodes) and calculation time (potentially) by considring matrices as
+#'   vectors without their diagonal or as a triangle (according to the chosen
+#'   igraph `mode`).
 #'
 #' @return depending if `sampling.param` are provided, either:
 #'  \itemize{
@@ -176,7 +181,8 @@ simu_scan <-
   function(Adj = NULL,
            total_scan = NULL,scans.to.do = NULL,
            mode = c("directed","undirected","max","min","upper","lower","plus","vector"),
-           sampling.param = NULL) {
+           sampling.param = NULL,
+           use.snPackMat = FALSE) {
     if (!is.null(sampling.param)) {
       if (is.samplingParam(sampling.param)) {
         if (!is.null(sampling.param$obs.prob)) {
@@ -224,7 +230,7 @@ simu_scan <-
     }
 
     # use the class "scan" object generator to
-    scan <- generate_scan(presence.prob = presence.prob,scans.to.do = scans.to.do)
+    scan <- generate_scan(presence.prob = presence.prob,scans.to.do = scans.to.do,use.snPackMat = use.snPackMat)
 
     # output either the theoretical scan or applies sample_from_scan
     if (is.null(sampling.param)) {

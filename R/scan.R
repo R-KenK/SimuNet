@@ -26,14 +26,15 @@
 #'   \item{`scans.to.do`: inputted `scans.to.do`}
 #'   \item{`mode`: `mode` data contained in `presence.prob`}
 #'   \item{`Adj.subfun`: `Adj.subfun` data contained in `presence.prob`}
-#'   \item{`presence.prob`: `presence.prob$P` (only the probability matrix) data
-#'   contained in `presence.prob`}
+#'   \item{`presence.prob`: `presence.prob$P` (only the probability matrix) data}
+#'   \item{`use.snPackMat`: logical, if scans should be `snPackMat` objects or
+#'   regular matrices}
 #' }
 #'
 #' @noRd
-generate_scan<- function(presence.prob,scans.to.do){
+generate_scan<- function(presence.prob,scans.to.do,use.snPackMat){
   if(length(scans.to.do) == 1) {if(scans.to.do == "all") {scans.to.do <- 1:presence.prob$total_scan}}
-  raw.scan.list <- draw_raw.scan.list(presence.prob = presence.prob,scans.to.do = scans.to.do)
+  raw.scan.list <- draw_raw.scan.list(presence.prob = presence.prob,scans.to.do = scans.to.do,use.snPackMat = use.snPackMat)
   theoretical.scan.list <- apply_mode(raw.scan.list = raw.scan.list,mode = presence.prob$mode)
   scan<- list(
     raw.scan.list = raw.scan.list,
@@ -44,7 +45,8 @@ generate_scan<- function(presence.prob,scans.to.do){
     scans.to.do = scans.to.do,
     mode = presence.prob$mode,
     Adj.subfun = presence.prob$Adj.subfun,
-    presence.prob = presence.prob$P # in here it is not a presenceProb object anymore, to avoid storing redundant variables
+    presence.prob = presence.prob$P, # in here it is not a presenceProb object anymore, to avoid storing redundant variables,
+    use.snPackMat = use.snPackMat
   )
   class(scan)<- "scan"
   scan
@@ -78,7 +80,7 @@ summary.scan <- function(object,...) {
   mode <- object$mode
   theoretical.sum <- sum_scan.list(object$theoretical.scan.list)
   theoretical.sampled <- sum_scan.sampled(object,method = "theoretical")
-  theoretical.scaled <- theoretical.sum/ifelse(theoretical.sampled != 0,theoretical.sampled,1)
+  theoretical.scaled <- theoretical.sum/replace_never_sampled(theoretical.sampled)
 
   scan.summary <- list(
     theoretical.sum = theoretical.sum,
@@ -101,11 +103,10 @@ summary.scan <- function(object,...) {
 print.summary.scan<- function(x,scaled = FALSE,...){
   cat("Theoretical weighted adjacency matrix:\n")
   if (scaled) {
-    to.print <- Matrix::Matrix(x$theoretical.scaled,sparse = TRUE)
+    use_printSpMatrix(x$theoretical.scaled)
   } else {
-    to.print <- Matrix::Matrix(x$theoretical.sum,sparse = TRUE)
+    use_printSpMatrix(x$theoretical.sum)
   }
-  Matrix::printSpMatrix(to.print,digits = 3,note.dropping.colnames = FALSE,align = "right")
   cat(paste0("\nobtained after summing ", length(x$scans.to.do), " binary scans (mode = \"", x$mode,"\")", "\n\n"))
 }
 
@@ -205,7 +206,7 @@ compute.EV<- function(graph,mode = NULL){
 #' @return a list of raw binary adjacency matrix shaped like the `Adj` contained in `presence.prob`
 #'
 #' @noRd
-draw_raw.scan.list <- function(presence.prob,scans.to.do){
+draw_raw.scan.list <- function(presence.prob,scans.to.do,use.snPackMat){
   n<- nrow(presence.prob$Adj);nodes_names<- rownames(presence.prob$Adj)
   presence.P.vec<- presence.prob$P[presence.prob$Adj.subfun(presence.prob$P)]; p<- length(presence.P.vec)  # subset a presence probability vector the same way Adj is subset (depends on `Adj`'s mode (cf. igraph)) <- NOW THIS IS JUST A UPPER/LOWER.TRI VS NON.DIAGONAL THING...
   raw.scan.list <-
@@ -218,8 +219,13 @@ draw_raw.scan.list <- function(presence.prob,scans.to.do){
   lapply(
     raw.scan.list,
     function(s) {
-      s[presence.prob$Adj.subfun(s)]<- stats::rbinom(p,1,presence.P.vec)  # core of the randomization: draw a (raw.scan.list) tie or not for each (relevant, cf. triangular matrices or undirected) dyad according to its presence probability
-      s
+      s[presence.prob$Adj.subfun(s)]<- stats::rbinom(p,1L,presence.P.vec)  # core of the randomization: draw a (raw.scan.list) tie or not for each (relevant, cf. triangular matrices or undirected) dyad according to its presence probability
+      # Matrix::pack(s,upperTri = TRUE) # Matrix.packed
+      if (use.snPackMat) {
+        generate_snPackMat(s,Adj.subfun = presence.prob$Adj.subfun,mode = presence.prob$mode) # SimuNet.packed
+      } else {
+        s # standard
+      }
     }
   )
 }

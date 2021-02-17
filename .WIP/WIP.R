@@ -1,180 +1,195 @@
-# left over bits of code ----
+# Tutorial draft  -----------------------------------------------------
+Adj <- import_from_asnr("Mammalia","bats_f",output = "adjacency",type = "upper")
 
-
-minimize_NA<- function(scan){
-  if(!is.empiScan(scan)) {scan}
-  switch(scan$mode,
-         "undirected" = , # as in `igraph`, consider this mode to be the same as `max`
-         "max" = {
-           resolvable_NA<- is.na(scan) & ((t(scan) == 1) & !is.na(t(scan)))  # scan[i,j] = NA & scan[j,i] = 1 =>  scan[i,j]<- 1
-           ifelse(resolvable_NA,1,scan)
-         },
-         "min" = {
-           resolvable_NA<- is.na(scan) & ((t(scan) == 0) & !is.na(t(scan)))  # scan[i,j] = NA & scan[j,i] = 0 =>  scan[i,j]<- 1
-           ifelse(resolvable_NA,0,scan)
-         },
-         "plus" = ,
-         "directed" = ,
-         "upper" = ,
-         "lower" =  ,
-         "vector" = raw.scan
-  )
-}
-
-
-
-# manual tests to see if `apply_mode` does what it should, including on weighted networks ---------------
-
-# Not needed anymore because now `apply_mode` works on the `theoretical.scan.list` part of `scan` object to produce `empiScan` objects
-# test.scan.NA<- matrix(c(0,1,NA,0,NA,
-#                         NA,0,1,1,NA,
-#                         0,1,0,0,1,
-#                         0,0,1,0,0,
-#                         NA,1,0,0,0),nrow = 5,byrow = TRUE,dimnames = list(letters[1:5],letters[1:5]))
-
-# handcrafted example that contain all potential problematic symmetrization issue
-test.raw.scan<- matrix(c(0,1,0,1,
-                0,0,0,0,
-                1,0,0,1,
-                1,0,1,0),nrow = 4,byrow = TRUE,dimnames = list(letters[1:4],letters[1:4]))
-
-apply_mode(test.raw.scan,"directed")
-apply_mode(test.raw.scan,"undirected")
-apply_mode(test.raw.scan,"max")
-apply_mode(test.raw.scan,"min")
-apply_mode(test.raw.scan,"plus")
-
-# handcrafted example that contain all potential problematic symmetrization issue
-test.raw.scan.weighted<- matrix(c(0,20,5,3,
-                         10,0,2,0,
-                         30,2,0,0,
-                         3,0,1,0),nrow = 4,byrow = TRUE,dimnames = list(letters[1:4],letters[1:4]))
-
-apply_mode(test.raw.scan.weighted,"directed")
-apply_mode(test.raw.scan.weighted,"undirected")
-apply_mode(test.raw.scan.weighted,"max")
-apply_mode(test.raw.scan.weighted,"min")
-apply_mode(test.raw.scan.weighted,"plus")
-
-
-# Usage example (as of 0.3.0.9000) for single scans -----------------------
-
-#' The user should mostly interact with `simu_X()` functions. As of now, the
-#' user should first define sampling parameters of class `samplingParam` through
-#' `simu_samplingParam()`, and then input them into `simu_scan()` to produce
-#' simulated empirical scans.
-
-set.seed(42)
-
-n<- 5;nodes<- letters[1:n];total_scan<- 42;
-Adj<- matrix(data = 0,nrow = n,ncol = n,dimnames = list(nodes,nodes))
-Adj[non.diagonal(Adj)]<- sample(0:total_scan,n*(n-1),replace = TRUE)
-Adj
-
-# by default will simulate a directed theoretical scan
-plot(simu_scan(Adj,total_scan))
-
-# but other mode can be used:
-simu_scan(Adj,total_scan,mode = "min")
-
-
-# Users can generate sampling parameters through `simu_samplingParam` to use in
-# `simu_scan`
-para.group.constant<- simu_samplingParam(Adj,total_scan,mode =
-                                         "max",group.scan_param = 0.42)
-simu_scan(Adj,total_scan,sampling.param = para.group.constant)
-
-# Users can also define functions to use trait- or network- based sampling
-# biases for group-scan sampling (cf. ?simu_samplingParam)
-obs.prob.trait.bias_fun<- function(i,j,Adj) {i+j} # comparable to a dyad-trait-based bias
-para.group.trait.bias<- simu_samplingParam(Adj,total_scan,mode ="directed",
-                                           group.scan_param = obs.prob.trait.bias_fun)
-para.group.net.bias<- simu_samplingParam(Adj,total_scan,mode =
-                                         "max",group.scan_param = function(i,j,Adj) {Adj*Adj})
-
-simu_scan(Adj,total_scan,sampling.param = para.group.trait.bias)
-simu_scan(Adj,total_scan,sampling.param = para.group.net.bias)
-
-# or for biases regarding which focals to draw for focal-scan sampling (cf.
-# ?simu_samplingParam)
-focal.trait.bias_fun<- function(n,Adj) {1:n} # comparable to a dyad-trait-based bias
-para.focal.trait.bias<- simu_samplingParam(Adj,
-                                           total_scan,mode = "directed",
-                                           focal.scan_param = focal.trait.bias_fun,
-                                           scans.to.do = 3:20)
-para.focal.net.bias<- simu_samplingParam(Adj,total_scan,mode = "max",
-                                         focal.scan_param = function(n,Adj) {colSums(Adj*Adj)},
-                                         scans.to.do = 20)
-
-simu_scan(Adj,total_scan,sampling.param = para.focal.trait.bias)
-
-
-
-simu_samplingParam(Adj,total_scan,focal.scan_param = "even")
-simu_samplingParam(Adj,total_scan,mode = "max",group.scan_param = 0.42)
-simu_samplingParam(Adj,total_scan,mode = "min",
-                   group.scan_param = 0.42,
-                   focal.scan_param = "random",scans.to.do = 1:4)
-
-
-# Testing with Mamiko -----------------------------------------------------
-
-#' TO WRITE
-#'
-#' @param path TO WRITE
-#' @param output TO WRITE
-#' @param type TO WRITE
-#'
-#' @return TO WRITE
-#' @noRd
-import_from_graphml<- function(path,output = c("graph","adjacency"),type = c("both", "upper", "lower")){
-  output <- match.arg(output)
-  G <- igraph::read_graph(path,format = "graphml")
-  switch(output,
-         "graph" = G,
-         "adjacency" = {
-           Adj <- igraph::get.adjacency(G,type = type,attr = "weight",sparse = FALSE);
-           if(!is.null(igraph::vertex_attr(G,"name")) | !is.null(igraph::vertex_attr(G,"id"))) {
-             if(is.null(igraph::vertex_attr(G,"name"))) {
-               rownames(Adj) <- igraph::vertex_attr(G,"id")
-             } else {
-               rownames(Adj) <- igraph::vertex_attr(G,"name")
-             }
-             colnames(Adj) <- rownames(Adj)
-           } else {
-             rownames(Adj) <- as.character(1:nrow(Adj));colnames(Adj)<- as.character(1:ncol(Adj))
-           }
-           Adj
-         }
-  )
-}
-
-Adj <- import_from_graphml("C:/R/Git/asnr/Networks/Mammalia/bats_foodsharing_weighted/vampirebats_carter_mouth_licking_attribute.graphml",
-                           "adjacency",
-                           "upper")
-source("C:/R/Git/asnr/Networks/Mammalia/bats_foodsharing_weighted/total_scan.R")
-total_scan
+total_scan <- 9000
 
 theo <- simu_scan(Adj,total_scan,scans.to.do = "all",mode = "upper")
+theo
 theo.sum <- summary(theo)
-theo.sum$theoretical.scaled
-plot(Adj,theo.sum$theoretical.sum)
+theo.sum
+str(theo.sum)
+
+plot_adj_cor(Adj[upper.tri(Adj)]/9000,theo.sum$theoretical.scaled[upper.tri(Adj)],
+             main = "Association indices correlation\n(theoretical scans)",
+             xlab = "Original association index",
+             ylab = "Simulated association index"
+)
+
+plot_adj_cor <- function(X, Y,...) {
+  plot(X,Y,...)
+  abline(0,1,col = "red")
+  text(0.7,0.1,labels = paste0("pearson's r = ",signif(cor.test(X,Y)$estimate,5)))
+}
 
 # unbiased random group-scan
-para.group <- simu_samplingParam(Adj,total_scan,mode = "upper",scans.to.do = "all",group.scan_param = "random")
-group <- simu_scan(sampling.param = para.group)
-group.sum <- summary(group)
-plot(Adj,group.sum$theoretical.sum)
-plot(group.sum$theoretical.scaled,group.sum$group.scaled)
+para.halfgroup <- simu_samplingParam(Adj,total_scan,mode = "upper",scans.to.do = "all",group.scan_param = 0.5)
+para.halfgroup
+halfgroup <- simu_scan(sampling.param = para.halfgroup)
+halfgroup
+halfgroup.sum <- summary(halfgroup)
+halfgroup.sum
+str(halfgroup.sum)
+hist(halfgroup.sum$group.sampled[upper.tri(halfgroup.sum$group.sampled)]/9000,
+     breaks = 0.001*480:520,
+     main = "edge sampling ratio",
+     xlab = "proportion of time a dyad has been observed over the whole sampling effort"
+)
+abline(v = 0.5,col = "blue",lty = "dashed",lwd = 3)
+text(0.51,17,labels = paste0("observation probability constant = ",max(para.halfgroup$obs.prob$P)))
+
+plot_adj_cor(Adj[upper.tri(Adj)]/9000,halfgroup.sum$theoretical.scaled[upper.tri(Adj)],
+             main = "Association indices correlation\n(theoretical scans)",
+             xlab = "Original association index",
+             ylab = "Simulated association index"
+)
+
+plot_adj_cor(halfgroup.sum$theoretical.scaled[upper.tri(Adj)],halfgroup.sum$group.scaled[upper.tri(Adj)],
+             main = "Association indices correlation\n(group scans)",
+             xlab = "Theoretical association index",
+             ylab = "Empirical association index"
+)
 
 # unbiased random group-scan & even focal scan
-para.both <- simu_samplingParam(Adj,total_scan,mode = "upper",scans.to.do = "all",group.scan_param = "random",focal.scan_param = "even")
+para.both <- simu_samplingParam(Adj,total_scan,mode = "upper",
+                                scans.to.do = 1:3000,group.scan_param = .2,focal.scan_param = "even")
 both <- simu_scan(sampling.param = para.both)
+both
 both.sum <- summary(both)
-plot(Adj[upper.tri(Adj)],
-     both.sum$theoretical.sum[upper.tri(both.sum$theoretical.sum)])
+both.sum
+str(both.sum)
+plot_adj_cor(Adj[upper.tri(Adj)]/9000,
+             both.sum$theoretical.scaled[upper.tri(Adj)])
 
-plot(both.sum$theoretical.scaled[upper.tri(both.sum$theoretical.scaled)],
-     both.sum$group.scaled[upper.tri(both.sum$group.scaled)])
-plot(both.sum$theoretical.scaled[upper.tri(both.sum$theoretical.scaled)],
-     both.sum$focal.scaled[upper.tri(both.sum$focal.scaled)])
+plot_adj_cor(both.sum$theoretical.scaled[upper.tri(Adj)],
+             both.sum$group.scaled[upper.tri(Adj)])
+plot_adj_cor(both.sum$theoretical.scaled[upper.tri(Adj)],
+             both.sum$focal.scaled[upper.tri(Adj)])
+
+
+#  triangular packed matrices vs regular vs vectors -----------------------
+
+Adj <- import_from_asnr("Mammalia","bats_f",output = "adjacency",type = "upper")
+total_scan <- 9000
+
+
+theo <- simu_scan(Adj,total_scan,scans.to.do = "all",mode = "upper",use.snPackMat = FALSE)
+theo
+str(theo$theoretical.scan.list[[1]])
+theo.packed <- simu_scan(Adj,total_scan,scans.to.do = "all",mode = "upper",use.snPackMat = TRUE)
+theo.packed
+str(theo.packed$theoretical.scan.list[[1]])
+print(object.size(theo),units = "Mb")
+print(object.size(theo.packed),units = "Mb")
+theo.sum <- summary(theo)
+theo.sum
+str(theo.sum)
+
+para.both <- simu_samplingParam(Adj,total_scan,mode = "upper",
+                                scans.to.do = "all",group.scan_param = .2,focal.scan_param = "even")
+
+both <- simu_scan(sampling.param = para.both,use.snPackMat = FALSE)
+both
+str(both$group.scan.list[[1]])
+both.sum <- summary(both)
+both.sum
+str(both.sum)
+
+bench.standard <- do.call(rbind,
+                          lapply(
+                            1:10,
+                            function(i) {
+                              cat(paste0("\r",i * 10,"%"))
+                              start <- Sys.time()
+                              theo <- simu_scan(Adj,total_scan,scans.to.do = "all",mode = "upper")
+                              theo.sum <- summary(theo)
+                              both <- simu_scan(sampling.param = para.both)
+                              both.sum <- summary(both)
+                              stop <- Sys.time()
+
+                              data.frame(
+                                i = i,
+                                method = "standard",
+                                # method = "packed",
+                                time = difftime(stop,start,units = "secs"),
+                                size.theo = format(object.size(theo),units = "Kb"),
+                                size.theo.sum = format(object.size(theo.sum),units = "Kb"),
+                                size.both = format(object.size(both),units = "Kb"),
+                                size.both.sum = format(object.size(both.sum),units = "Kb")
+                              )
+                            }
+                          )
+)
+#
+# bench.packed <- do.call(rbind,
+#                         lapply(
+#                           1:10,
+#                           function(i) {
+#                             cat(paste0("\r",i * 10,"%"))
+#                             start <- Sys.time()
+#                             theo <- simu_scan(Adj,total_scan,scans.to.do = "all",mode = "upper")
+#                             theo.sum <- summary(theo)
+#                             both <- simu_scan(sampling.param = para.both)
+#                             both.sum <- summary(both)
+#                             stop <- Sys.time()
+#
+#                             data.frame(
+#                               i = i,
+#                               # method = "standard",
+#                               method = "Matrix.packed",
+#                               time = difftime(stop,start,units = "secs"),
+#                               size.theo = format(object.size(theo),units = "Kb"),
+#                               size.theo.sum = format(object.size(theo.sum),units = "Kb"),
+#                               size.both = format(object.size(both),units = "Kb"),
+#                               size.both.sum = format(object.size(both.sum),units = "Kb")
+#                             )
+#                           }
+#                         )
+# )
+
+bench.homemade <- do.call(rbind,
+                        lapply(
+                          1:10,
+                          function(i) {
+                            cat(paste0("\r",i * 10,"%"))
+                            start <- Sys.time()
+                            theo <- simu_scan(Adj,total_scan,scans.to.do = "all",mode = "upper")
+                            theo.sum <- summary(theo)
+                            both <- simu_scan(sampling.param = para.both)
+                            both.sum <- summary(both)
+                            stop <- Sys.time()
+
+                            data.frame(
+                              i = i,
+                              # method = "standard",
+                              method = "SimuNet.packed",
+                              time = difftime(stop,start,units = "secs"),
+                              size.theo = format(object.size(theo),units = "Kb"),
+                              size.theo.sum = format(object.size(theo.sum),units = "Kb"),
+                              size.both = format(object.size(both),units = "Kb"),
+                              size.both.sum = format(object.size(both.sum),units = "Kb")
+                            )
+                          }
+                        )
+)
+
+bench <- rbind(bench.standard,bench.packed,bench.homemade)
+bench$time <- as.numeric(bench$time)
+
+bench$size.theo <- as.numeric(substr(bench$size.theo,1,nchar(bench$size.theo) - 3))
+bench$size.theo.sum <- as.numeric(substr(bench$size.theo.sum,1,nchar(bench$size.theo.sum) - 3))
+bench$size.both.sum <- as.numeric(substr(bench$size.both.sum,1,nchar(bench$size.both.sum) - 3))
+bench$size.both <- as.numeric(substr(bench$size.both,1,nchar(bench$size.both) - 3))
+
+library(ggplot2)
+
+ggplot(bench,aes(method, as.numeric(time), fill = method))+
+  geom_boxplot(colour = "black")+theme_bw()
+
+ggplot(bench,aes(method, size.theo, fill = method))+
+  geom_boxplot(colour = "black")+theme_bw()
+
+median(bench[bench$method == "Matrix.packed",]$time) / median(bench[bench$method == "standard",]$time)
+median(bench[bench$method == "Matrix.packed",]$size.theo) / median(bench[bench$method == "standard",]$size.theo)
+median(bench[bench$method == "Matrix.packed",]$size.theo.sum) / median(bench[bench$method == "standard",]$size.theo.sum)
+median(bench[bench$method == "Matrix.packed",]$size.both) / median(bench[bench$method == "standard",]$size.both)
+median(bench[bench$method == "Matrix.packed",]$size.both.sum) / median(bench[bench$method == "standard",]$size.both.sum)

@@ -9,7 +9,8 @@ simu_scan(
   total_scan = NULL,
   scans.to.do = NULL,
   mode = c("directed", "undirected", "max", "min", "upper", "lower", "plus", "vector"),
-  sampling.param = NULL
+  sampling.param = NULL,
+  use.snPackMat = FALSE
 )
 }
 \arguments{
@@ -69,6 +70,12 @@ using a `presenceProb` object.}
   \item{obs.prob: inputted `obs.prob`}
   \item{focal: inputted `focal`}
 }}
+
+\item{use.snPackMat}{logical. Should the SimuNet's packed matrix class be
+used (default is `FALSE`). Extra feature to save on object size (useful
+from 10 nodes) and calculation time (potentially) by considring matrices as
+vectors without their diagonal or as a triangle (according to the chosen
+igraph `mode`).}
 }
 \value{
 depending if `sampling.param` are provided, either:
