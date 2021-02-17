@@ -35,10 +35,11 @@
 #'   contained in `presence.prob`}
 #' }
 #' @noRd
-generate_empiScan <- function(scan, sampling.param,use.snPackMat) {
+generate_empiScan <- function(scan, sampling.param) {
   scan$scan.type <- "empirical"
   method <- sampling.param$method
   mode <- scan$mode
+  use.snPackMat <- scan$use.snPackMat
   scans.to.do <- sampling.param$scans.to.do
   if (!is.null(sampling.param$obs.prob)) {
     group.scan.list <-
@@ -77,7 +78,8 @@ generate_empiScan <- function(scan, sampling.param,use.snPackMat) {
     scans.to.do = scan$scans.to.do,
     mode = mode,
     Adj.subfun = scan$Adj.subfun,
-    presence.prob = scan$presence.prob # in here it is not a presenceProb object anymore, to avoid storing redundant variables
+    presence.prob = scan$presence.prob, # in here it is not a presenceProb object anymore, to avoid storing redundant variables
+    use.snPackMat = use.snPackMat
   )
   class(scan) <- c("empiScan", "scan")
   scan
@@ -405,9 +407,9 @@ group_sample <- function(scan, obs.prob,use.snPackMat) {
       s[scan$Adj.subfun(s)][missed] <-
         NA
       if (use.snPackMat) {
-        s # standard
-      } else {
         generate_snPackMat(M = s,Adj.subfun = scan$Adj.subfun,mode = scan$mode) # Matrix.packed
+      } else {
+        s # standard
       }
       # Matrix::pack(as.matrix(s)) # Matrix.packed
     }
@@ -441,9 +443,9 @@ focal_sample <- function(scan, focal,use.snPackMat) {
       obs[-foc,-foc] <- NA
       obs[!scan$Adj.subfun(obs)] <- 0L
       if (use.snPackMat) {
-        obs # standard
-      } else {
         generate_snPackMat(M = obs,Adj.subfun = scan$Adj.subfun,mode = scan$mode) # Matrix.packed
+      } else {
+        obs # standard
       }
       # Matrix::pack(as.matrix(obs)) # Matrix.packed
     }

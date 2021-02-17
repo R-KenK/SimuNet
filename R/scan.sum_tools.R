@@ -7,12 +7,7 @@
 #' @return a weighted adjacency matrix representing the total number of occurrences where each dyad has been observed associated (and where `NA`s were considered as zero)
 #' @noRd
 sum_scan.list <- function(scan.list){
-  summed <- Reduce(matrix_sum_na.rm,scan.list) # sum the scan list, considering NAs as zeros
-  if (is.snPackMat(summed)) {
-    unpack_snPackMat(summed)
-  } else {
-    summed
-  }
+  Reduce(matrix_sum_na.rm,scan.list) # sum the scan list, considering NAs as zeros
 }
 
 #' Sum up `scan.list` into weighted sampling effort matrix
@@ -24,17 +19,29 @@ sum_scan.list <- function(scan.list){
 #' @noRd
 sum_scan.sampled<- function(scan,method = c("theoretical","group","focal")) {
   method <- match.arg(method)
-  X.sampled <- switch(method,
-         "theoretical" = {
-           theoretical.sampled <- scan$Adj
-           theoretical.sampled[scan$Adj.subfun(theoretical.sampled)] <- length(explicit_scans.to.do(scan))
-           theoretical.sampled
-         },
-         "group" = count_nonNA(scan$group.scan.list,scan$Adj.subfun),
-         "focal" = count_nonNA(scan$focal.scan.list,scan$Adj.subfun)
-  )
-  X.sampled[!scan$Adj.subfun(X.sampled)] <- 0L
-  X.sampled
+  if (scan$use.snPackMat) {
+    switch(method,
+           "theoretical" = {
+             theoretical.sampled <- scan$theoretical.scan.list[[1]]
+             theoretical.sampled$M <- length(explicit_scans.to.do(scan))
+             theoretical.sampled
+           },
+           "group" = count_nonNA(scan$group.scan.list,scan$Adj.subfun),
+           "focal" = count_nonNA(scan$focal.scan.list,scan$Adj.subfun)
+    )
+  } else {
+    X.sampled <- switch(method,
+           "theoretical" = {
+             theoretical.sampled <- scan$theoretical.scan.list[[1]]
+             theoretical.sampled[scan$Adj.subfun(theoretical.sampled)] <- length(explicit_scans.to.do(scan))
+             theoretical.sampled
+           },
+           "group" = count_nonNA(scan$group.scan.list,scan$Adj.subfun),
+           "focal" = count_nonNA(scan$focal.scan.list,scan$Adj.subfun)
+    )
+    X.sampled[!scan$Adj.subfun(X.sampled)] <- 0L
+    X.sampled
+  }
 }
 
 #' Explicit the vector of scans to do
@@ -51,4 +58,13 @@ explicit_scans.to.do <- function(scan) {
     }
   }
   scan$scans.to.do
+}
+
+replace_never_sampled <- function(X.sampled) {
+  if (is.snPackMat(X.sampled)) {
+    ifelse(X.sampled$M != 0,X.sampled$M,1)
+  } else {
+    ifelse(X.sampled != 0,X.sampled,1)
+  }
+
 }
