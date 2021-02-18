@@ -256,7 +256,8 @@ plot.summary.empiScan <- function(x,
            # graphics::par(mar=c(5,1,2,1))
            graphics::layout(matrix(c(0,1,1,0,2,2,3,3), 2, 4, byrow = TRUE))
            if (scaled) {theoretical.adj <- x$theoretical.scaled} else {theoretical.adj <- x$theoretical.sum}
-           if (is.null(layout) | is.function(layout)) {
+           if (is.null(layout)) {layout <- igraph::layout_with_fr}
+           if (is.function(layout)) {
              x.G <- igraph::graph_from_adjacency_matrix(theoretical.adj,mode = x$mode,weighted = TRUE)
              layout <- layout(x.G)
            }
