@@ -150,9 +150,9 @@ plot.summary.scan<- function(x,scaled = FALSE,vertex.size = NULL,vertex.size.mul
 #' @return a vector of degree values for each node
 #' @noRd
 compute.deg<- function(graph,mode=NULL){
-  if(is.matrix(graph)){graph<- igraph::graph_from_adjacency_matrix(graph,mode = mode,weighted = TRUE,add.colnames = TRUE)}
+  if (!inherits(graph,"igraph")) {graph <- igraph::graph_from_adjacency_matrix(graph,mode = mode,weighted = TRUE)}
   deg<- igraph::degree(graph)
-  if(!is.null(names(deg))) {names(deg)<- igraph::vertex_attr(graph)[[1]]} # dirty: does not actually test if the order of the vertex centrality is the same as the name, but I suspect igraph does that by default...
+  if (!is.null(names(deg))) {names(deg)<- igraph::vertex_attr(graph)[[1]]} # dirty: does not actually test if the order of the vertex centrality is the same as the name, but I suspect igraph does that by default...
   deg
 }
 
@@ -168,7 +168,7 @@ compute.deg<- function(graph,mode=NULL){
 #' @return a vector of strength values for each node
 #' @noRd
 compute.strength<- function(graph,mode = NULL){
-  if (is.matrix(graph)) {graph <- igraph::graph_from_adjacency_matrix(graph,mode = mode,weighted = TRUE,add.colnames = TRUE)}
+  if (!inherits(graph,"igraph")) {graph <- igraph::graph_from_adjacency_matrix(graph,mode = mode,weighted = TRUE)}
   stren <- igraph::strength(graph)
   if (!is.null(names(stren))) {names(stren) <- igraph::vertex_attr(graph)[[1]]} # dirty: does not actually test if the order of the vertex centrality is the same as the name, but I suspect igraph does that by default...
   stren
@@ -186,9 +186,9 @@ compute.strength<- function(graph,mode = NULL){
 #'
 #' @return a vector of eigenvector centrality values for each node
 #' @noRd
-compute.EV<- function(graph,mode = NULL){
-  if (is.matrix(graph)) {graph <- igraph::graph_from_adjacency_matrix(graph,mode = mode,weighted = TRUE,add.colnames = TRUE)}
-  EV <- igraph::eigen_centrality(graph, weights = igraph::E(graph)$weight,scale = FALSE)$vector
+compute.EV<- function(graph,mode = NULL,scale = FALSE){
+  if (!inherits(graph,"igraph")) {graph <- igraph::graph_from_adjacency_matrix(graph,mode = mode,weighted = TRUE)}
+  EV <- igraph::eigen_centrality(graph, weights = igraph::E(graph)$weight,scale = scale)$vector
   if (!is.null(names(EV))) {names(EV) <- igraph::vertex_attr(graph)[[1]]} # dirty: does not actually test if the order of the vertex centrality is the same as the name, but I suspect igraph does that by default...
   EV
 }

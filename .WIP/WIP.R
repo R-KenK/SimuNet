@@ -56,14 +56,11 @@ both <- simu_scan(sampling.param = para.both)
 both
 both.sum <- summary(both)
 both.sum
+plot(both.sum)
 str(both.sum)
-plot_adj_cor(Adj[upper.tri(Adj)]/9000,
-             both.sum$theoretical.scaled[upper.tri(Adj)])
 
-plot_adj_cor(both.sum$theoretical.scaled[upper.tri(Adj)],
-             both.sum$group.scaled[upper.tri(Adj)])
-plot_adj_cor(both.sum$theoretical.scaled[upper.tri(Adj)],
-             both.sum$focal.scaled[upper.tri(Adj)])
+
+
 
 
 #  triangular packed matrices vs regular vs vectors -----------------------
