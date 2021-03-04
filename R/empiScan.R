@@ -186,17 +186,25 @@ summary.empiScan <- function(object,...) {
 #' @importFrom Matrix printSpMatrix
 #' @export
 #' @noRd
-print.summary.empiScan<- function(x,...){
-  print.summary.scan(x,...)
+print.summary.empiScan<- function(x,scaled = FALSE,...){
+  print.summary.scan(x,scaled = scaled,...)
   if (!is.null(x$group.sum)) {
     cat("Group-scan sampling method weighted adjacency matrix:\n")
-    use_printSpMatrix(x$group.sum)
+    if (scaled) {
+      use_printSpMatrix(x$group.scaled)
+    } else {
+      use_printSpMatrix(x$group.sum)
+    }
     cat(paste0("\nobtained after the following per-edge sampling matrix:", "\n\n"))
     use_printSpMatrix(x$group.sampled)
   }
   if (!is.null(x$focal.sum)) {
     cat("Focal-scan sampling method weighted adjacency matrix:\n")
-    use_printSpMatrix(x$focal.sum)
+    if (scaled) {
+      use_printSpMatrix(x$focal.scaled)
+    } else {
+      use_printSpMatrix(x$focal.sum)
+    }
     cat(paste0("\nobtained after the following per-edge sampling matrix:", "\n\n"))
     use_printSpMatrix(x$focal.sampled)
   }
@@ -254,7 +262,11 @@ plot.summary.empiScan <- function(x,
          },
          "both" = {
            # graphics::par(mar=c(5,1,2,1))
-           graphics::layout(matrix(c(0,1,1,0,2,2,3,3), 2, 4, byrow = TRUE))
+           if (is.null(x$group.sampled) | is.null(x$focal.sampled)) {
+             graphics::layout(matrix(c(1,2), 1, 2, byrow = TRUE))
+           } else {
+             graphics::layout(matrix(c(0,1,1,0,2,2,3,3), 2, 4, byrow = TRUE))
+           }
            if (scaled) {theoretical.adj <- x$theoretical.scaled} else {theoretical.adj <- x$theoretical.sum}
            if (is.null(layout)) {layout <- igraph::layout_with_fr}
            if (is.function(layout)) {
@@ -270,27 +282,32 @@ plot.summary.empiScan <- function(x,
                              layout = layout,
                              ...)
            # par(mar=c(1,2,1,2))
-           plot_empirical(x = x,
-                          method = "group",scaled = scaled,
-                          vertex.size = vertex.size,
-                          vertex.size.mul = vertex.size.mul,
-                          vertex.size.min = vertex.size.min,
-                          vertex.size.fun = vertex.size.fun,
-                          layout = layout,
-                          ...)
-           plot_empirical(x = x,
-                          method = "focal",scaled = scaled,
-                          vertex.size = vertex.size,
-                          vertex.size.mul = vertex.size.mul,
-                          vertex.size.min = vertex.size.min,
-                          vertex.size.fun = vertex.size.fun,
-                          layout = layout,
-                          ...)
+           if (!is.null(x$group.sampled)) {
+             plot_empirical(x = x,
+                            method = "group",scaled = scaled,
+                            vertex.size = vertex.size,
+                            vertex.size.mul = vertex.size.mul,
+                            vertex.size.min = vertex.size.min,
+                            vertex.size.fun = vertex.size.fun,
+                            layout = layout,
+                            ...)
+           }
+           if (!is.null(x$focal.sampled)) {
+             plot_empirical(x = x,
+                            method = "focal",scaled = scaled,
+                            vertex.size = vertex.size,
+                            vertex.size.mul = vertex.size.mul,
+                            vertex.size.min = vertex.size.min,
+                            vertex.size.fun = vertex.size.fun,
+                            layout = layout,
+                            ...)
+           }
            # par(mar = c(5,4,4,2))
-           graphics::layout(matrix(c(1,1,1), 1, 1, byrow = TRUE))
-           graphics::par(mar=c(5,4,4,2))
+
          }
   )
+  graphics::layout(matrix(c(1,1,1), 1, 1, byrow = TRUE))
+  graphics::par(mar=c(5,4,4,2))
 }
 
 #' Plot method for `scan` objects
