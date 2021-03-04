@@ -96,6 +96,13 @@ format_output <- function(output,l) {
 
 # additional SN metrics ---------------------------------------------------
 
+#' TO WRITE
+#'
+#' @param Adj TO WRITE
+#' @param mode TO WRITE
+#'
+#' @return TO WRITE
+#' @noRd
 GlobalCC <- function(Adj,mode) {
   if (inherits(Adj,"igraph")) {
     Adj <- igraph::get.adjacency(Adj,type = "both",sparse = FALSE,attr = "weight")
@@ -112,3 +119,41 @@ GlobalCC <- function(Adj,mode) {
   DirectedClustering::ClustF(Adj,type = type)[["GlobalCC"]]
 }
 
+#' TO WRITE
+#'
+#' @param G TO WRITE
+#' @param mode TO WRITE
+#' @param centrality.fun TO WRITE
+#'
+#' @return TO WRITE
+#' @noRd
+sort_central <- function(G,mode,centrality.fun) {
+  sort(centrality.fun(G,mode),decreasing = TRUE)
+}
+
+#' TO WRITE
+#'
+#' @param G TO WRITE
+#' @param mode TO WRITE
+#' @param centrality.fun TO WRITE
+#'
+#' @return TO WRITE
+#' @noRd
+get_central.node <- function(G,mode,centrality.fun) {
+  names(sort_central(G,mode,centrality.fun)[1])
+}
+
+#' TO WRITE
+#'
+#' @param G TO WRITE
+#' @param mode TO WRITE
+#' @param centrality.fun TO WRITE
+#' @param central.node TO WRITE
+#'
+#' @return TO WRITE
+#' @noRd
+remove_central.node <- function(G,mode = NULL,centrality.fun = NULL,central.node = NULL) {
+  central.node <- get_central.node(G = G,mode = mode,centrality.fun = centrality.fun)
+  to.keep <- row.names(G) != central.node
+  G[to.keep,to.keep]
+}
