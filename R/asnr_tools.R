@@ -127,7 +127,7 @@ construct_full.path <- function(class = NULL,
 
   is_unique <- grep(species,unique(asnr.df$species),value = TRUE,fixed = TRUE)
   if (length(is_unique) > 1) {
-    stop("Input `species` matches with different species folders.")
+    warning("Input `species` matches with different species folders. The first one matching has been used.")
   }
   sp <- match.arg(species,unique(asnr.df$species))
 
