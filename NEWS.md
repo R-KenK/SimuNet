@@ -1,5 +1,7 @@
 # SimuNet (development version)
 
+# SimuNet 1.4.0
+
 # SimuNet 1.3.0.9000
 * Added a homemade class of packed matrices: `snPackMat` (SimuNet Packed Matrix) that stores only a vector of the relevant data, as well as a way to unpack the matrix to a regular one. Especially designed to avoid storing empry matrix triangles and performing useless operations on them. Now `simu_scan` has an optional use.snPackMat logical argument (`FALSE` by default). Early benchmarks are promising  
 * Added two user-friendly functions to interact with the [Animal Social Network Repository](http://www.github.com/bansallab/asnr):  
