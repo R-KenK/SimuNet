@@ -133,9 +133,9 @@ n <- 4L
 n.rep <- 100L
 node_names <- as.character(1:n)
 
-N.to.do <- c(10,20,50,100,200,500)
+N.to.do <- c(10,50,100,200,500)
 # N.to.do <- c(50)
-n.a0.to.do <- 1:1000
+n.a0.to.do <- 1:500
 parameters <- expand.grid(N = N.to.do,n.a0 = n.a0.to.do)
 
 P0 <- draw_P0(n = n,method = "seq",min = 0,max = 1,node_names = node_names)
@@ -196,10 +196,13 @@ Comp.aij.N <-
   )
 
 snow::stopCluster(cl)
-Comp.aij.N %>% setDT
+
 Comp.aij.N <-
   Comp.aij.N %>%
   do.call(rbind,.)
+
+# saveRDS(Comp.aij.N,file = ".WIP/Comp.aij.N.rds")
+Comp.aij.N <-readRDS(".WIP/Comp.aij.N.rds")
 
 a0.N.df <-
   Comp.aij.N %>% setDT %>%  {
