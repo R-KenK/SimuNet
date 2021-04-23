@@ -12,8 +12,8 @@
 #'
 #' X<- lapply(1:3,function(i) list(int = 42,df = data.frame(x = runif(10,0,1),y = runif(10,0,1))))
 #' rbind_lapply(X,function(x) x$df)
-rbind_lapply <- function(X,FUN){
-  do.call(rbind,lapply(X = X,FUN = FUN))
+rbind_lapply <- function(X,FUN,...){
+  do.call(rbind,lapply(X = X,FUN = FUN,...))
 }
 
 # Column bind list of data frames
