@@ -3,14 +3,13 @@ source(".WIP/P.obs.validation_tools.R")
 
 # Simulation validation ---------------------------------------------------
 
-
 ## Generating "black-boxed" variables -------------------------------------
 
 ### toy-example variables -------------------------------------------------
 set.seed(42)
 n <- 5L
 N <- 100L
-n.rep <- 500L
+n.rep <- 2000L
 node_names <- as.character(1:n)
 
 ### Drawing probability matrix of association -----------------------------
@@ -22,27 +21,31 @@ P0
 A.GT.list <-
   replicate(n = n.rep,
             simplify = FALSE,
-            draw_Adj_from_binom(N,P0)
+            Mat_rbinom(N,P0)
+  )
+
+### Generating Ground-truth adjacency matrix distribution -----------------
+scanList.GT.list <-
+  replicate(n = n.rep,
+            simplify = FALSE,
+            draw_scanList(P = P0,N = N)
   )
 
 ## Generating researcher's empirical data ---------------------------------
 
 ### Drawing an empirical binary scan list ---------------------------------
-scanList0 <- draw_scanList(P0,N = N)
+scanList0 <- draw_scanList(P = P0,N = N)
 scanList0
 
 ### Sum them into weighted adjacency matrix -------------------------------
 A0 <- sum_scanList(scanList0)
 A0
 
-
 ## Simulate scan lists and adjacency matrices from observed data ----------
-
 
 ### Simulations from A0 ---------------------------------------------------
 
-
-#### Hierarchical model (beta probability, binomial for each scan) --------
+#### Step-by-step Beta-Binomial --------
 A.sim.scanList <-
   replicate(n = n.rep,
             simplify = FALSE,
@@ -54,7 +57,7 @@ A.sim.scanList <-
 A.sim.bbinom <-
   replicate(n = n.rep,
             simplify = FALSE,
-            A0 %>% draw_Adj_from_betabinom(A.obs = ,N = N)
+            A0 %>% Mat_rbbinom(A.obs = .,N = N)
   )
 
 
@@ -72,20 +75,104 @@ A.bootstrap <-
 P0.df <- extract_xij(P0,x.name = "p")
 A0.df <- extract_xij(A0,N = N,x.name = "a0",n.a0 = 1)
 
+
+
 Comp.aij <-
   rbind(
     format_and_merge_xij.df(A.GT.list,N,"GT",A0.df),
     format_and_merge_xij.df(A.sim.scanList,N,"SimuNet",A0.df),
-    format_and_merge_xij.df(A.sim.bbinom,N,"beta binomial",A0.df),
+    format_and_merge_xij.df(A.sim.bbinom,N,"Beta binomial",A0.df),
     format_and_merge_xij.df(A.bootstrap,N,"bootstrap",A0.df)
   )
 
 Comp.aij$method <-
   Comp.aij$method %>%
-  factor(levels = c("GT","beta binomial","SimuNet","bootstrap"))
+  factor(levels = c("GT","Beta binomial","SimuNet","bootstrap"))
 
 
 ### Plot data -------------------------------------------------------------
+
+Comp.aij %>%
+  subset(i == 3 & j == 4) %>%
+  ggplot(aes(a / N,colour = method,fill = method))+
+  facet_grid(method~.,scales = "free")+
+  # geom_line(aes(group = n.a0),stat="density",alpha = 0.15)+
+  # geom_density(aes(group = n.a0),colour = NA,alpha = 0.005)+
+  # geom_line(data = data.frame(select(dt.GT,-method)),inherit.aes = FALSE,aes(x = X / N),stat="density",colour = "darkred",alpha = 0.3,size = 1.2)+
+  geom_line(stat="density",alpha = 0.3,size = 1.2)+
+  geom_vline(aes(xintercept = (0.5 + a0)/(0.5 + 0.5 + N),colour = method),alpha = 0.7,lty = "dashed")+
+  theme_cowplot()
+
+
+# Repeating across many A0 ------------------------------------------------
+Comp.aij <-
+  rbind_lapply(
+    1:100,
+    function(n.a0) {
+      scanList0 <- draw_scanList(P = P0,N = N)
+      A0 <- sum_scanList(scanList0)
+      A0.df <- extract_xij(A0,N = N,x.name = "a0",n.a0 = n.a0)
+      rbind(
+        format_and_merge_xij.df(A.GT.list,N,"GT",A0.df),
+        replicate(n = n.rep,simplify = FALSE,A0 %>% draw_scanList(A.obs = .,N = N) %>% sum_scanList()) %>%
+          format_and_merge_xij.df(.,N,"SimuNet",A0.df),
+        replicate(n = n.rep,simplify = FALSE,A0 %>% Mat_rbbinom(A.obs = .,N = N)) %>%
+          format_and_merge_xij.df(.,N,"Beta binomial",A0.df),
+        replicate(n = n.rep,simplify = FALSE,scanList0 %>% resample_scanList() %>% sum_scanList()) %>%
+          format_and_merge_xij.df(.,N,"bootstrap",A0.df)
+      )
+    }
+  )
+
+Comp.aij$method <-
+  Comp.aij$method %>%
+  factor(levels = c("GT","Beta binomial","SimuNet","bootstrap"))
+
+Comp.aij %>%
+  subset(i == 3 & j == 4) %>%
+  subset(n.a0 <= 50) %>%
+  ggplot(aes(a / N,colour = method,fill = method))+
+  facet_grid(method~.,scales = "free")+
+  geom_density(colour = NA,alpha = 0.15,bw = 1/100)+
+  geom_density(aes(group = n.a0),colour = NA,alpha = 0.005,bw = 1/100)+
+  geom_line(aes(group = n.a0),stat="density",size = .6,alpha = 0.20,bw = 1/100)+
+  # geom_line(data = data.frame(select(dt.GT,-method)),inherit.aes = FALSE,aes(x = X / N),stat="density",colour = "darkred",alpha = 0.3,size = 1.2)+
+  geom_line(stat="density",lty = "dashed",alpha = 0.3,size = 1.4,bw = 1/100)+
+  geom_vline(aes(xintercept = (0.5 + a0)/(0.5 + 0.5 + N),colour = method),alpha = 0.2,lty = "dashed")+
+  theme_cowplot()
+
+
+sample.df <-
+  A0 %>%
+  {replicate(n = 10000,simplify = TRUE,Mat_rbbinom(A.obs = .,N = N) %>% {.[3,4] / N})} %>%
+  {rbind_lapply(1:10000,function(r) data.table(r = r,lower = quantile(x = .[1:r],0.025),upper = quantile(x = .[1:r],0.975)))}
+
+sample.df %>%
+  ggplot(aes(r,lower))+
+  geom_hline(yintercept = P0[3,4],lty = "dashed",colour = "tomato")+
+  geom_linerange(aes(ymin = lower,ymax = upper),alpha = 0.3)+
+  theme_minimal_grid()
+
+## Compare GT and simulated data ------------------------------------------
+
+### Extract data ----------------------------------------------------------
+P0.df <- extract_xij(P0,x.name = "p")
+A0.df <- extract_xij(A0,N = N,x.name = "a0",n.a0 = 1)
+
+
+
+Comp.aij <-
+  rbind(
+    format_and_merge_xij.df(A.GT.list,N,"GT",A0.df),
+    format_and_merge_xij.df(A.sim.scanList,N,"SimuNet",A0.df),
+    format_and_merge_xij.df(A.sim.bbinom,N,"Beta binomial",A0.df),
+    format_and_merge_xij.df(A.bootstrap,N,"bootstrap",A0.df)
+  )
+
+Comp.aij$method <-
+  Comp.aij$method %>%
+  factor(levels = c("GT","Beta binomial","SimuNet","bootstrap"))
+
 
 
 bw <- 1 / (3 * n * (n - 1))
@@ -126,20 +213,20 @@ Comp.aij %>%
 
 # Simulating across N -----------------------------------------------------
 rm(list = ls())
-source(".WIP/P.obs.validation_tools.R")
 
 set.seed(42)
 n <- 4L
-n.rep <- 100L
+n.rep <- 50L
 node_names <- as.character(1:n)
 
-N.to.do <- c(10,50,100,200,500)
+N.to.do <- c(20,50,100,200,500)
 # N.to.do <- c(50)
-n.a0.to.do <- 1:500
+n.a0.to.do <- 1:50
 parameters <- expand.grid(N = N.to.do,n.a0 = n.a0.to.do)
 
 P0 <- draw_P0(n = n,method = "seq",min = 0,max = 1,node_names = node_names)
 P0.df <- extract_xij(P0,x.name = "p")
+
 
 library(pbapply)
 library(snow)
@@ -202,14 +289,99 @@ Comp.aij.N <-
   do.call(rbind,.)
 
 # saveRDS(Comp.aij.N,file = ".WIP/Comp.aij.N.rds")
-Comp.aij.N <-readRDS(".WIP/Comp.aij.N.rds")
+Comp.aij.N <- readRDS(".WIP/Comp.aij.N.rds")
+
+# equivalent to merge(Comp.aij.N,P0.df,by = c("i","j"))
+setDT(P0.df)
+setkey(P0.df,i,i)
+Comp.aij.N[P0.df,on = .(i,j),p := i.p]
+
+setkey(Comp.aij.N,N,n.a0,method,i,i)
+
+Comp.aij.N[,keyby = .(N,n.a0,method,i,j),
+      `:=`(lower = quantile(a,0.025),upper = quantile(a,0.975))]
+
+Comp.aij.N[,in.CI := ifelse(p >= lower / N &
+                              p <= upper / N,1,0),]
+
+Comp.aij.N
+
+Comp.aij.N.summ <-
+  Comp.aij.N[,by = .(N,method,rep,i,j,p),
+              .(a = median(a),
+                sd.a = sd(a),
+                p.value = sum(in.CI) / .N,
+                n.row = .N,
+                CI.range = mean(upper - lower),
+                CI.range.sd = sd(upper - lower))][order(N,rep,method,j,i)]
+
+Comp.aij.N.summ[,by = .(N,method,i,j,p),
+           .(a = mean(a),
+             sd.a = mean(sd.a),
+             p.value = mean(p.value),
+             p.min = min(p.value),
+             p.max = max(p.value),
+             n.row = .N)][order(N,method,j,i)]
+
+
+
+Comp.aij.N.summ %>%
+  ggplot(aes(p,p.value,shape = method,colour = N))+
+  geom_line(aes(group = interaction(N,method)),alpha = 1)+
+  scale_color_gradientn(colours = c("#ef8a62","#67a9cf"))+
+  geom_point(alpha = 1)+
+  cowplot::theme_minimal_grid()
+
+unique(Comp.aij.N.CI$N)
+
+a0.N.summ <-
+  Comp.aij.N %>% setDT %>%  {
+    .[,by = .(N,method,i,j),
+      .(a0 = mean(a0),
+        type = as.factor(ifelse(method == "GT","GT","empirical")))
+    ]
+  }
+
+Comp.aij.N %>%
+  subset(N %in% c(20,50,500)) %>%
+  mutate(type = as.factor(ifelse(method == "GT","GT","empirical"))) %>%
+  mutate(type = relevel(type,"GT")) %>%
+  ggplot(aes(a / N,interaction(type,N),colour = method,fill = method))+
+  facet_grid(i~j,scale = "free")+
+  geom_density_ridges(stat = "binline",
+                      binwidth = 1 / 50,
+                      position = position_dodge(2 * bw),
+                      alpha = 0.1,
+                      scale = 1.2)+
+  # geom_histogram(aes(y = stat(count) / sum(count)),
+  #                alpha = 0.2,
+  #                colour = NA,
+  #                position = position_dodge(0),
+  #                binwidth = 1 / 20)+
+  geom_hline(yintercept = 1,colour = "black")+
+  scale_x_continuous(limits = c(0 - bw,1 + bw),
+                     breaks = c(0,0.5,1),labels = c("0","0.5","1"))+
+  scale_y_discrete(expand = expansion(mult = c(0,0.5)),
+                   labels = rep(c("N = 20","N = 50","N = 500"),each = 2))+
+  geom_vline(data = P0.df,aes(xintercept = p),
+             lty = "dashed",colour = "tomato")+
+  geom_point(data = a0.N.summ[N %in% c(20,50,500)],aes(x = a0 / N),
+             colour = "royalblue")+
+  # geom_label(data = P0.df,aes(x = 0.5,y = 7,label = paste0("p = ",round(p,2))))+
+  xlab("a / N")+
+  cowplot::theme_half_open()+
+  theme(panel.grid.major.x = element_line(colour = "grey90"))
+
+
+
+# plot draft --------------------------------------------------------------
 
 a0.N.df <-
   Comp.aij.N %>% setDT %>%  {
     .[n.a0 == 1,by = .(N,method,i,j),
       .(a0 = mean(a0),
-      type = as.factor(ifelse(method == "GT","GT","empirical")))
-      ]
+        type = as.factor(ifelse(method == "GT","GT","empirical")))
+    ]
   }
 
 
@@ -251,62 +423,6 @@ Comp.aij.N %>%
   # cowplot::theme_half_open()+
   theme(panel.grid.major.x = element_line(colour = "grey90"))
 
-Comp.aij.N %>%
-  subset(N %in% c(20,50,500)) %>%
-  merge(P0.df,by = c("i","j")) %>%
-  group_by(N,n.a0,method,i,j) %>%
-  mutate(lower = quantile(a,0.025),
-         upper = quantile(a,0.975),
-         in.CI = ifelse(p >= lower / N & p <= upper / N,1,0)) %>%
-  group_by(N,method,i,j,p) %>%
-  summarize(p.value = sum(in.CI) / n()) %>%
-  # group_by(N,method) %>%
-  # summarise(p.value = mean(p.value),
-  #           lower = quantile(p.value,0.025),
-  #           upper = quantile(p.value,0.975)
-  # ) %>%
-  data.table %>%
-  ggplot(aes(method,p.value))
-
-
-
-a0.N.summ <-
-  Comp.aij.N %>% setDT %>%  {
-    .[,by = .(N,method,i,j),
-      .(a0 = mean(a0),
-        type = as.factor(ifelse(method == "GT","GT","empirical")))
-    ]
-  }
-
-Comp.aij.N %>%
-  subset(N %in% c(20,50,500)) %>%
-  mutate(type = as.factor(ifelse(method == "GT","GT","empirical"))) %>%
-  mutate(type = relevel(type,"GT")) %>%
-  ggplot(aes(a / N,interaction(type,N),colour = method,fill = method))+
-  facet_grid(i~j,scale = "free")+
-  geom_density_ridges(stat = "binline",
-                      binwidth = 1 / 50,
-                      position = position_dodge(2 * bw),
-                      alpha = 0.1,
-                      scale = 1.2)+
-  # geom_histogram(aes(y = stat(count) / sum(count)),
-  #                alpha = 0.2,
-  #                colour = NA,
-  #                position = position_dodge(0),
-  #                binwidth = 1 / 20)+
-  geom_hline(yintercept = 1,colour = "black")+
-  scale_x_continuous(limits = c(0 - bw,1 + bw),
-                     breaks = c(0,0.5,1),labels = c("0","0.5","1"))+
-  scale_y_discrete(expand = expansion(mult = c(0,0.5)),
-                   labels = rep(c("N = 20","N = 50","N = 500"),each = 2))+
-  geom_vline(data = P0.df,aes(xintercept = p),
-             lty = "dashed",colour = "tomato")+
-  geom_point(data = a0.N.summ[N %in% c(20,50,500)],aes(x = a0 / N),
-             colour = "royalblue")+
-  # geom_label(data = P0.df,aes(x = 0.5,y = 7,label = paste0("p = ",round(p,2))))+
-  xlab("a / N")+
-  cowplot::theme_half_open()+
-  theme(panel.grid.major.x = element_line(colour = "grey90"))
 
 
 

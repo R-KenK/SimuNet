@@ -5,7 +5,7 @@
 \title{Row bind list of data frames
 wrapper to one-function do.call rbind over a lapply list}
 \usage{
-rbind_lapply(X, FUN)
+rbind_lapply(X, FUN, ...)
 }
 \arguments{
 \item{X}{a list. See details \link[base]{lapply}.}

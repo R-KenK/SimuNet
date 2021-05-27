@@ -1,6 +1,7 @@
 # Loading used packages --------------------------------------
 library(ggplot2)
 library(ggridges)
+library(cowplot)
 library(data.table)
 library(dplyr)
 library(extraDistr)
@@ -74,12 +75,12 @@ draw_P0 <- function(n,method = c("sequence","gregarious.index"),
   )
 }
 
-# Draw scans and adjacency matrices ---------------------------------------
+# Draw P, scans and adjacency matrices ---------------------------------------
 
 ## Drawing A0 ----
 
 ### Adjacency from binomial probabilities ----
-draw_Adj_from_binom <- function(N,p) {
+Mat_rbinom <- function(N,p) {
   Adj <- rbinom(length(p),N,p)
   if (is.array(p)) {
     dim(Adj) <- dim(p)
@@ -90,11 +91,11 @@ draw_Adj_from_binom <- function(N,p) {
 
 ## Drawing A.sim ----
 ### A.sim from BetaBinomial ----
-draw_Adj_from_betabinom <- function(A.obs,N,alpha.prior = 0.5,beta.prior = 0.5) {
+Mat_rbbinom <- function(A.obs,N,alpha.prior = 0.5,beta.prior = 0.5,N.new = N) {
   Adj <-
     extraDistr::rbbinom(
       n = length(A.obs),
-      size = N,
+      size = N.new,
       alpha = A.obs + alpha.prior,
       beta = N - A.obs + beta.prior
     )
@@ -107,7 +108,7 @@ draw_Adj_from_betabinom <- function(A.obs,N,alpha.prior = 0.5,beta.prior = 0.5) 
 }
 
 ## Binomial probability from Beta distribution ----
-draw_P_from_beta <- function(A.obs,N,alpha.prior = 0.5,beta.prior = 0.5) {
+Mat_rbeta <- function(A.obs,N,alpha.prior = 0.5,beta.prior = 0.5) {
   P <- rbeta(n = length(A.obs),A.obs + alpha.prior,N - A.obs + beta.prior)
   if (is.array(A.obs)) {
     dim(P) <- dim(A.obs)
@@ -118,24 +119,20 @@ draw_P_from_beta <- function(A.obs,N,alpha.prior = 0.5,beta.prior = 0.5) {
 }
 
 ## Draw binary scan list ----
-draw_scanList <- function(P = NULL,A.obs = NULL,N,scans.to.do = 1:N) {
-  need.to.draw.P <- is.null(P) & !is.null(A.obs)
-  need.to.draw.P
+draw_scanList <- function(P = NULL,A.obs = NULL,N,n.scans = N) {
+  if (is.null(P) & !is.null(A.obs)) {
+    P <- Mat_rbeta(A.obs,N)
+  }
   scan.list <-
-    lapply(
-      scans.to.do,
-      function(s) {
-        if (need.to.draw.P) {P <- draw_P_from_beta(A.obs,N)}
-        scan <-
-          list(
-            A = draw_Adj_from_binom(P,N = 1),
-            P = P
-          )
-        class(scan) <- "valscan"
-        scan
-      }
+    list(
+      scans = replicate(
+        n = n.scans,
+        simplify = FALSE,
+        Mat_rbinom(P,N = 1)
+      ),
+      P = P
     )
-  class(scan.list) <- "valscanList"
+  class(scan.list) <- "sL"
   scan.list
 }
 
@@ -145,46 +142,43 @@ use_printSpMatrix <- function(M,...,sparse = TRUE, digits = 3, note.dropping.col
   Matrix::printSpMatrix(M,digits = digits,note.dropping.colnames = note.dropping.colnames,align = align,...)
 }
 
-print.valscan <- function(x,...) {
-  use_printSpMatrix(x$A)
-}
-
-print.valscanList <- function(x,...) {
-  n <- length(x)
+print.sL <- function(x,...) {
+  n <- length(x$scans)
   if (n >= 10) {
-    lapply(1:3,function(i) print_scanList_i(x,i))
+    lapply(1:3,function(i) print_scan_i(x,i))
     cat("\n... (",n - 3," more scans)\n\n",sep = "")
-    lapply((n - 2 + 1):n,function(i) print_scanList_i(x,i))
+    lapply((n - 2 + 1):n,function(i) print_scan_i(x,i))
   } else {
-    lapply(1:n,function(i) print_scanList_i(x,i))
+    lapply(1:n,function(i) print_scan_i(x,i))
   }
 }
-print_scanList_i <- function(x,i) {
+
+print_scan_i <- function(x,i) {
   cat(paste0("[[",i,"]]\n"))
-  print(x[[i]])
+  use_printSpMatrix(x$scans[[i]])
 }
 
-get_scanList <- function(scan.list,attribute) {
-  lapply(scan.list,function(s) s[[attribute]])
+get_sL <- function(scan.list,attribute) {
+  scan.list[[attribute]]
 }
 
 ## Sum binary scan list into a weighted adjacency matrix ----
-sum_scanList <- function(scan.list,attribute = "A") {
-  get_scanList(scan.list,attribute) %>%
+sum_scanList <- function(scan.list,attribute = "scans") {
+  get_sL(scan.list,attribute) %>%
     Reduce("+",.)
 }
 
 # Uncertainty assessment tools -------------------------------------------
 # Scan list Bootstrap ----
 resample_scanList <- function(scan.list) {
-  resampled <-
-    scan.list %>%
+  scan.list$scans <-
+    scan.list$scans %>%
     sample(replace = TRUE)
-  class(resampled) <-  "valscanList"
-  resampled
+  class(scan.list) <-  "sL"
+  scan.list
 }
 
-bootstrap_scanList <- function(scan.list,n.boot = 100,attribute = "A",simplify = FALSE) {
+bootstrap_scanList <- function(scan.list,n.boot = 100,attribute = "scans",simplify = FALSE) {
   replicate(n = n.boot,
             simplify = simplify,
             resample_scanList(scan.list) %>%
