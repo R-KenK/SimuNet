@@ -542,5 +542,15 @@ infer_one_network <- function(P,N,n.samp = n.samp,rep = NULL) {
 }
 
 infer_multiple_networks <- function(P,N,n.rep,n.samp = n.samp,cl = NULL) {
-  pbapply::pblapply(1:n.rep,function(r) infer_one_network(P = P,N = N,n.samp = n.samp,rep = r),cl = cl)
+  cat(paste0("\nN = ",N," - n.rep = ",n.rep," - n.samp = ",n.samp,"\n"))
+  pbapply::pblapply(1:n.rep,function(r) infer_one_network(P = P,N = N,n.samp = n.samp,rep = r),cl = cl) %>%
+    {
+      list(
+        P_hat.dt = rbind_lapply(.,function(r) r$P_hat.dt),
+        node_metric.dt = rbind_lapply(.,function(r) r$node_metric.dt),
+        global_metric.dt = rbind_lapply(.,function(r) r$global_metric.dt)
+      )
+    }
 }
+
+infer_across_N <- Vectorize(infer_multiple_networks,vectorize.args = c("N"),SIMPLIFY = FALSE)
