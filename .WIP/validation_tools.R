@@ -309,7 +309,7 @@ get_original.node.metrics <- function(P) {
       n = nrow(P),
       N = 1,
       method = factor("original"),
-      i = factor(1:n),
+      i = factor(1:nrow(P)),
       sample = factor(1),
       .
     )
@@ -507,8 +507,8 @@ proportion_in_CI.global <- function(compared.CI.dt) {
 
 
 # Repeat data inference for many networks ----------------------------------------------------
-
-infer_one_network <- function(P,N,n.samp = n.samp,rep = NULL) {
+infer_one_network <- function(P,N,n.samp = n.samp,rep = NULL,Pij.dt,P.node.dt,P.global.dt) {
+  n <- nrow(P)
   A0.list <- generate_infered_networks(P = P,N = N,n.samp = n.samp)
   P_hat.dt <-
     A0.list %>%
@@ -541,9 +541,11 @@ infer_one_network <- function(P,N,n.samp = n.samp,rep = NULL) {
   list(P_hat.dt = P_hat.dt,node_metric.dt = node_metric.dt,global_metric.dt = global_metric.dt)
 }
 
-infer_multiple_networks <- function(P,N,n.rep,n.samp = n.samp,cl = NULL) {
-  cat(paste0("\nN = ",N," - n.rep = ",n.rep," - n.samp = ",n.samp,"\n"))
-  pbapply::pblapply(1:n.rep,function(r) infer_one_network(P = P,N = N,n.samp = n.samp,rep = r),cl = cl) %>%
+infer_multiple_networks <- function(P,n,N,n.rep,n.samp,cl = NULL,Pij.dt,P.node.dt,P.global.dt) {
+  cat(paste0("\nn = ",n," - N = ",N," - n.rep = ",n.rep," - n.samp = ",n.samp,"\n"))
+  pbapply::pblapply(1:n.rep,function(r) infer_one_network(P = P,N = N,n.samp = n.samp,rep = r,
+                                                          Pij.dt = Pij.dt,P.node.dt = P.node.dt,
+                                                          P.global.dt = P.global.dt),cl = cl) %>%
     {
       list(
         P_hat.dt = rbind_lapply(.,function(r) r$P_hat.dt),
@@ -554,3 +556,20 @@ infer_multiple_networks <- function(P,N,n.rep,n.samp = n.samp,cl = NULL) {
 }
 
 infer_across_N <- Vectorize(infer_multiple_networks,vectorize.args = c("N"),SIMPLIFY = FALSE)
+
+# Repeat data inference for different n ----------------------------------------------------
+generate_P_and_infer <- function(n,N,n.rep,n.samp,cl = NULL) {
+  P <- generate_P.seq(n = n,mode = "directed")
+  Pij.dt <- P %>%
+    extract_xij(x.name = "p",mode = "directed",N = N,method = as.factor("original"))
+  P.node.dt <- P %>%
+    get_original.node.metrics()
+  P.global.dt <- P %>%
+    get_original.global.metrics()
+  infer_across_N(P = P,n = n,N = N,n.rep = n.rep,n.samp = n.samp,
+                 cl = cl,
+                 Pij.dt = Pij.dt,P.node.dt = P.node.dt,
+                 P.global.dt = P.global.dt)
+}
+
+infer_across_n_N <- Vectorize(generate_P_and_infer,vectorize.args = c("n"),SIMPLIFY = FALSE)

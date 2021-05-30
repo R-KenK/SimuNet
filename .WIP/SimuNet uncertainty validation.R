@@ -114,7 +114,7 @@ snow::clusterExport(cl,list = list("n","N","n.rep","n.samp","P","Pij.dt","P.node
 ### across several N ----
 N.list <- c(20,50,100,1000,2000)
 repeated <-
-  infer_across_N(P,N = N.list,n.rep,n.samp,cl = cl) %>%
+  infer_across_N(P,N = N.list,n.rep,n.samp,cl = cl,Pij.dt,P.node.dt,P.global.dt) %>%
   {
     list(
       P_hat.dt = rbind_lapply(.,function(r) r$P_hat.dt),
@@ -126,6 +126,7 @@ repeated <-
 snow::stopCluster(cl)
 
 saveRDS(repeated,".WIP/repeated.across.N.rds")
+
 ## proto data exploration ----
 repeated %>%
   .$P_hat.dt %>%
@@ -191,3 +192,119 @@ repeated %>%
   geom_point(data = P.node.dt,aes(i,fbet),inherit.aes = FALSE,
              colour = "darkred",size = 3)+
   theme_cowplot()
+# Generate inferred data for several network observations & n --------------------------------------
+rm(list = ls())
+source(".WIP/validation_tools.R")
+
+set.seed(42)
+n.list <- c(5,10,25,50,100)
+N.list <- c(50,100,1000,2000)
+n.rep <- 350L
+n.samp <- 1000L
+
+## parallelization ----
+library(snow)
+cl <- snow::makeCluster(7)
+snow::clusterEvalQ(cl,expr = {source(".WIP/validation_tools.R")})
+
+## Gather data ----
+# repeated <-
+#   infer_multiple_networks(P,N,n.rep,n.samp,cl = cl)
+
+### across several N & n ----
+repeated.n <-
+  infer_across_n_N(n = n.list,N = N.list,n.rep,n.samp,cl = cl) %>%
+  {
+    list(
+      P_hat.dt = rbind_lapply(
+        .,
+        function(r.n) rbind_lapply(
+          r.n,
+          function(r) r$P_hat.dt
+        )
+      ),
+      node_metric.dt = rbind_lapply(
+        .,
+        function(r.n) rbind_lapply(
+          r.n,
+          function(r) r$node_metric.dt
+        )
+      ),
+      global_metric.dt = rbind_lapply(
+        .,
+        function(r.n) rbind_lapply(
+          r.n,
+          function(r) r$global_metric.dt
+        )
+      )
+    )
+  }
+
+snow::stopCluster(cl)
+
+saveRDS(repeated.n,".WIP/repeated.across.n.N.rds")
+
+## proto data exploration ----
+repeated.n %>%
+  .$P_hat.dt %>%
+  proportion_in_CI.P_hat() %>%
+  {
+    .[
+      ,prop.in := in.CI / n.rep,
+    ][
+      ,prop.lower := lower.CI / n.rep,
+    ][
+      ,prop.higher := higher.CI / n.rep,
+    ][]
+  }
+
+repeated.n %>%
+  .$node_metric.dt %>%
+  proportion_in_CI.nodes() %>%
+  {
+    .[
+      ,prop.in := in.CI / n.rep,
+    ][
+      ,prop.lower := lower.CI / n.rep,
+    ][
+      ,prop.higher := higher.CI / n.rep,
+    ][]
+  }
+
+repeated.n %>%
+  .$global_metric.dt %>%
+  proportion_in_CI.global() %>%
+  {
+    .[
+      ,prop.in := in.CI / n.rep,
+    ][
+      ,prop.lower := lower.CI / n.rep,
+    ][
+      ,prop.higher := higher.CI / n.rep,
+    ][]
+  }
+
+repeated.n %>%
+  .$P_hat.dt %>%
+  ggplot(aes(ij,p,colour = method,fill = method))+
+  facet_grid(n~.)+
+  geom_boxplot(aes(group = interaction(method,ij)),alpha = .5)+
+  theme_cowplot()
+
+repeated.n %>%
+  .$node_metric.dt %>%
+  subset(metric == "str") %>%
+  ggplot(aes(i,value,colour = method,fill = method))+
+  facet_grid(n~.)+
+  geom_boxplot(aes(group = interaction(method,i)),alpha = .5)+
+  theme_cowplot()
+
+repeated.n %>%
+  .$node_metric.dt %>%
+  subset(metric == "fbet") %>%
+  ggplot(aes(i,value,colour = method,fill = method))+
+  facet_grid(n~.)+
+  geom_boxplot(aes(group = interaction(method,i)),alpha = .5)+
+  theme_cowplot()
+
+
