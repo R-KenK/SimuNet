@@ -4,10 +4,10 @@ source(".WIP/validation_tools.R")
 
 set.seed(42)
 
-n <- 4L
+n <- 10L
 N <- 20L
-n.rep <- 14L
-n.samp <- 50L
+n.rep <- 350L
+n.samp <- 1000L
 
 # Generating P ---------------------------------------------------------------------------------
 P <- generate_P.seq(n,mode = "directed")
@@ -108,10 +108,11 @@ snow::clusterEvalQ(cl,expr = {source(".WIP/validation_tools.R")})
 snow::clusterExport(cl,list = list("n","N","n.rep","n.samp","P","Pij.dt","P.node.dt","P.global.dt"))
 
 ## Gather data ----
+# repeated <-
+#   infer_multiple_networks(P,N,n.rep,n.samp,cl = cl)
+N.list <- c(20,50,100,1000,2000)
 repeated <-
-  infer_multiple_networks(P,N,n.rep,n.samp,cl = cl)
-
-infer_across_N(P,N = c(20,50,100),n.rep,n.samp,cl = cl) %>%
+  infer_across_N(P,N = N.list,n.rep,n.samp,cl = cl) %>%
   {
     list(
       P_hat.dt = rbind_lapply(.,function(r) r$P_hat.dt),
