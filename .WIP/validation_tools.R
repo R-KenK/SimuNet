@@ -471,7 +471,7 @@ merge_with_original.nodes <- function(node.CI.dt,P.node.dt) {
 }
 
 proportion_in_CI.nodes <- function(compared.CI.dt) {
-  proportion_in_CI(compared.CI.dt,by = .(i,method,metric))
+  proportion_in_CI(compared.CI.dt,by = .(n,N,i,method,metric))
 }
 
 ### global ----
@@ -501,7 +501,7 @@ merge_with_original.global <- function(global.CI.dt,P.global.dt) {
 }
 
 proportion_in_CI.global <- function(compared.CI.dt) {
-  proportion_in_CI(compared.CI.dt,by = .(method,metric))
+  proportion_in_CI(compared.CI.dt,by = .(n,N,method,metric))
 }
 
 
@@ -561,7 +561,7 @@ infer_across_N <- Vectorize(infer_multiple_networks,vectorize.args = c("N"),SIMP
 generate_P_and_infer <- function(n,N,n.rep,n.samp,cl = NULL) {
   P <- generate_P.seq(n = n,mode = "directed")
   Pij.dt <- P %>%
-    extract_xij(x.name = "p",mode = "directed",N = N,method = as.factor("original"))
+    extract_xij(x.name = "p",mode = "directed",method = as.factor("original"))
   P.node.dt <- P %>%
     get_original.node.metrics()
   P.global.dt <- P %>%
