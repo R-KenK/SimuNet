@@ -110,6 +110,8 @@ snow::clusterExport(cl,list = list("n","N","n.rep","n.samp","P","Pij.dt","P.node
 ## Gather data ----
 # repeated <-
 #   infer_multiple_networks(P,N,n.rep,n.samp,cl = cl)
+
+### across several N ----
 N.list <- c(20,50,100,1000,2000)
 repeated <-
   infer_across_N(P,N = N.list,n.rep,n.samp,cl = cl) %>%
@@ -123,6 +125,8 @@ repeated <-
 
 snow::stopCluster(cl)
 
+saveRDS(repeated,".WIP/repeated.across.N.rds")
+## proto data exploration ----
 repeated %>%
   .$P_hat.dt %>%
   proportion_in_CI.P_hat() %>%
