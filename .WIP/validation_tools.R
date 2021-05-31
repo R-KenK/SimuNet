@@ -188,6 +188,12 @@ extract_xij <- function(M,N = NULL,x.name = "x",...,
     subset(i != j | keep.diag)
 }
 
+create_Pij.dt <- function(P,mode = "directed") {
+  P %>%
+    extract_xij(x.name = "p",mode = mode,method = as.factor("original"))
+}
+
+
 extract_pij <- function(A.list,N,x.name = "p",keep.diag = FALSE,
                         mode = c("directed","upper","lower","undirected"),...) {
   lapply(A.list,function(A) A / N) %>%
@@ -281,9 +287,22 @@ extract_node.metrics <- function(A,n,N,method = c("GT","bbinom","SimuNet","boot"
          "boot" = A$A.boot
   ) %>%
     lapply(function(A) A / N) %>%
-    extract_SNm.vec(SNm_fun = c(custom_EV,custom_CC,custom_str,custom_bet,custom_fbet),
-                    transform.to.igraph = c(TRUE,FALSE,TRUE,FALSE,FALSE),
-                    mode = "directed",Xapply = rbind_lapply) %>%
+    extract_SNm.vec(
+      SNm_fun = c(
+        custom_EV,
+        custom_CC,
+        custom_str,
+        # custom_fbet,
+        custom_bet
+      ),
+      transform.to.igraph = c(
+        TRUE,
+        FALSE,
+        TRUE,
+        # FALSE,
+        FALSE
+      ),
+      mode = "directed",Xapply = rbind_lapply) %>%
     do.call(cbind,.) %>%
     cbind(
       n = n,
@@ -301,9 +320,22 @@ extract_node.metrics.vec <- Vectorize(extract_node.metrics,
 
 get_original.node.metrics <- function(P) {
   P %>%
-  extract_SNm.vec(c(custom_EV,custom_CC,custom_str,custom_bet,custom_fbet),
-                  transform.to.igraph = c(TRUE,FALSE,TRUE,FALSE,FALSE),
-                  mode = "directed",Xapply = rbind_lapply) %>%
+  extract_SNm.vec(
+    c(
+      custom_EV,
+      custom_CC,
+      custom_str,
+      # custom_fbet,
+      custom_bet
+    ),
+    transform.to.igraph = c(
+      TRUE,
+      FALSE,
+      TRUE,
+      # FALSE,
+      FALSE
+    ),
+    mode = "directed",Xapply = rbind_lapply) %>%
     do.call(cbind,.) %>%
     cbind(
       n = nrow(P),
@@ -389,6 +421,8 @@ calculate_CIs <- function(long.dt,by) {
                  value = median(value),
                  low = low_q(value),
                  up = up_q(value),
+                 mean = mean(value),
+                 sd = sd(value),
                  n.samp = .N
                )
   ]
@@ -424,6 +458,8 @@ calculate_CIs.P_hat <- function(P_hat.dt) {
       p = median(p),
       low = low_q(p),
       up = up_q(p),
+      mean = mean(p),
+      sd = sd(p),
       n.samp = .N
     )
   ]
@@ -449,7 +485,13 @@ melt_node.metrics <- function(node.metrics.dt) {
   node.metrics.dt %>%
     melt.data.table(
       id.vars = c("n","N","method","i","sample"),
-      measure.vars = c("EV","CC","str","bet","fbet"),
+      measure.vars = c(
+        "EV",
+        "CC",
+        "str",
+        # "fbet",
+        "bet"
+      ),
       variable.name = "metric",
       value.name = "value"
     )
@@ -560,12 +602,9 @@ infer_across_N <- Vectorize(infer_multiple_networks,vectorize.args = c("N"),SIMP
 # Repeat data inference for different n ----------------------------------------------------
 generate_P_and_infer <- function(n,N,n.rep,n.samp,cl = NULL) {
   P <- generate_P.seq(n = n,mode = "directed")
-  Pij.dt <- P %>%
-    extract_xij(x.name = "p",mode = "directed",method = as.factor("original"))
-  P.node.dt <- P %>%
-    get_original.node.metrics()
-  P.global.dt <- P %>%
-    get_original.global.metrics()
+  Pij.dt <- create_Pij.dt(P,mode = "directed")
+  P.node.dt <- get_original.node.metrics(P)
+  P.global.dt <- get_original.global.metrics(P)
   infer_across_N(P = P,n = n,N = N,n.rep = n.rep,n.samp = n.samp,
                  cl = cl,
                  Pij.dt = Pij.dt,P.node.dt = P.node.dt,
@@ -573,3 +612,29 @@ generate_P_and_infer <- function(n,N,n.rep,n.samp,cl = NULL) {
 }
 
 infer_across_n_N <- Vectorize(generate_P_and_infer,vectorize.args = c("n"),SIMPLIFY = FALSE)
+
+combine_inferred_across_n_N <- function(dt.list) {
+  list(
+    P_hat.dt = rbind_lapply(
+      dt.list,
+      function(r.n) rbind_lapply(
+        r.n,
+        function(r) r$P_hat.dt
+      )
+    ),
+    node_metric.dt = rbind_lapply(
+      dt.list,
+      function(r.n) rbind_lapply(
+        r.n,
+        function(r) r$node_metric.dt
+      )
+    ),
+    global_metric.dt = rbind_lapply(
+      dt.list,
+      function(r.n) rbind_lapply(
+        r.n,
+        function(r) r$global_metric.dt
+      )
+    )
+  )
+}

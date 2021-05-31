@@ -197,10 +197,10 @@ rm(list = ls())
 source(".WIP/validation_tools.R")
 
 set.seed(42)
-n.list <- c(5,10,25,50,100)
-N.list <- c(50,100,1000,2000)
-n.rep <- 350L
-n.samp <- 1000L
+n.list <- c(5,10,25,50)
+N.list <- c(50,100,1000)
+n.rep <- 105L
+n.samp <- 100L
 
 ## parallelization ----
 library(snow)
@@ -214,31 +214,7 @@ snow::clusterEvalQ(cl,expr = {source(".WIP/validation_tools.R")})
 ### across several N & n ----
 repeated.n <-
   infer_across_n_N(n = n.list,N = N.list,n.rep,n.samp,cl = cl) %>%
-  {
-    list(
-      P_hat.dt = rbind_lapply(
-        .,
-        function(r.n) rbind_lapply(
-          r.n,
-          function(r) r$P_hat.dt
-        )
-      ),
-      node_metric.dt = rbind_lapply(
-        .,
-        function(r.n) rbind_lapply(
-          r.n,
-          function(r) r$node_metric.dt
-        )
-      ),
-      global_metric.dt = rbind_lapply(
-        .,
-        function(r.n) rbind_lapply(
-          r.n,
-          function(r) r$global_metric.dt
-        )
-      )
-    )
-  }
+  combine_inferred_across_n_N()
 
 snow::stopCluster(cl)
 
