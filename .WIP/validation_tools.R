@@ -445,7 +445,13 @@ proportion_in_CI <- function(compared.CI.dt,by) {
         higher.CI = sum(.SD$higher.CI),
         n.rep = .N
       )
-    ]
+    ][
+      ,prop.in := in.CI / n.rep,
+    ][
+      ,prop.lower := lower.CI / n.rep,
+    ][
+      ,prop.higher := higher.CI / n.rep,
+    ][]
 }
 
 ### P_hat ----
