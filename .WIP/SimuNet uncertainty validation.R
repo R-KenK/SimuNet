@@ -196,8 +196,9 @@ repeated %>%
 rm(list = ls())
 source(".WIP/validation_tools.R")
 
-set.seed(42)
-n.list <- c(5,10,25,50)
+set.seed(424242)
+# n.list <- c(10,25,50)
+n.list <- c(75,100)
 N.list <- c(50,100,1000)
 n.rep <- 105L
 n.samp <- 100L
@@ -218,7 +219,8 @@ repeated.n <-
 
 snow::stopCluster(cl)
 
-saveRDS(repeated.n,".WIP/repeated.across.n.N.rds")
+saveRDS(repeated.n,".WIP/repeated.across.n.75.100.N.rds")
+repeated.n <- readRDS(".WIP/repeated.across.n.10.25.50.N.rds")
 
 ## proto data exploration ----
 repeated.n %>%
