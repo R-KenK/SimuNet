@@ -77,6 +77,8 @@ is.presenceProb <- function(x){
   inherits(x,"presenceProb")
 }
 
+if (getRversion() >= "2.15.1")  utils::globalVariables(".")
+
 #' Binarize from adjacency matrix
 #' Internal use. Provide binary probability for each weight, taking into account the sampling effort.
 #'
