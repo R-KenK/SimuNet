@@ -125,7 +125,7 @@ repeated <-
 
 snow::stopCluster(cl)
 
-saveRDS(repeated,".WIP/repeated.across.N.rds")
+saveRDS(repeated,".WIP/simulation.data/repeated.across.N.rds")
 
 ## proto data exploration ----
 repeated %>%
@@ -219,11 +219,12 @@ repeated.n <-
 
 snow::stopCluster(cl)
 
-saveRDS(repeated.n,".WIP/repeated.across.n.75.100.N.rds")
+saveRDS(repeated.n,".WIP/simulation.data/repeated.across.n.75.100.N.rds")
 
-output.list <- c(".WIP/repeated.across.n.10.25.50.N.rds",".WIP/repeated.across.n.10.25.50.more.N.rds")
+output.list <- c(".WIP/simulation.data/repeated.across.n.10.25.50.N.rds",
+                 ".WIP/simulation.data/repeated.across.n.10.25.50.more.N.rds")
 repeated.n <- readRDS_and_rbind(output.list)
-repeated.n <- readRDS(".WIP/repeated.across.n.10.25.50.N.rds")
+repeated.n <- readRDS(".WIP/simulation.data/repeated.across.n.10.25.50.N.rds")
 
 ## proto data exploration ----
 ### calculate proportions ----
