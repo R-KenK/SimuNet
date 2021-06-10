@@ -164,7 +164,9 @@ generate_infered_networks <- function(P,N,N.new = N,n.samp = 1000,seed = NULL) {
   list(
     A.GT = replicate(n = n.samp,simplify = FALSE,mat_rbinom(P = P,N = N)),
     A.bbinom = replicate(n = n.samp,simplify = FALSE,mat_rbbinom(A = A0,N = N)),
-    A.SimuNet = replicate(n = n.samp,simplify = FALSE,mat_rbeta(A = A0,N = N) %>% mat_rbinom(P = .,N = N)),
+    A.SimuNet = replicate(n = n.samp,
+                          simplify = FALSE,mat_rbeta(A = A0,N = N) %>% mat_rbinom(P = .,N = N)
+    ),
     A.boot = bootstrap_scanList(scan.list = sL0,n.boot = n.samp)
   )
 }
@@ -641,6 +643,24 @@ combine_inferred_across_n_N <- function(dt.list) {
         r.n,
         function(r) r$global_metric.dt
       )
+    )
+  )
+}
+
+# Reimport vector of rds files ----
+readRDS_and_rbind <- function(file.vec) {
+  list(
+    P_hat.dt = rbind_lapply(
+      output.list,
+      function(file) file %>% readRDS() %>% {.$P_hat.dt}
+    ),
+    node_metric.dt = rbind_lapply(
+      output.list,
+      function(file) file %>% readRDS() %>% {.$node_metric.dt}
+    ),
+    global_metric.dt = rbind_lapply(
+      output.list,
+      function(file) file %>% readRDS() %>% {.$global_metric.dt}
     )
   )
 }

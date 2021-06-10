@@ -220,48 +220,27 @@ repeated.n <-
 snow::stopCluster(cl)
 
 saveRDS(repeated.n,".WIP/repeated.across.n.75.100.N.rds")
+
+output.list <- c(".WIP/repeated.across.n.10.25.50.N.rds",".WIP/repeated.across.n.10.25.50.more.N.rds")
+repeated.n <- readRDS_and_rbind(output.list)
 repeated.n <- readRDS(".WIP/repeated.across.n.10.25.50.N.rds")
 
 ## proto data exploration ----
+### calculate proportions ----
 repeated.n %>%
   .$P_hat.dt %>%
-  proportion_in_CI.P_hat() %>%
-  {
-    .[
-      ,prop.in := in.CI / n.rep,
-    ][
-      ,prop.lower := lower.CI / n.rep,
-    ][
-      ,prop.higher := higher.CI / n.rep,
-    ][]
-  }
+  proportion_in_CI.P_hat()
 
 repeated.n %>%
   .$node_metric.dt %>%
-  proportion_in_CI.nodes() %>%
-  {
-    .[
-      ,prop.in := in.CI / n.rep,
-    ][
-      ,prop.lower := lower.CI / n.rep,
-    ][
-      ,prop.higher := higher.CI / n.rep,
-    ][]
-  }
+  proportion_in_CI.nodes()
 
 repeated.n %>%
   .$global_metric.dt %>%
-  proportion_in_CI.global() %>%
-  {
-    .[
-      ,prop.in := in.CI / n.rep,
-    ][
-      ,prop.lower := lower.CI / n.rep,
-    ][
-      ,prop.higher := higher.CI / n.rep,
-    ][]
-  }
+  proportion_in_CI.global()
 
+
+### plotting ----
 repeated.n %>%
   .$P_hat.dt %>%
   ggplot(aes(ij,p,colour = method,fill = method))+
@@ -285,4 +264,148 @@ repeated.n %>%
   geom_boxplot(aes(group = interaction(method,i)),alpha = .5)+
   theme_cowplot()
 
+repeated.n %>%
+  .$P_hat.dt %>%
+  proportion_in_CI.P_hat() %>%
+  {
+    .[
+      ,by = .(n,N,method),
+      .(
+        p.in = median(prop.in),
+        p.in.low = low_q(prop.in),
+        p.in.up = up_q(prop.in),
+        p.lower = median(prop.lower),
+        p.lower.low = low_q(prop.lower),
+        p.lower.up = up_q(prop.lower),
+        p.higher = median(prop.higher),
+        p.higher.low = low_q(prop.higher),
+        p.higher.up = up_q(prop.higher)
+      )
+    ]
+  } %>%
+  ggplot(aes(N,p.in,colour = method,fill = method))+
+  facet_grid(n~.)+
+  geom_hline(yintercept = 0.95,lty = "dashed",colour = "darkred")+
+  geom_ribbon(aes(ymin = p.in.low,ymax = p.in.up),colour = NA, alpha = 0.2,
+              position = position_dodge(10))+
+  geom_point(position = position_dodge(10))+
+  scale_x_continuous(breaks = c(50,100,1000))+
+  theme_minimal_grid()
 
+repeated.n %>%
+  .$P_hat.dt %>%
+  proportion_in_CI.P_hat() %>%
+  select(-c("i","j","in.CI","lower.CI","higher.CI","n.rep")) %>%
+  melt.data.table(id.vars = c("ij","n","N","method"),measure.vars = c("prop.in","prop.lower","prop.higher"),variable.name = "prop") %>%
+  {
+    .[
+      ,by = .(n,N,method,prop),
+      .(
+        value = mean(value),
+        low = low_q(value),
+        up = up_q(value)
+      )
+    ]
+  } %>%
+  ggplot(aes(N,value,colour = method,fill = method))+
+  facet_grid(prop~n,scales = "free")+
+  geom_hline(data = data.table(prop = c("prop.in","prop.lower","prop.higher"),
+                               value = c(0.95,0.025,0.025)),
+             aes(yintercept = value),lty = "dashed",colour = "darkred")+
+  geom_ribbon(aes(ymin = low,ymax = up),colour = NA, alpha = 0.2,
+              position = position_dodge(10))+
+  geom_point(position = position_dodge(10))+
+  scale_x_continuous(breaks = c(0,100,1000,250,500,750,1500,2000))+
+  theme_half_open()
+
+repeated.n %>%
+  {.$P_hat.dt[,abs.err := abs(p - original),][]} %>%
+  {
+    .[,by = .(n,N,method),
+      .(
+        abs.err = mean(abs.err),
+        low = low_q(abs.err),
+        up = up_q(abs.err)
+      )
+    ]
+  } %>%
+  ggplot(aes(N,abs.err,colour = method,fill = method))+
+  facet_grid(.~n,scales = "free")+
+  geom_ribbon(aes(ymin = low,ymax = up),colour = NA, alpha = 0.1,
+              position = position_dodge(10))+
+  geom_point(position = position_dodge(10))+
+  scale_x_continuous(breaks = c(0,100,1000,250,500,750,1500,2000))+
+  theme_half_open()
+
+repeated.n %>%
+  {.$P_hat.dt[,abs.err := abs(p - original),][]} %>%
+  subset(n == 25) %>%
+  subset(ij %in% paste0(seq(1,25,len = 5),"-",seq(1,25,len = 5) + 1)) %>%
+  {
+    .[,by = .(n,N,method,ij),
+      .(
+        abs.err = mean(abs.err),
+        low = low_q(abs.err),
+        up = up_q(abs.err)
+      )
+    ]
+  } %>%
+  ggplot(aes(N,abs.err,colour = method,fill = method))+
+  facet_grid(.~ij,scales = "free")+
+  geom_ribbon(aes(ymin = low,ymax = up),colour = NA, alpha = 0.1,
+              position = position_dodge(10))+
+  geom_point(position = position_dodge(10))+
+  scale_x_continuous(breaks = c(0,100,1000,250,500,750,1500,2000))+
+  theme_half_open()
+
+
+repeated.n %>%
+  .$node_metric.dt %>%
+  proportion_in_CI.nodes() %>%
+  select(-c("in.CI","lower.CI","higher.CI","n.rep")) %>%
+  melt.data.table(id.vars = c("i","n","N","method","metric"),
+                  measure.vars = c("prop.in","prop.lower","prop.higher"),
+                  variable.name = "prop") %>%
+  {
+    .[
+      ,by = .(n,N,method,metric,prop),
+      .(
+        value = mean(value),
+        low = low_q(value),
+        up = up_q(value)
+      )
+    ]
+  } %>%
+  subset(metric == "bet") %>%
+  ggplot(aes(N,value,colour = method,fill = method))+
+  facet_grid(prop~n,scales = "free")+
+  geom_hline(data = data.table(prop = c("prop.in","prop.lower","prop.higher"),
+                               value = c(0.95,0.025,0.025)),
+             aes(yintercept = value),lty = "dashed",colour = "darkred")+
+  geom_ribbon(aes(ymin = low,ymax = up),colour = NA, alpha = 0.2,
+              position = position_dodge(10))+
+  geom_point(position = position_dodge(10))+
+  scale_x_continuous(breaks = c(0,100,1000,250,500,750,1500,2000))+
+  theme_half_open()
+
+
+repeated.n %>%
+  .$node_metric.dt %>%
+  subset(metric == "str" & n == 25 & i %in% seq(1,25,len = 5)) %>%
+  {.[,abs.err := abs(value - original),][]} %>%
+  {
+    .[,by = .(n,N,method,i),
+      .(
+        abs.err = mean(abs.err),
+        low = low_q(abs.err),
+        up = up_q(abs.err)
+      )
+    ]
+  } %>%
+  ggplot(aes(N,abs.err,colour = method,fill = method))+
+  facet_grid(.~i,scales = "free")+
+  geom_ribbon(aes(ymin = low,ymax = up),alpha = 0.1,colour = NA,
+              position = position_dodge(0))+
+  geom_point(position = position_dodge(0))+
+  scale_x_continuous(breaks = c(0,100,1000,250,500,750,1500,2000))+
+  theme_half_open()
