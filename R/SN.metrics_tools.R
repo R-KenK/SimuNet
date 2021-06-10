@@ -125,6 +125,8 @@ format_output <- function(output,l) {
 #' @param mode TO WRITE
 #'
 #' @return TO WRITE
+#' @importFrom DirectedClustering ClustF
+#'
 #' @noRd
 GlobalCC <- function(Adj,mode) {
   if (inherits(Adj,"igraph")) {

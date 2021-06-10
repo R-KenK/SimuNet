@@ -159,14 +159,26 @@ compute.deg<- function(graph,mode=NULL){
 #' Compute node strength from graph or adjacency matrix
 #'
 #' @param graph an igraph object (or an adjacency matrix)
-#' @param mode optional, only if `graph` is an adjacency matrix. Otherwise character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
+#' @param mode optional, only if `graph` is an adjacency matrix. Otherwise character scalar,
+#'   specifies how igraph should interpret the supplied matrix. Default here is directed. Possible
+#'   values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details
+#'   \link[igraph]{graph_from_adjacency_matrix}.
 #'
 #' @importFrom igraph graph_from_adjacency_matrix
 #' @importFrom igraph strength
 #' @importFrom igraph vertex_attr
 #'
 #' @return a vector of strength values for each node
-#' @noRd
+#' @export
+#' @examples
+#' set.seed(42)
+#'
+#' n<- 5;nodes<- letters[1:n];total_scan<- 42;
+#' Adj<- matrix(data = 0,nrow = n,ncol = n,dimnames = list(nodes,nodes))
+#' Adj[non.diagonal(Adj)]<- sample(0:total_scan,n*(n-1),replace = TRUE)
+#' Adj
+#'
+#' compute.strength(Adj,"directed")
 compute.strength<- function(graph,mode = NULL){
   if (!inherits(graph,"igraph")) {graph <- igraph::graph_from_adjacency_matrix(graph,mode = mode,weighted = TRUE)}
   stren <- igraph::strength(graph)
