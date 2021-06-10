@@ -98,6 +98,8 @@ if (getRversion() >= "2.15.1")  utils::globalVariables(".")
 #'
 #' @return matrix of probability of presence for each dyad
 #'
+#' @importFrom stats rbeta
+#'
 #' @noRd
 binary.prob <- function(Adj,total_scan,
                        Adj.subfun = NULL){
@@ -109,7 +111,7 @@ binary.prob <- function(Adj,total_scan,
   # Newer bayesian approach
   prob.scaled <-
     Adj[Adj.subfun(Adj)] %>% {
-      rbeta(length(.),
+      stats::rbeta(length(.),
             shape1 = . + 0.5,
             shape2 = total_scan - . + 0.5)
     }
