@@ -101,8 +101,16 @@ binary.prob <- function(Adj,total_scan,
                        Adj.subfun = NULL){
   if (total_scan < max(Adj)) {stop("total_scan provided incompatible with the maximum value found in the provided adjacency matrix.")}
   bin.P <- Adj
-  min_resol <- 1 / total_scan;
-  prob.scaled <- (Adj[Adj.subfun(Adj)] * (1 - 2 * min_resol) / total_scan) + min_resol;
+  # # old approach
+  # min_resol <- 1 / total_scan;
+  # prob.scaled <- (Adj[Adj.subfun(Adj)] * (1 - 2 * min_resol) / total_scan) + min_resol;
+  # Newer bayesian approach
+  prob.scaled <-
+    Adj[Adj.subfun(Adj)] %>% {
+      rbeta(length(.),
+            shape1 = . + 0.5,
+            shape2 = total_scan - . + 0.5)
+    }
   bin.P[Adj.subfun(bin.P)] <- prob.scaled
   bin.P
 }
