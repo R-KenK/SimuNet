@@ -17,4 +17,5 @@ Imports:
     stats,
     igraph,
     Matrix,
-    httr
+    httr,
+    magrittr
