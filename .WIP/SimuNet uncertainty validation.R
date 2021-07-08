@@ -4,8 +4,8 @@ source(".WIP/validation_tools.R")
 
 set.seed(42)
 
-n <- 10L
-N <- 20L
+n <- 5L
+N <- 100L
 n.rep <- 350L
 n.samp <- 1000L
 
@@ -126,46 +126,20 @@ repeated <-
 snow::stopCluster(cl)
 
 saveRDS(repeated,".WIP/simulation.data/repeated.across.N.rds")
+repeated <- readRDS(".WIP/simulation.data/repeated.across.N.rds")
 
 ## proto data exploration ----
 repeated %>%
   .$P_hat.dt %>%
-  proportion_in_CI.P_hat() %>%
-  {
-    .[
-      ,prop.in := in.CI / n.rep,
-    ][
-      ,prop.lower := lower.CI / n.rep,
-    ][
-      ,prop.higher := higher.CI / n.rep,
-    ][]
-  }
+  proportion_in_CI.P_hat()
 
 repeated %>%
   .$node_metric.dt %>%
-  proportion_in_CI.nodes() %>%
-  {
-    .[
-      ,prop.in := in.CI / n.rep,
-    ][
-      ,prop.lower := lower.CI / n.rep,
-    ][
-      ,prop.higher := higher.CI / n.rep,
-    ][]
-  }
+  proportion_in_CI.nodes()
 
 repeated %>%
   .$global_metric.dt %>%
-  proportion_in_CI.global() %>%
-  {
-    .[
-      ,prop.in := in.CI / n.rep,
-    ][
-      ,prop.lower := lower.CI / n.rep,
-    ][
-      ,prop.higher := higher.CI / n.rep,
-    ][]
-  }
+  proportion_in_CI.global()
 
 repeated %>%
   .$P_hat.dt %>%
@@ -224,7 +198,6 @@ saveRDS(repeated.n,".WIP/simulation.data/repeated.across.n.75.100.N.rds")
 output.list <- c(".WIP/simulation.data/repeated.across.n.10.25.50.N.rds",
                  ".WIP/simulation.data/repeated.across.n.10.25.50.more.N.rds")
 repeated.n <- readRDS_and_rbind(output.list)
-repeated.n <- readRDS(".WIP/simulation.data/repeated.across.n.10.25.50.N.rds")
 
 ## proto data exploration ----
 ### calculate proportions ----
@@ -377,7 +350,7 @@ repeated.n %>%
       )
     ]
   } %>%
-  subset(metric == "bet") %>%
+  subset(metric == "EV") %>%
   ggplot(aes(N,value,colour = method,fill = method))+
   facet_grid(prop~n,scales = "free")+
   geom_hline(data = data.table(prop = c("prop.in","prop.lower","prop.higher"),
