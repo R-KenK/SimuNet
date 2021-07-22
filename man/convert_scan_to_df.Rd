@@ -10,10 +10,12 @@ convert_scan_to_df(scan, method = c("theoretical", "group", "focal"))
 \arguments{
 \item{scan}{a scan object}
 
-\item{method}{character scalar, the scan.list to transform into an edge-list. Either "theoretical","group", or "focal"}
+\item{method}{character scalar, the scan.list to transform into an edge-list. Either
+"theoretical","group", or "focal"}
 }
 \value{
-a data frame with columns i and j representing the association between node i and j (more or less considered always directed at present)
+a data frame with columns i and j representing the association between node i and j (more
+  or less considered always directed at present)
 }
 \description{
 Convert a scan object into a data frame

@@ -15,13 +15,17 @@ calculate_SNm(
 \arguments{
 \item{scan}{a scan or empiScan object}
 
-\item{method}{character vector, among "theoretical","group", and "focal", on which to calculate the network metric}
+\item{method}{character vector, among "theoretical","group", and "focal", on which to calculate
+the network metric}
 
-\item{on.what}{character scalar, among "scan.list","sum","scaled", describing the type of matrix/network on which the function should be applied}
+\item{on.what}{character scalar, among "scan.list","sum","scaled", describing the type of
+matrix/network on which the function should be applied}
 
-\item{SNm.fun}{function of (matrix,mode) (for the moment) that returns a named numeric vector of the metric(s) of interest}
+\item{SNm.fun}{function of (matrix,mode) (for the moment) that returns a named numeric vector of
+the metric(s) of interest}
 
-\item{output}{character scalar, among "vector" and "list" (for the moment), to know if the vector of metric should be concatenated into a vector, or outputted as a list of vector}
+\item{output}{character scalar, among "vector" and "list" (for the moment), to know if the vector
+of metric should be concatenated into a vector, or outputted as a list of vector}
 }
 \value{
 a named vector or list of vectors of the metric of interest
@@ -43,5 +47,8 @@ calculate_SNm(theo.scans,method = "theoretical","sum",compute.strength)
 para.group.constant<- simu_samplingParam(Adj,total_scan,mode =
                                          "min",group.scan_param = 0.42)
 group.constant.scans <- simu_scan(sampling.param = para.group.constant)
-calculate_SNm(group.constant.scans,method = c("theoretical","group"),"scaled",compute.strength,output = "list")
+calculate_SNm(group.constant.scans,
+  method = c("theoretical","group"),"scaled",
+  compute.strength,output = "list"
+ )
 }

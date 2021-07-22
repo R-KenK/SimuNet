@@ -1,10 +1,14 @@
 #' Calculate a social network metric from simulation
 #'
 #' @param scan a scan or empiScan object
-#' @param method character vector, among "theoretical","group", and "focal", on which to calculate the network metric
-#' @param on.what character scalar, among "scan.list","sum","scaled", describing the type of matrix/network on which the function should be applied
-#' @param SNm.fun function of (matrix,mode) (for the moment) that returns a named numeric vector of the metric(s) of interest
-#' @param output character scalar, among "vector" and "list" (for the moment), to know if the vector of metric should be concatenated into a vector, or outputted as a list of vector
+#' @param method character vector, among "theoretical","group", and "focal", on which to calculate
+#'   the network metric
+#' @param on.what character scalar, among "scan.list","sum","scaled", describing the type of
+#'   matrix/network on which the function should be applied
+#' @param SNm.fun function of (matrix,mode) (for the moment) that returns a named numeric vector of
+#'   the metric(s) of interest
+#' @param output character scalar, among "vector" and "list" (for the moment), to know if the vector
+#'   of metric should be concatenated into a vector, or outputted as a list of vector
 #'
 #' @return a named vector or list of vectors of the metric of interest
 #' @export
@@ -23,7 +27,10 @@
 #' para.group.constant<- simu_samplingParam(Adj,total_scan,mode =
 #'                                          "min",group.scan_param = 0.42)
 #' group.constant.scans <- simu_scan(sampling.param = para.group.constant)
-#' calculate_SNm(group.constant.scans,method = c("theoretical","group"),"scaled",compute.strength,output = "list")
+#' calculate_SNm(group.constant.scans,
+#'   method = c("theoretical","group"),"scaled",
+#'   compute.strength,output = "list"
+#'  )
 calculate_SNm <- function(scan,method = c("theoretical","group","focal"),
                           on.what = c("scan.list","sum","scaled"),SNm.fun,output = c("vector","list")) {
   # method <- match.arg(method)
@@ -44,6 +51,22 @@ calculate_SNm <- function(scan,method = c("theoretical","group","focal"),
   l <- compute.SNm.list(scan.arg,arg.name,mode,SNm.fun)
   format_output(output,l)
 }
+# early recycling from validation script
+# extract_SNm <- function(Adj.list,SNm_fun,transform.to.igraph = FALSE,mode = NULL,weighted = TRUE,...,Xapply = lapply) {
+#   if (!is.list(Adj.list)) {Adj.list <- list(Adj.list)}
+#   if (transform.to.igraph) {
+#     Adj.list <- lapply(Adj.list,igraph::graph.adjacency,mode = mode,weighted = weighted)
+#   }
+#   Xapply(Adj.list,SNm_fun,...)
+# }
+#
+#
+# # wrapper to extract several metrics passed as a vector of functions ------
+#
+#
+# extract_SNm.vec <- Vectorize(FUN = extract_SNm,
+#                              vectorize.args = c("SNm_fun","transform.to.igraph"),
+#                              SIMPLIFY = FALSE)
 
 #' TO WRITE
 #'
@@ -102,6 +125,8 @@ format_output <- function(output,l) {
 #' @param mode TO WRITE
 #'
 #' @return TO WRITE
+#' @importFrom DirectedClustering ClustF
+#'
 #' @noRd
 GlobalCC <- function(Adj,mode) {
   if (inherits(Adj,"igraph")) {
