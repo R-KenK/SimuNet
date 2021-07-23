@@ -213,6 +213,7 @@ compute.EV<- function(graph,mode = NULL,scale = FALSE){
 #'  \itemize{
 #'   \item{an integer vector included in `1:total_scan` of the scans to perform}
 #'   \item{the special case `"all"` (default) sets `scans.to.do` to `1:total_scan` and set the simulation to perform all the scans}
+#   )
 #' }
 #'
 #' @return a list of raw binary adjacency matrix shaped like the `Adj` contained in `presence.prob`
