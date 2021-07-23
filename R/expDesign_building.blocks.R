@@ -1,13 +1,16 @@
 # expDesign "building-block" functions --------------------------------------------------------
 #' Title
+#'  TO WRITE
 #'
-#' @param scan.list
-#' @param obs.P
+#' @param scan.list TO WRITE
+#' @param obs.P TO WRITE
 #'
-#' @return
+#' @return  TO WRITE
 #' @export
 #'
+#'
 #' @examples
+#' # TO WRITE
 group_samp.list <- function(scan.list,obs.P){
   vapply(
     1:dim(scan.list)[3],
@@ -17,14 +20,16 @@ group_samp.list <- function(scan.list,obs.P){
   )
 }
 
-#' Title
+#'  TO WRITE
 #'
-#' @param scan.list
+#' @param scan.list TO WRITE
+#' @param which TO WRITE
 #'
-#' @return
+#' @return TO WRITE
 #' @export
 #'
 #' @examples
+#' # TO WRITE
 sum_scans <- function(scan.list,which = c("auto","theoretical","raw")) {
   which <- match.arg(which)
   sL.ori <- scan.list
@@ -39,14 +44,15 @@ sum_scans <- function(scan.list,which = c("auto","theoretical","raw")) {
   summed
 }
 
-#' Title
+#'  TO WRITE
 #'
-#' @param scan.list
+#' @param summed TO WRITE
 #'
-#' @return
+#' @return TO WRITE
 #' @export
 #'
 #' @examples
+#' # TO WRITE
 scale_scans <- function(summed) {
   scaled <- summed / attrs(summed,"Adj")
   scaled <-
@@ -56,26 +62,29 @@ scale_scans <- function(summed) {
   scaled
 }
 
-#' Title
+#'  TO WRITE
 #'
-#' @param scan.list
+#' @param scan.list TO WRITE
+#' @param empirical TO WRITE
 #'
-#' @return
+#' @return TO WRITE
 #' @export
 #'
 #' @examples
+#' # TO WRITE
 count_na <- function(scan.list,empirical = TRUE) {
   scan.list |> is.na() |> ifelse(1L,0L) |> sum_scans()
 }
 
-#' Title
+#'  TO WRITE
 #'
-#' @param scan.list
+#' @param scan.list TO WRITE
 #'
-#' @return
+#' @return TO WRITE
 #' @export
 #'
 #' @examples
+#' # TO WRITE
 remove_mostPeripheral <- function(scan.list) {
   scan.list |>
     sum_scans() |>
@@ -86,27 +95,29 @@ remove_mostPeripheral <- function(scan.list) {
     {scan.list[-c(.),-c(.),]}
 }
 
-#' Title
+#'  TO WRITE
 #'
-#' @param array.3D
+#' @param array.3D TO WRITE
 #'
-#' @return
+#' @return TO WRITE
 #' @export
 #'
 #' @examples
+#' # TO WRITE
 array2matList <- function(array.3D) {
   vapply(1:dim(array.3D)[3],\(s) array.3D[,,s],FUN.VALUE = array.3D[,,1])
 }
 
-#' Title
+#'  TO WRITE
 #'
-#' @param method
-#' @param obsProb
+#' @param method TO WRITE
+#' @param obsProb TO WRITE
 #'
-#' @return
+#' @return TO WRITE
 #' @export
 #'
 #' @examples
+#' # TO WRITE
 customize_sampling <- function(method = c("group","focal"),obsProb) {
   method <- match.arg(method)
   switch(method,

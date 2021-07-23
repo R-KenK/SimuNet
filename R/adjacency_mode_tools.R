@@ -6,7 +6,7 @@
 #'
 #' @return a subsetting function among `non.diagonal`, `upper.tri`, `lower.tri` or `function(V) {rep(TRUE,length(V))}`
   #' @noRd
-determine_Adj.subfun<- function(mode){
+determine_Adj.subfun <- function(mode){
   switch(mode,
          "directed" = ,
          "undirected" = ,
@@ -33,15 +33,12 @@ apply_mode <-
     switch(mode,
            "undirected" = , # as in `igraph`, consider this mode to be the same as `max`
            "max" = raw.scanList |>
-             {\(sL) ifelse(sL >= t(sL),sL,t(sL))}(),
+             {\(x) ifelse(x >= t(x),x,t(x))}(),
            "min" = raw.scanList |>
-             {\(sL) ifelse(sL <= t(sL),sL,t(sL))}(),
+             {\(x) ifelse(x <= t(x),x,t(x))}(),
            "plus" = {  # WHAT DOES THIS MEAN FOR BINARY SCANS?
-             raw.scanList |>
-               {\(sL) not.na <- !is.na(sL) & !is.na(t(sL))
-               ifelse(sL <= t(sL),sL,t(sL))}()
-             not.na <- !is.na(scan) & !is.na(t(sL))
-             ifelse(not.na,scan + t(sL),NA)
+             !is.na(raw.scanList) & !is.na(t(raw.scanList)) |>
+               ifelse(raw.scanList,t(raw.scanList))
            },
            "directed" = ,
            "upper" = ,
