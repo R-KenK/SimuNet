@@ -16,8 +16,6 @@ Depends:
 Imports: 
     stats,
     igraph,
-    Matrix,
     httr,
     magrittr,
-    DirectedClustering,
     purrr

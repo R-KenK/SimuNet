@@ -44,15 +44,13 @@ generate_scanList <- function(edge.Prob,n.scans){
   scanList
 }
 
-#' Title
+#'  TO WRITE
 #'
-#' @param scan.list
-#' @param exp.design
+#' @param scan.list TO WRITE
+#' @param exp.design TO WRITE
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return TO WRITE
+#' @noRd
 generate_empiscanList <- function(scan.list,exp.design) {
   empiscanList <- exp.design$FUN.seq(scan.list)
   attr(empiscanList,"attrs") <-
@@ -65,15 +63,13 @@ generate_empiscanList <- function(scan.list,exp.design) {
   empiscanList
 }
 
-#' Title
+#'  TO WRITE
 #'
-#' @param edge.Prob
-#' @param n.scans
+#' @param edge.Prob TO WRITE
+#' @param n.scans TO WRITE
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return TO WRITE
+#' @noRd
 draw_raw_scanList <- function(edge.Prob,n.scans) {
   sL <- vapply(
     1:n.scans,
@@ -87,55 +83,56 @@ draw_raw_scanList <- function(edge.Prob,n.scans) {
 
 # scanList tools ------------------------------------------------------------------------------
 
-#' Title
+#'  TO WRITE
 #'
-#' @param scanList
+#' @param scanList TO WRITE
 #'
-#' @return
+#' @return TO WRITE
 #' @export
 #'
 #' @examples
+#' # TO WRITE
 get_attrs <- function(scanList) {
   attr(scanList,"attrs")
 }
 
-#' Title
+#'  TO WRITE
 #'
-#' @param scanList
+#' @param scanList TO WRITE
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return TO WRITE
+#' @noRd
 without_attrs <- function(scanList) {
   attr(scanList,"attrs") <- NULL
   scanList
 }
 
-#' Title
+#'  TO WRITE
 #'
-#' @param scanList
-#' @param a
+#' @param scanList TO WRITE
+#' @param a TO WRITE
 #'
-#' @return
+#' @return TO WRITE
 #' @export
 #'
 #' @examples
+#' # TO WRITE
 attrs <- function(scanList,a = NULL) {
   if (is.null(a)) return(get_attrs(scanList))
   get_attrs(scanList)[[a]]
 }
 
-#' Title
+#'  TO WRITE
 #'
-#' @param x
-#' @param which
-#' @param value
+#' @param x TO WRITE
+#' @param which TO WRITE
+#' @param value TO WRITE
 #'
-#' @return
+#' @return TO WRITE
 #' @export
 #'
 #' @examples
+#' # TO WRITE
 `attrs<-` <- function(x,which,value) {
   new <- get_attrs(x)
   new[[which]] <- value
@@ -165,15 +162,9 @@ sLapply <- function(sL,.f,...,USE.NAMES = TRUE) {
   )
 }
 
-#' Title
-#'
-#' @param x
-#' @param ...
-#'
-#' @return
+#' Print method for `scanList` objects
 #' @export
-#'
-#' @examples
+#' @noRd
 print.scanList <- function(x,...) {
   print.default(without_attrs(x))
   cat("\n\nHidden attributes:",names(get_attrs(x)))
@@ -181,7 +172,7 @@ print.scanList <- function(x,...) {
 
 #' TO WRITE
 #'
-#' @param x
+#' @param x  TO WRITE
 #'
 #' @return TO WRITE
 #' @keywords internal

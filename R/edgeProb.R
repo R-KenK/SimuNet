@@ -1,14 +1,15 @@
-#' Title
+#' TO WRITE
 #'
-#' @param Adj
-#' @param samp.effort
-#' @param mode
-#' @param Adj.subfun
+#' @param Adj TO WRITE
+#' @param samp.effort TO WRITE
+#' @param mode TO WRITE
+#' @param Adj.subfun TO WRITE
 #'
-#' @return
+#' @return TO WRITE
 #' @export
 #'
 #' @examples
+#' # TO WRITE
 generate_edgeProb <- function(Adj,samp.effort,mode,
                                   Adj.subfun = NULL){
   Adj[] <- as.integer(Adj)
@@ -27,17 +28,15 @@ generate_edgeProb <- function(Adj,samp.effort,mode,
   edge.Prob
 }
 
-#' Title
+#' TO WRITE
 #'
-#' @param Adj
-#' @param mode
-#' @param samp.effort
-#' @param edge.Prob
+#' @param Adj TO WRITE
+#' @param mode TO WRITE
+#' @param samp.effort TO WRITE
+#' @param edge.Prob TO WRITE
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return TO WRITE
+#' @noRd
 determine_edgeProb <- function(Adj = NULL,mode = NULL,samp.effort = NULL,edge.Prob = NULL) {
   if (!is.null(edge.Prob)) {
     if (!is.null(Adj) & !is.null(samp.effort)) {
@@ -57,8 +56,10 @@ determine_edgeProb <- function(Adj = NULL,mode = NULL,samp.effort = NULL,edge.Pr
 #' Internal use. Provide binary probability for each weight, taking into account the sampling effort.
 #'
 #' @param Adj square integers matrix of occurrences of dyads. WIP: implement method for association matrices...
+#' @param Adj.subfun  TO WRITE
+#' @param alpha.prior  TO WRITE
+#' @param beta.prior  TO WRITE
 #' @param samp.effort integer, sampling effort. Note that 1/samp.effort should be relatively small, increasingly small with increasing precision.
-#' @param mode Character scalar, specifies how igraph should interpret the supplied matrix. See also the weighted argument, the interpretation depends on that too. Possible values are: directed, undirected, upper, lower, max, min, plus. See details \link[igraph]{graph_from_adjacency_matrix}. Added also a vector mode.
 #'
 #' @details
 #'

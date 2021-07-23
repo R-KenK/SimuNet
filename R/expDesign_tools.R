@@ -1,14 +1,15 @@
 # expDesign object functions ------------------------------------------------------------------
 
-#' Title
+#' TO WRITE
 #'
-#' @param scan_list
-#' @param exp.design
+#' @param scan.list TO WRITE
+#' @param exp.design TO WRITE
 #'
-#' @return
+#' @return TO WRITE
 #' @export
 #'
 #' @examples
+#' # TO WRITE
 perform_exp <- function(scan.list,exp.design = NULL){
   if (!inherits(scan.list,"scanList")) {stop("scan.list inputted is not a scanList object.")}
   if (is.null(exp.design)) {
@@ -17,29 +18,33 @@ perform_exp <- function(scan.list,exp.design = NULL){
   generate_empiscanList(scan.list,exp.design)
 }
 
-#' Title
+#' TO WRITE
 #'
-#' @param ...
-#' @param .dir
+#' @param ... TO WRITE
+#' @param .dir TO WRITE
 #'
-#' @return
+#' @return TO WRITE
 #' @export
 #'
+#' @importFrom purrr compose
+#'
 #' @examples
+#' # TO WRITE
 design_exp <- function(...,.dir = c("forward", "backward")) {
   .dir <- match.arg(.dir)
   FUN.seq <- purrr::compose(... = ...,.dir = .dir)
   generate_expDesign(FUN.seq = FUN.seq)
 }
 
-#' Title
+#' TO WRITE
 #'
-#' @param FUN.seq
+#' @param FUN.seq TO WRITE
 #'
-#' @return
+#' @return TO WRITE
 #' @export
 #'
 #' @examples
+#' # TO WRITE
 generate_expDesign <- function(FUN.seq) {
   expD <-
     list(
