@@ -22,39 +22,31 @@ determine_Adj.subfun<- function(mode){
 #' Make Adjacency fit the selected mode
 #' Internal use.
 #'
-#' @param raw.scan.list a list of (directed by default) binary adjacency matrix, pre-theoretical, to which the chosen `mode` is to be applied
+#' @param raw.scanList a list of (directed by default) binary adjacency matrix, pre-theoretical, to which the chosen `mode` is to be applied
 #' @param mode Character scalar, specifies how igraph should interpret the supplied matrix. Default here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus. Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
 #'
 #' @return an list of adjacency matrix fitting the chosen `mode` is to be applied
 #' @noRd
-apply_mode<- function(raw.scan.list,mode = c("directed", "undirected", "max","min", "upper", "lower", "plus","vector")){
-  switch(mode,
-         "undirected" = , # as in `igraph`, consider this mode to be the same as `max`
-         "max" = lapply(
-           raw.scan.list,
-           function(scan) {
-             ifelse(scan >= t(scan),scan,t(scan))
-           }
-         ),
-         "min" = lapply(
-           raw.scan.list,
-           function(scan) {
-             ifelse(scan <= t(scan),scan,t(scan))
-           }
-         ),
-         "plus" = {  # WHAT DOES THIS MEAN FOR BINARY SCANS?
-           lapply(
-             raw.scan.list,
-             function(scan) {
-               not.na <- !is.na(scan) & !is.na(t(scan))
-               ifelse(not.na,scan+t(scan),NA)
-             }
-           )
-         },
-         "directed" = ,
-         "upper" = ,
-         "lower" =  ,
-         "vector" = raw.scan.list
-  )
-}
+apply_mode <-
+  function(raw.scanList,
+           mode = c("directed", "undirected", "max","min", "upper", "lower", "plus","vector")){
+    switch(mode,
+           "undirected" = , # as in `igraph`, consider this mode to be the same as `max`
+           "max" = raw.scanList |>
+             {\(sL) ifelse(sL >= t(sL),sL,t(sL))}(),
+           "min" = raw.scanList |>
+             {\(sL) ifelse(sL <= t(sL),sL,t(sL))}(),
+           "plus" = {  # WHAT DOES THIS MEAN FOR BINARY SCANS?
+             raw.scanList |>
+               {\(sL) not.na <- !is.na(sL) & !is.na(t(sL))
+               ifelse(sL <= t(sL),sL,t(sL))}()
+             not.na <- !is.na(scan) & !is.na(t(sL))
+             ifelse(not.na,scan + t(sL),NA)
+           },
+           "directed" = ,
+           "upper" = ,
+           "lower" =  ,
+           "vector" = raw.scanList
+    )
+  }
 
