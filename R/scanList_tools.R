@@ -54,7 +54,7 @@ generate_scanList <- function(edge.Prob,n.scans){
 generate_empiscanList <- function(scan.list,exp.design) {
   empiscanList <- exp.design$FUN.seq(scan.list)
   attr(empiscanList,"attrs") <-
-    append(
+    c(
       get_attrs(scan.list),
       list(theoretical.scanList = without_attrs(scan.list))
     )
