@@ -1,5 +1,5 @@
 # Matrix subset tools -----------------------------------------------------
-
+# TO RECYCLE
 #' Non Diagonal Part of a Matrix
 #'
 #' Similarly to `upper.tri` and `lower.tri`, returns a matrix of `logical`s to identify the diagonal of a square matrix
@@ -13,9 +13,14 @@
 #' @examples
 #' M<- matrix(sample(1:10,16,replace = TRUE),4,4)
 #' non.diagonal(M)
-non.diagonal<- function(M,output=c("matrix.logical","vector.values")) {
-  output<- match.arg(output)
-  if(dim(M)[1]==dim(M)[2]) logicals<- upper.tri(M,diag = FALSE)|lower.tri(M,diag = FALSE) else stop("Matrix provided is not a square matrix.")
+non.diagonal <- function(M,output=c("matrix.logical","vector.values")) {
+  output <- match.arg(output)
+
+  if (dim(M)[1] == dim(M)[2]) {
+    logicals <- upper.tri(M,diag = FALSE) |
+      lower.tri(M,diag = FALSE)
+  } else stop("Matrix provided is not a square matrix.")
+
   switch(output,
          "matrix.logical" = logicals,
          "vector.values" = M[logicals])
@@ -34,8 +39,8 @@ non.diagonal<- function(M,output=c("matrix.logical","vector.values")) {
 #' @examples
 #' M<- matrix(sample(1:10,16,replace = TRUE),4,4)
 #' diagonal(M)
-diagonal<- function(M,output=c("matrix.logical","vector.values")) {
-  output<- match.arg(output)
+diagonal <- function(M,output=c("matrix.logical","vector.values")) {
+  output <- match.arg(output)
   if(dim(M)[1]==dim(M)[2]) logicals<- upper.tri(M,diag = TRUE)&!upper.tri(M,diag = FALSE) else stop("Matrix provided is not a square matrix.")
   switch(output,
          "matrix.logical" = logicals,
