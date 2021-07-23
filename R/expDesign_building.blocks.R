@@ -8,6 +8,7 @@
 #' @return  TO WRITE
 #' @export
 #'
+#' @importFrom stats rbinom
 #'
 #' @examples
 #' # TO WRITE
@@ -15,7 +16,7 @@ group_samp.list <- function(scan.list,obs.P){
   vapply(
     1:dim(scan.list)[3],
     function(s) {
-      scan.list[,,s] %>% {ifelse(rbinom(.,1L,obs.P) == 1,.,NA)}
+      scan.list[,,s] %>% {ifelse(stats::rbinom(.,1L,obs.P) == 1,.,NA)}
     },scan.list[,,1]
   )
 }
