@@ -1,5 +1,5 @@
 # expDesign "building-block" functions --------------------------------------------------------
-#' Title
+. <- NULL
 #'  TO WRITE
 #'
 #' @param scan.list TO WRITE
