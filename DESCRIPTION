@@ -19,4 +19,5 @@ Imports:
     Matrix,
     httr,
     magrittr,
-    DirectedClustering
+    DirectedClustering,
+    purrr
