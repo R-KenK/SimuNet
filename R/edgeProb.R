@@ -88,3 +88,21 @@ draw_edgeProb <- function(Adj,samp.effort,
   attr(P,"Beta priors") <- c(alpha.prior,beta.prior)
   P
 }
+
+#' TO WRITE
+#'
+#' @param scan.list TO WRITE
+#'
+#' @return TO WRITE
+#' @noRd
+reconstruct_edgeProb <- function(scan.list) {
+  edge.Prob <- list(
+    P = attrs(scan.list,"edge.Prob"),
+    Adj = attrs(scan.list,"Adj"),
+    samp.effort = attrs(scan.list,"samp.effort"),
+    mode = attrs(scan.list,"mode"),
+    Adj.subfun = attrs(scan.list,"Adj.subfun")
+  )
+  class(edge.Prob)<- "edgeProb"
+  edge.Prob
+}
