@@ -39,10 +39,12 @@ sum_scans <- function(scan.list,which = c("auto","theoretical","raw")) {
 #' @examples
 #' # TO WRITE
 scale_scans <- function(summed) {
-  scaled <- summed / attrs(summed,"Adj")
-  scaled <-
-    scaled |> is.nan() |> ifelse(0,scaled)
-  attr(scaled,"attrs") <- get_attrs(summed)
+  sf <- attrs(summed,"Adj.subfun")
+  sampled <- attrs(summed,"sampled")
+  scaled <- summed
+  scaled[sf(scaled)] <- summed[sf(summed)] / sampled[sf(sampled)]
+  ifelse(!is.infinite(scaled),sampled,NA)
+  scaled <- copy_attrs_to(summed,scaled)
   class(scaled) <- c("scaled",class(summed))
   scaled
 }
