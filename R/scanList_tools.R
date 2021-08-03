@@ -178,3 +178,12 @@ print.scanList <- function(x,...) {
 t.scanList <- function(x) {
   aperm(x,c(2,1,3))
 }
+
+
+#' rbind method for `scanList` objects
+#' @importFrom abind abind
+#' @export
+#' @noRd
+rbind.scanList <- function(...,deparse.level = 1) {
+  do.call(abind::abind,list(...,along = 3))
+}
