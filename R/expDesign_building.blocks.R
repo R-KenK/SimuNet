@@ -55,9 +55,30 @@ scale_scans <- function(summed) {
 #'
 #' @examples
 #' # TO WRITE
-count_na <- function(scan.list,empirical = TRUE) {
-  scan.list |> is.na() |> ifelse(1L,0L) |> sum_scans()
+count_NA <- function(scan.list,empirical = TRUE) {
+  sf <- attrs(scan.list,"Adj.subfun")
+  scan.sampled <- scan.list |> is.na() |> ifelse(1L,0L) %>% copy_attrs_to(from = scan.list)
+  scan.sampled <- scan.sampled |> sum_scans()
+  scan.sampled[!sf(scan.sampled)] <- 0L
+  scan.sampled
 }
+
+#' Count observed edges (non-`NA`s) for each edge in list of scans
+#' Internal use. Used to determine the sampling effort across all scans performed
+#'
+#' @param scan.list a list of binary adjacency matrices, where an unobserved dyad (whether it is theoretically 0 or 1) is `NA`
+#'
+#' @return an integer matrix representing the sampling effort for each dyad
+#' @noRd
+count_nonNA <- function(scan.list) {
+  sf <- attrs(scan.list,"Adj.subfun")
+  scan.sampled <- scan.list |> is.na() |> ifelse(0L,1L) %>% copy_attrs_to(from = scan.list)
+  scan.sampled <- scan.sampled |> sum_scans()
+  scan.sampled[!sf(scan.sampled)] <- 0L
+  scan.sampled
+}
+
+
 
 #'  TO WRITE
 #'
