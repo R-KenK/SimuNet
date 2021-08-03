@@ -26,7 +26,7 @@
 #' @param full.path character scalar. Optional, can be used to input directly an
 #'   URL to a graphml file.
 #'
-#' @return TO WRITE
+#' @return According to output, either a igraph object or an adjacency matrix.
 #' @export
 #'
 #' @examples

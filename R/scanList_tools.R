@@ -53,12 +53,8 @@ generate_scanList <- function(edge.Prob,n.scans){
 #' @noRd
 generate_empiscanList <- function(scan.list,exp.design) {
   empiscanList <- exp.design$FUN.seq(scan.list)
-  attr(empiscanList,"attrs") <-
-    c(
-      get_attrs(scan.list),
-      list(theoretical.scanList = without_attrs(scan.list))
-    )
   attrs(empiscanList,"scanList.type") <- "empirical"
+  attrs(empiscanList,"theoretical.scanList") <- without_attrs(scan.list)
   class(empiscanList)<- c("empirical","scanList")
   empiscanList
 }
@@ -140,6 +136,12 @@ attrs <- function(scanList,a = NULL) {
   x
 }
 
+copy_attrs_to <- function(from,to) {
+  if (!inherits(to,"scanList")) {class(to) <- class(from)}
+  attr(to,"attrs") <- attrs(from)
+  to
+}
+
 #' TO WRITE
 #'
 #' @param sL TO WRITE
@@ -170,16 +172,9 @@ print.scanList <- function(x,...) {
   cat("\n\nHidden attributes:",names(get_attrs(x)))
 }
 
-#' TO WRITE
-#'
-#' @param x  TO WRITE
-#'
-#' @return TO WRITE
-#' @keywords internal
-#'
-#' @examples
-#' # TO WRITE
+#' transpose method for `scanList` objects
+#' @export
+#' @noRd
 t.scanList <- function(x) {
   aperm(x,c(2,1,3))
 }
-

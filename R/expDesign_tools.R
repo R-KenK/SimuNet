@@ -54,4 +54,16 @@ generate_expDesign <- function(FUN.seq) {
   expD
 }
 
-
+# scanList convenience and compatibility functions ----
+#'  TO WRITE
+#'
+#' @param array.3D TO WRITE
+#'
+#' @return TO WRITE
+#' @export
+#'
+#' @examples
+#' # TO WRITE
+array2matList <- function(array.3D) {
+  vapply(1:dim(array.3D)[3],\(s) array.3D[,,s],FUN.VALUE = array.3D[,,1])
+}

@@ -1,11 +1,13 @@
 # graphml file import -----------------------------------------------------
 
-#' TO WRITE
+#' Import .graphml files into R object of the desired type
 #'
-#' @param path TO WRITE
-#' @param output TO WRITE
+#' @param path character, path to a graphml file
+#' @param output character, either "graph" or "adjacency". COntrols the type of object outputted
+#' @param type character, one of "both", "upper", or "lower". Controls the type of adjacency matrix
+#'   desired
 #'
-#' @return TO WRITE
+#' @return According to output, either a igraph object or an adjacency matrix.
 #' @importFrom igraph read_graph
 #' @importFrom igraph get.adjacency
 #' @noRd

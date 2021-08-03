@@ -75,24 +75,21 @@
 #   cl
 # }
 
-# Quick optimized equivalent to sample(x,size,replace=TRUE)
-#
-# @param x a vector
-# @param size number of elements to sample
-#
-# @importFrom stats runif
-#
-# @return sample of size "size" taken from x
-# @export
-#
-# @examples
-# quick.sample(1:20,5)
-# # microbenchmark::microbenchmark(runif={(1:20)[ceiling(runif(5,0,20))]},
-# #   quick.sample=quick.sample(1:20,5),sample=sample(1:20,5,replace = TRUE),
-# #   times = 1000,control = list("warmup"=100))
-# quick.sample<- function(x,size){
-#   x[ceiling(stats::runif(size,0,length(x)))]
-# }
+#' Quick optimized equivalent to sample(x,size,replace=TRUE)
+#'
+#' @param x a vector
+#' @param size number of elements to sample
+#'
+#' @importFrom stats runif
+#'
+#' @return sample of size "size" taken from x
+#' @export
+#'
+#' @examples
+#' quick_sample(1:20,5)
+quick_sample<- function(x,size){
+  x[ceiling(stats::runif(size,0,length(x)))]
+}
 
 # Two-sample t-tests from sample statistics
 # cf. https://stats.stackexchange.com/a/30450/255116
