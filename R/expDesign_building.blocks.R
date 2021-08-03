@@ -1,26 +1,7 @@
 # expDesign "building-block" functions --------------------------------------------------------
 . <- NULL
-#'  TO WRITE
-#'
-#' @param scan.list TO WRITE
-#' @param obs.P TO WRITE
-#'
-#' @return  TO WRITE
-#' @export
-#'
-#' @importFrom stats rbinom
-#'
-#' @examples
-#' # TO WRITE
-group_samp.list <- function(scan.list,obs.P){
-  vapply(
-    1:dim(scan.list)[3],
-    function(s) {
-      scan.list[,,s] %>% {ifelse(stats::rbinom(.,1L,obs.P) == 1,.,NA)}
-    },scan.list[,,1]
-  )
-}
 
+# scanList manipulations ----
 #'  TO WRITE
 #'
 #' @param scan.list TO WRITE
@@ -40,7 +21,8 @@ sum_scans <- function(scan.list,which = c("auto","theoretical","raw")) {
          "raw" = scan.list <- attrs(scan.list,"raw.scanList.type")
   )
   summed <- rowSums(scan.list,na.rm = TRUE,dims = 2L)
-  attr(summed,"attrs") <- get_attrs(sL.ori)
+  summed <- copy_attrs_to(sL.ori,summed)
+  attrs(summed,"summed.scanList") <- without_attrs(sL.ori)
   class(summed) <- c("sum",class(scan.list))
   summed
 }
@@ -94,35 +76,4 @@ remove_mostPeripheral <- function(scan.list) {
     .$vector |>
     which.min() %>%
     {scan.list[-c(.),-c(.),]}
-}
-
-#'  TO WRITE
-#'
-#' @param array.3D TO WRITE
-#'
-#' @return TO WRITE
-#' @export
-#'
-#' @examples
-#' # TO WRITE
-array2matList <- function(array.3D) {
-  vapply(1:dim(array.3D)[3],\(s) array.3D[,,s],FUN.VALUE = array.3D[,,1])
-}
-
-#'  TO WRITE
-#'
-#' @param method TO WRITE
-#' @param obsProb TO WRITE
-#'
-#' @return TO WRITE
-#' @export
-#'
-#' @examples
-#' # TO WRITE
-customize_sampling <- function(method = c("group","focal"),obsProb) {
-  method <- match.arg(method)
-  switch(method,
-         "group" = \(scan.list) group_samp.list(scan.list,obs.P = obsProb),
-         "focal" = stop("not implemented")
-  )
 }
