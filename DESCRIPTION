@@ -18,5 +18,5 @@ Imports:
     igraph,
     httr,
     magrittr,
-    purrr
+    purrr,
     scales

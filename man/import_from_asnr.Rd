@@ -50,7 +50,7 @@ graphml _file_ from github.}
 URL to a graphml file.}
 }
 \value{
-TO WRITE
+According to output, either a igraph object or an adjacency matrix.
 }
 \description{
 Import network from asnr package
