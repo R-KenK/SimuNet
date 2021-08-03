@@ -14,6 +14,7 @@
 #' # TO WRITE
 sum_scans <- function(scan.list,which = c("auto","theoretical","raw")) {
   which <- match.arg(which)
+  sf <- attrs(scan.list,"Adj.subfun")
   sL.ori <- scan.list
   switch(which,
          "auto" = {},
@@ -23,6 +24,7 @@ sum_scans <- function(scan.list,which = c("auto","theoretical","raw")) {
   summed <- rowSums(scan.list,na.rm = TRUE,dims = 2L)
   summed <- copy_attrs_to(sL.ori,summed)
   attrs(summed,"summed.scanList") <- without_attrs(sL.ori)
+  attrs(summed,"sampled") <- scan.list |> count_nonNA()
   class(summed) <- c("sum",class(scan.list))
   summed
 }
@@ -58,7 +60,7 @@ scale_scans <- function(summed) {
 count_NA <- function(scan.list,empirical = TRUE) {
   sf <- attrs(scan.list,"Adj.subfun")
   scan.sampled <- scan.list |> is.na() |> ifelse(1L,0L) %>% copy_attrs_to(from = scan.list)
-  scan.sampled <- scan.sampled |> sum_scans()
+  scan.sampled <- scan.sampled |> rowSums(na.rm = TRUE,dims = 2L)
   scan.sampled[!sf(scan.sampled)] <- 0L
   scan.sampled
 }
@@ -73,12 +75,10 @@ count_NA <- function(scan.list,empirical = TRUE) {
 count_nonNA <- function(scan.list) {
   sf <- attrs(scan.list,"Adj.subfun")
   scan.sampled <- scan.list |> is.na() |> ifelse(0L,1L) %>% copy_attrs_to(from = scan.list)
-  scan.sampled <- scan.sampled |> sum_scans()
+  scan.sampled <- scan.sampled |> rowSums(na.rm = TRUE,dims = 2L)
   scan.sampled[!sf(scan.sampled)] <- 0L
   scan.sampled
 }
-
-
 
 #'  TO WRITE
 #'
