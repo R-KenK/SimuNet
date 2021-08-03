@@ -4,18 +4,23 @@
 #'
 #' @param scan.list TO WRITE
 #' @param exp.design TO WRITE
+#' @param ... TO WRITE
 #'
 #' @return TO WRITE
 #' @export
 #'
 #' @examples
 #' # TO WRITE
-perform_exp <- function(scan.list,exp.design = NULL){
+perform_exp <- function(scan.list,exp.design = NULL,...){
   if (!inherits(scan.list,"scanList")) {stop("scan.list inputted is not a scanList object.")}
   if (is.null(exp.design)) {
     return(scan.list)
-  } else if(!inherits(exp.design,"expDesign")) {stop("exp.design inputted is not a expDesign object.")}
-  generate_empiscanList(scan.list,exp.design)
+  } else if (!inherits(exp.design,"expDesign")) {stop("exp.design inputted is not a expDesign object.")}
+  if (missing(...)) generate_empiscanList(scan.list,exp.design)
+  else {
+    expD.list <- list(exp.design,...)
+    lapply(expD.list,\(expD) generate_empiscanList(scan.list = scan.list,exp.design = expD))
+  }
 }
 
 #' TO WRITE

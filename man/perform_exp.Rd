@@ -4,12 +4,14 @@
 \alias{perform_exp}
 \title{TO WRITE}
 \usage{
-perform_exp(scan.list, exp.design = NULL)
+perform_exp(scan.list, exp.design = NULL, ...)
 }
 \arguments{
 \item{scan.list}{TO WRITE}
 
 \item{exp.design}{TO WRITE}
+
+\item{...}{TO WRITE}
 }
 \value{
 TO WRITE
