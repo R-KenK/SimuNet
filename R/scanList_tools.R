@@ -179,11 +179,18 @@ t.scanList <- function(x) {
   aperm(x,c(2,1,3))
 }
 
+rbind_2scanList <- function(sL1,sL2) {
+  if (!identical(dim(sL1)[1:2],dim(sL2)[1:2])) stop("Incompatible dimensions (not the same number of nodes?")
+  if (!identical(dimnames(sL1)[1:2],dimnames(sL2)[1:2])) warning("scanLists have different node names.")
+  array(c(sL1,sL2),
+        dimnames = dimnames(sL1),
+        dim = c(dim(sL1)[1:2],attrs(sL1,"n.scans") + attrs(sL2,"n.scans"))
+  )
+}
 
 #' rbind method for `scanList` objects
-#' @importFrom abind abind
 #' @export
 #' @noRd
 rbind.scanList <- function(...,deparse.level = 1) {
-  do.call(abind::abind,list(...,along = 3))
+  Reduce(rbind_2scanList,list(...))
 }
