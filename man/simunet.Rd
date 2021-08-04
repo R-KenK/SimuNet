@@ -7,10 +7,11 @@
 simunet(
   Adj = NULL,
   samp.effort = NULL,
+  mode = c("directed", "undirected", "max", "min", "upper", "lower", "plus", "vector"),
   n.scans = NULL,
   exp.design = NULL,
-  edge.Prob = NULL,
-  mode = c("directed", "undirected", "max", "min", "upper", "lower", "plus", "vector")
+  ...,
+  edge.Prob = NULL
 )
 }
 \arguments{
@@ -18,13 +19,15 @@ simunet(
 
 \item{samp.effort}{TO WRITE}
 
+\item{mode}{TO WRITE}
+
 \item{n.scans}{TO WRITE}
 
 \item{exp.design}{TO WRITE}
 
-\item{edge.Prob}{TO WRITE}
+\item{...}{TO WRITE}
 
-\item{mode}{TO WRITE}
+\item{edge.Prob}{TO WRITE}
 }
 \value{
 TO WRITE
