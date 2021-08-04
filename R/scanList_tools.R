@@ -180,10 +180,18 @@ t.scanList <- function(x) {
 }
 
 rbind_2scanList <- function(sL1,sL2) {
-  if (!identical(dim(sL1)[1:2],dim(sL2)[1:2])) stop("Incompatible dimensions (not the same number of nodes?")
-  if (!identical(dimnames(sL1)[1:2],dimnames(sL2)[1:2])) warning("scanLists have different node names.")
+  if (!identical(dim(sL1)[1:2],dim(sL2)[1:2]))
+    stop("Incompatible dimensions (not the same number of nodes?")
+  if (!identical(dimnames(sL1)[1:2],dimnames(sL2)[1:2]))
+    warning("scanLists have different node names.")
+
+  if (is.null(dimnames(sL1)[[3]]) | is.null(dimnames(sL2)[[3]]))
+    dn <- c(dimnames(sL1)[1:2],list(NULL))
+  else
+    dn <- c(dimnames(sL1)[1:2],list(c(dimnames(sL1)[[3]],dimnames(sL2)[[3]])))
+
   array(c(sL1,sL2),
-        dimnames = dimnames(sL1),
+        dimnames = dn,
         dim = c(dim(sL1)[1:2],attrs(sL1,"n.scans") + attrs(sL2,"n.scans"))
   )
 }
