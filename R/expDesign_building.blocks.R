@@ -115,8 +115,7 @@ add_scans <- function(scan.list,new.scans) {
   edge.Prob <- reconstruct_edgeProb(scan.list)
   n.scans <- attrs(scan.list,"n.scans")
 
-  new.scan.list <- draw_raw_scanList(edge.Prob = edge.Prob,n.scans = new.scans)
-  new.scan.list <- apply_mode(new.scan.list,edge.Prob$mode)
+  new.scan.list <- generate_scanList(edge.Prob = edge.Prob,n.scans = new.scans)
 
   new.scan.list <- rbind(scan.list,new.scan.list)
   new.scan.list <- copy_attrs_to(scan.list,new.scan.list)
