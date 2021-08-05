@@ -164,6 +164,22 @@ sLapply <- function(sL,.f,...,USE.NAMES = TRUE) {
   )
 }
 
+#' TO WRITE
+#'
+#' @param sLlist TO WRITE
+#' @param FUN TO WRITE
+#' @param ... TO WRITE
+#'
+#' @return TO WRITE
+#'
+#' @examples
+#' # TO WRITE
+sLlapply <- function(sLlist,FUN,...) {
+  sLlist <- lapply(sLlist,FUN,...)
+  class(sLlist) <- "sLlist"
+  sLlist
+}
+
 #' Print method for `scanList` objects
 #' @export
 #' @noRd

@@ -19,7 +19,9 @@ perform_exp <- function(scan.list,exp.design = NULL,...){
   if (missing(...)) generate_empiscanList(scan.list,exp.design)
   else {
     expD.list <- list(exp.design,...)
-    lapply(expD.list,\(expD) generate_empiscanList(scan.list = scan.list,exp.design = expD))
+    sL.list <- lapply(expD.list,\(expD) generate_empiscanList(scan.list = scan.list,exp.design = expD))
+    class(sL.list) <- "sLlist"
+    sL.list
   }
 }
 
