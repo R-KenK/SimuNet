@@ -4,10 +4,12 @@
 \alias{scale_scans}
 \title{TO WRITE}
 \usage{
-scale_scans(summed)
+scale_scans(summed, ...)
 }
 \arguments{
 \item{summed}{TO WRITE}
+
+\item{...}{TO WRITE}
 }
 \value{
 TO WRITE

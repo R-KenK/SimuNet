@@ -4,10 +4,12 @@
 \alias{remove_mostPeripheral}
 \title{TO WRITE}
 \usage{
-remove_mostPeripheral(scan.list)
+remove_mostPeripheral(scan.list, ...)
 }
 \arguments{
 \item{scan.list}{TO WRITE}
+
+\item{...}{TO WRITE}
 }
 \value{
 TO WRITE

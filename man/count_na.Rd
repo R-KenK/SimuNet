@@ -4,12 +4,12 @@
 \alias{count_NA}
 \title{TO WRITE}
 \usage{
-count_NA(scan.list, empirical = TRUE)
+count_NA(scan.list, ...)
 }
 \arguments{
 \item{scan.list}{TO WRITE}
 
-\item{empirical}{TO WRITE}
+\item{...}{TO WRITE}
 }
 \value{
 TO WRITE

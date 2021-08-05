@@ -4,12 +4,12 @@
 \alias{sum_scans}
 \title{TO WRITE}
 \usage{
-sum_scans(scan.list, which = c("auto", "theoretical", "raw"))
+sum_scans(scan.list, ...)
 }
 \arguments{
 \item{scan.list}{TO WRITE}
 
-\item{which}{TO WRITE}
+\item{...}{TO WRITE}
 }
 \value{
 TO WRITE
