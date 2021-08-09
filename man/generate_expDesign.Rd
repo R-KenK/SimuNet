@@ -2,19 +2,21 @@
 % Please edit documentation in R/expDesign_tools.R
 \name{generate_expDesign}
 \alias{generate_expDesign}
-\title{TO WRITE}
+\title{Generate \code{expDesign} objects}
 \usage{
 generate_expDesign(FUN.seq)
 }
 \arguments{
-\item{FUN.seq}{TO WRITE}
+\item{FUN.seq}{function sequence created by \code{purrr}'s \code{\link[purrr:compose]{compose()}} function}
 }
 \value{
-TO WRITE
+an \code{expDesign} objects, a list consisting in the following elements:
+\itemize{
+\item \code{FUN.seq}: function sequence created by \code{purrr}'s \code{\link[purrr:compose]{compose()}} function
+\item WIP: more to come, notably to include more descriptive function names.
+}
 }
 \description{
-TO WRITE
+Generate \code{expDesign} objects
 }
-\examples{
-# TO WRITE
-}
+\keyword{internal}

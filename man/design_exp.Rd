@@ -2,21 +2,113 @@
 % Please edit documentation in R/expDesign_tools.R
 \name{design_exp}
 \alias{design_exp}
-\title{TO WRITE}
+\title{Design experiment to perform on theoretical \code{scanList}}
 \usage{
 design_exp(..., .dir = c("forward", "backward"))
 }
 \arguments{
-\item{...}{TO WRITE}
+\item{...}{functions of \code{scanList} objects. Can be a combination of the provided "building
+blocks" and user-defined function (cf. the example section).}
 
-\item{.dir}{TO WRITE}
+\item{.dir}{character scalar, either \code{"forward"} (default) or \code{"backward"} (see \code{purrr}'s
+\code{\link[purrr:compose]{compose()}}) to indicate in which order inputted functions should be
+applied (first function first, or \emph{vice versa}).}
 }
 \value{
-TO WRITE
+an \code{expDesign} objects, a list consisting in the following elements:
+\itemize{
+\item \code{FUN.seq}: function sequence created by \code{purrr}'s \code{\link[purrr:compose]{compose()}} function
+\item WIP: more to come, notably to include more descriptive function names.
+}
 }
 \description{
-TO WRITE
+Generate \code{expDesign} objects that mainly consist on a sequence of functions to apply to
+\code{scanList} objects. \code{expDesign} object generation relies on \code{purrr}'s
+\code{\link[purrr:compose]{compose()}} function.
+}
+\details{
+It is best practice to use a combination of:
+\itemize{
+\item provided "building blocks": functions included in the \code{SimuNet} package, such as
+\code{\link[=customize_sampling]{customize_sampling()}}, \code{\link[=add_scans]{add_scans()}},
+\code{\link[=remove_mostPeripheral]{remove_mostPeripheral()}}, or \code{\link[=sum_scans]{sum_scans()}}
+\item user-defined functions: designed to take a \code{scanList} object as a first argument, which is is
+in essence a 3 dimensional array with adjacency matrices on the first 2 dimensions, and the
+successive scan numbers as the 3rd dimension. User-defined function should returned a modified
+\code{scanList} object, therefore allowing for function chaining in a fashion similar to
+\href{https://www.tidyverse.org/}{\code{tidy}} functions (see also the notion of grammar of data
+manipulation with the \href{https://dplyr.tidyverse.org/}{\code{dplyr}} package).
+}
+
+\code{expDesign} objects are used to store sequences of manipulations to apply to a theoretical
+\code{scanList}, in order to obtain a (simulated) empirical \code{scanList}. Such manipulations can
+represent empirical sampling (e.g. group-scan sampling, focal sampling, biased sampling),
+observation error, node removal, etc.
+
+\code{expDesign} objects can be applied to \code{scanList} objects via the function
+\code{\link[=perform_exp]{perform_exp()}}, or directly as \code{\link[=simunet]{simunet()}} \code{exp.design} argument
+for \code{simunet()} to automatically generate a theoretical \code{scanList} and apply the inputted
+\code{expDesign} to it.
+
+Providing more than one \code{expDesign} object to either \code{\link[=perform_exp]{perform_exp()}} or
+\code{\link[=simunet]{simunet()}} functions (i.e. effectively passing them as their \code{...} argument) will
+make them output a \emph{list} of \code{scanList} objects - i.e. a \code{sLlist} object - which are convenient
+ways to apply different experimental manipulation sequences to a given theoretical \code{scanList} and
+allow for comparison (e.g. of the impact of sampling regime).
 }
 \examples{
-# TO WRITE
+set.seed(42)
+n <- 5L
+samp.effort <- 100L
+
+# Adjacency matrix import
+## random directed adjacency matrix
+Adj <- sample(1:samp.effort,n * n) |>
+  matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
+Adj[lower.tri(Adj,diag = TRUE)] <- 0L
+Adj
+
+# Designing the experiments:
+## setting a constant probability of not observing edges
+group.scan <- design_exp(customize_sampling(method = "group",sampling = 0.8))
+
+## setting a biased focal sampling favoring central individual (node strength)
+focal.scan <- design_exp(
+  customize_sampling(
+    method = "focal",
+    sampling = function(Adj) Adj |>
+      igraph::graph.adjacency("upper",weighted = TRUE) |>
+      igraph::strength()
+  )
+)
+
+## Adding more scans, removing the most peripheral individual, before performing an even focal
+## sampling
+focal.periRemoved <- design_exp(
+  function(Adj) add_scans(Adj,42),     # users can use anonymous function to specify arguments
+  remove_mostPeripheral,               # ... or pass functions as arguments directly
+  customize_sampling(method = "focal",sampling = "even")    # customize_sampling: special case
+                                                            # that returns sampling functions
+)
+
+# Apply the experimental design
+## on previously obtained theoretical scans
+sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L)
+
+perform_exp(sL,group.scan)
+perform_exp(sL,focal.periRemoved) |> sum_scans()
+
+## on newly simulated scanList within the simunet() wrapper
+simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L,
+        focal.scan
+)
+
+## performing a list of experiments
+perform_exp(sL,group.scan,focal.scan)
+simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L,
+        focal.scan,focal.periRemoved
+)
+}
+\seealso{
+\code{\link[=perform_exp]{perform_exp()}}, \code{\link[=simunet]{simunet()}}, \code{\link[=customize_sampling]{customize_sampling()}}.
 }
