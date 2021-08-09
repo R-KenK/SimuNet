@@ -21,16 +21,9 @@ sum_scans <- function(scan.list,...) {
 
 
 #'  TO WRITE
-#'
-#' @param scan.list TO WRITE
-#' @param which TO WRITE
-#'
-#' @return TO WRITE
 #' @export
-#'
-#' @examples
-#' # TO WRITE
-sum_scans.scanList <- function(scan.list,which = c("auto","theoretical","raw")) {
+#' @noRd
+sum_scans.scanList <- function(scan.list,which = c("auto","theoretical","raw"),...) {
   which <- match.arg(which)
   sf <- attrs(scan.list,"Adj.subfun")
   sL.ori <- scan.list
@@ -48,17 +41,17 @@ sum_scans.scanList <- function(scan.list,which = c("auto","theoretical","raw")) 
 }
 
 #'  TO WRITE
-#'
-#' @param scan.list TO WRITE
-#' @param which TO WRITE
-#'
-#' @return TO WRITE
 #' @export
-#'
-#' @examples
-#' # TO WRITE
-sum_scans.sLlist <- function(scan.list,which = c("auto","theoretical","raw")) {
+#' @noRd
+sum_scans.sLlist <- function(scan.list,which = c("auto","theoretical","raw"),...) {
   sLlapply(scan.list,sum_scans,which = which)
+}
+
+#'  TO WRITE
+#' @export
+#' @noRd
+sum_scans.empirical <- function(scan.list,which = c("auto","theoretical","raw"),...) {
+  NextMethod()
 }
 
 ## scale ----
@@ -78,15 +71,9 @@ scale_scans <- function(summed,...) {
 }
 
 #'  TO WRITE
-#'
-#' @param summed TO WRITE
-#'
-#' @return TO WRITE
 #' @export
-#'
-#' @examples
-#' # TO WRITE
-scale_scans.sum <- function(summed) {
+#' @noRd
+scale_scans.sum <- function(summed,...) {
   sf <- attrs(summed,"Adj.subfun")
   sampled <- attrs(summed,"sampled")
   scaled <- summed
@@ -98,30 +85,25 @@ scale_scans.sum <- function(summed) {
 }
 
 #'  TO WRITE
-#'
-#' @param summed TO WRITE
-#'
-#' @return TO WRITE
 #' @export
-#'
-#' @examples
-#' # TO WRITE
-scale_scans.scanList <- function(summed) {
+#' @noRd
+scale_scans.scanList <- function(summed,...) {
   summed |>
     sum_scans() |>
     scale_scans()
 }
 
 #'  TO WRITE
-#'
-#' @param summed TO WRITE
-#'
-#' @return TO WRITE
 #' @export
-#'
-#' @examples
-#' # TO WRITE
-scale_scans.sLlist <- function(summed) {
+#' @noRd
+scale_scans.empirical <- function(summed,...) {
+  NextMethod()
+}
+
+#'  TO WRITE
+#' @export
+#' @noRd
+scale_scans.sLlist <- function(summed,...) {
   sLlapply(summed,scale_scans)
 }
 
@@ -141,16 +123,9 @@ count_NA <- function(scan.list,...) {
 }
 
 #'  TO WRITE
-#'
-#' @param scan.list TO WRITE
-#' @param empirical TO WRITE
-#'
-#' @return TO WRITE
 #' @export
-#'
-#' @examples
-#' # TO WRITE
-count_NA.scanList <- function(scan.list,empirical = TRUE) {
+#' @noRd
+count_NA.scanList <- function(scan.list,empirical = TRUE,...) {
   sf <- attrs(scan.list,"Adj.subfun")
   scan.sampled <- scan.list |> is.na() |> ifelse(1L,0L) %>% copy_attrs_to(from = scan.list)
   scan.sampled <- scan.sampled |> rowSums(na.rm = TRUE,dims = 2L)
@@ -159,16 +134,16 @@ count_NA.scanList <- function(scan.list,empirical = TRUE) {
 }
 
 #'  TO WRITE
-#'
-#' @param scan.list TO WRITE
-#' @param empirical TO WRITE
-#'
-#' @return TO WRITE
 #' @export
-#'
-#' @examples
-#' # TO WRITE
-count_NA.sLlist <- function(scan.list,empirical = TRUE) {
+#' @noRd
+count_NA.empirical <- function(scan.list,empirical = TRUE,...) {
+  NextMethod()
+}
+
+#'  TO WRITE
+#' @export
+#' @noRd
+count_NA.sLlist <- function(scan.list,empirical = TRUE,...) {
   sLlapply(scan.list,count_NA,empirical = empirical)
 }
 
@@ -181,19 +156,19 @@ count_NA.sLlist <- function(scan.list,empirical = TRUE) {
 #' @param ... TO WRITE
 #'
 #' @return an integer matrix representing the sampling effort for each dyad
-#' @noRd
+#'
+#' @export
+#'
+#' @examples
+#' # TO WRITE
 count_nonNA <- function(scan.list,...) {
   UseMethod("count_nonNA")
 }
 
-#' Count observed edges (non-`NA`s) for each edge in list of scans
-#' Internal use. Used to determine the sampling effort across all scans performed
-#'
-#' @param scan.list a list of binary adjacency matrices, where an unobserved dyad (whether it is theoretically 0 or 1) is `NA`
-#'
-#' @return an integer matrix representing the sampling effort for each dyad
+#'  TO WRITE
+#' @export
 #' @noRd
-count_nonNA.scanList <- function(scan.list) {
+count_nonNA.scanList <- function(scan.list,...) {
   sf <- attrs(scan.list,"Adj.subfun")
   scan.sampled <- scan.list |> is.na() |> ifelse(0L,1L) %>% copy_attrs_to(from = scan.list)
   scan.sampled <- scan.sampled |> rowSums(na.rm = TRUE,dims = 2L)
@@ -201,14 +176,17 @@ count_nonNA.scanList <- function(scan.list) {
   scan.sampled
 }
 
-#' Count observed edges (non-`NA`s) for each edge in list of scans
-#' Internal use. Used to determine the sampling effort across all scans performed
-#'
-#' @param scan.list a list of binary adjacency matrices, where an unobserved dyad (whether it is theoretically 0 or 1) is `NA`
-#'
-#' @return an integer matrix representing the sampling effort for each dyad
+#'  TO WRITE
+#' @export
 #' @noRd
-count_nonNA.sLlist <- function(scan.list) {
+count_nonNA.empirical <- function(scan.list,...) {
+  NextMethod()
+}
+
+#'  TO WRITE
+#' @export
+#' @noRd
+count_nonNA.sLlist <- function(scan.list,...) {
   sLlapply(scan.list,count_nonNA)
 }
 
@@ -229,16 +207,9 @@ add_scans <- function(scan.list,...) {
 }
 
 #'  TO WRITE
-#'
-#' @param scan.list TO WRITE
-#' @param new.scans TO WRITE
-#'
-#' @return TO WRITE
 #' @export
-#'
-#' @examples
-#' # TO WRITE
-add_scans.scanList <- function(scan.list,new.scans) {
+#' @noRd
+add_scans.scanList <- function(scan.list,new.scans,...) {
   edge.Prob <- reconstruct_edgeProb(scan.list)
   n.scans <- attrs(scan.list,"n.scans")
 
@@ -258,16 +229,16 @@ add_scans.scanList <- function(scan.list,new.scans) {
 }
 
 #'  TO WRITE
-#'
-#' @param scan.list TO WRITE
-#' @param new.scans TO WRITE
-#'
-#' @return TO WRITE
 #' @export
-#'
-#' @examples
-#' # TO WRITE
-add_scans.sLlist <- function(scan.list,new.scans) {
+#' @noRd
+add_scans.empirical <- function(scan.list,new.scans,...) {
+  NextMethod()
+}
+
+#'  TO WRITE
+#' @export
+#' @noRd
+add_scans.sLlist <- function(scan.list,new.scans,...) {
   sLlapply(scan.list,add_scans,new.scans = new.scans)
 }
 
@@ -288,34 +259,25 @@ remove_mostPeripheral <- function(scan.list,...) {
 }
 
 #'  TO WRITE
-#'
-#' @param scan.list TO WRITE
-#'
-#' @return TO WRITE
 #' @export
-#'
-#' @examples
-#' # TO WRITE
-remove_mostPeripheral.scanList <- function(scan.list) {
+#' @noRd
+remove_mostPeripheral.scanList <- function(scan.list,...) {
+  mode <- attrs(scan.list,"mode")
+  directed <- switch(mode,"directed" = TRUE,FALSE)
   scan.list |>
     sum_scans() |>
     igraph::graph.adjacency(weighted = TRUE) |>
-    igraph::eigen_centrality(directed = TRUE) %>%
+    igraph::eigen_centrality(directed = directed) %>%
     .$vector |>
     which.min() %>%
-    {scan.list[-c(.),-c(.),]}
+    {scan.list[-c(.),-c(.),]} |>
+    copy_attrs_to(from = scan.list)
 }
 
 #'  TO WRITE
-#'
-#' @param scan.list TO WRITE
-#'
-#' @return TO WRITE
 #' @export
-#'
-#' @examples
-#' # TO WRITE
-remove_mostPeripheral.sLlist <- function(scan.list) {
+#' @noRd
+remove_mostPeripheral.sLlist <- function(scan.list,...) {
  sLlapply(remove_mostPeripheral,scan.list)
 }
 
