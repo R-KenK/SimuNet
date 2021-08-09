@@ -2,7 +2,8 @@
 % Please edit documentation in R/expDesign_sampling.R
 \name{determine_obsProb}
 \alias{determine_obsProb}
-\title{TO WRITE}
+\title{Determine the matrix of probabilities of observing the edges
+Internal.}
 \usage{
 determine_obsProb(
   scan.list,
@@ -11,16 +12,33 @@ determine_obsProb(
 )
 }
 \arguments{
-\item{scan.list}{TO WRITE}
+\item{scan.list}{a \code{scanList} object}
 
-\item{sampling}{TO WRITE}
+\item{sampling}{for \verb{method = "group}, users should input either:
+\itemize{
+\item a numeric scalar (\code{"constant"}): the constant probability of observing an edge for all edges
+\item a numeric matrix (\code{"matrix"}): the probabilities of observing an edge for each edges
+\item a character scalar: for common sampling regimes:
+\itemize{
+\item \code{"random"}: random edge observation probabilities
+}
+\item a user-defined function (\code{"function"}): a function of the adjacency matrix \code{Adj} (can be
+named anything) that returns a matrix of the probabilities of observing an edge for each edges
+}}
 
-\item{all.sampled}{TO WRITE}
+\item{all.sampled}{logical scalar, should all nodes be sampled at least once? (TO CHECK: does it
+work with group-scan sampling?)}
 }
 \value{
-TO WRITE
+an \code{obsProb} object, being:
+\itemize{
+\item a matrix of probabilities of observing an edge (whether it is 0 or 1)
+\item with attribute \code{"sampling"}, one of \code{"constant"},\code{"matrix"},\code{"random"},\code{"function"},
+accordingly
+}
 }
 \description{
-TO WRITE
+Determine the matrix of probabilities of observing the edges
+Internal.
 }
 \keyword{internal}

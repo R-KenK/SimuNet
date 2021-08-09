@@ -2,7 +2,8 @@
 % Please edit documentation in R/expDesign_sampling.R
 \name{focal_sample}
 \alias{focal_sample}
-\title{TO WRITE}
+\title{Performs a focal-scan sampling over a \code{scanList} object
+Internal.}
 \usage{
 focal_sample(
   scan.list,
@@ -11,18 +12,42 @@ focal_sample(
 )
 }
 \arguments{
-\item{scan.list}{TO WRITE}
+\item{scan.list}{a \code{scanList} object}
 
-\item{sampling}{TO WRITE}
+\item{sampling}{for \verb{method = "focal}, users should input either:
+\itemize{
+\item a character scalar: for common sampling regimes:
+\itemize{
+\item \code{"even"}: select focals as evenly as possible, and the extra scans uniformly
+\item \code{"random"}: uniform probability of choosing a focal at each scan
+}
+\item a user-defined function (\code{"function"}): a function of the adjacency matrix \code{Adj} (can be
+named anything) that returns a vector of the probabilities of choosing a focal node at each
+scan
+\item WIP: more option to be added, like with the possibility to pass a \code{focalList} object directly
+}}
 
-\item{all.sampled}{TO WRITE}
+\item{all.sampled}{logical scalar, should all nodes be sampled at least once? (TO CHECK: does it
+work with group-scan sampling?)}
 }
 \value{
-TO WRITE
+an empirical \code{scanList} object in which, compared to the \code{theoretical.scanList} (added
+to \code{attrs}), edges not involving the scan's focal are replaced by \code{NA}s (regardless of them
+being 0 or 1).
+
+Returned \code{scanList} has new attributes added to attrs:
+\itemize{
+\item \code{focalList}: named integer vector representing the node's index (row/column) to be sampled for
+each scan. Names are obtain from the adjacency matrix \code{Adj}, the vector's length is equal
+\item \code{theoretical.scanList}: the original theoretical \code{scanList} from which some edges have not been
+observed
+}
 }
 \description{
-TO WRITE
+Performs a focal-scan sampling over a \code{scanList} object
+Internal.
 }
-\examples{
-# TO WRITE
+\seealso{
+\code{\link[=customize_sampling]{customize_sampling()}}, \code{\link[=draw_focalList]{draw_focalList()}}.
 }
+\keyword{internal}

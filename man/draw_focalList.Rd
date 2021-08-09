@@ -2,7 +2,7 @@
 % Please edit documentation in R/expDesign_sampling.R
 \name{draw_focalList}
 \alias{draw_focalList}
-\title{TO WRITE}
+\title{Draw the list of focals to sample at each scan}
 \usage{
 draw_focalList(
   scan.list,
@@ -11,18 +11,30 @@ draw_focalList(
 )
 }
 \arguments{
-\item{scan.list}{TO WRITE}
+\item{scan.list}{a \code{scanList} object}
 
-\item{sampling}{TO WRITE}
+\item{sampling}{for \verb{method = "focal}, users should input either:
+\itemize{
+\item a character scalar: for common sampling regimes:
+\itemize{
+\item \code{"even"}: select focals as evenly as possible, and the extra scans uniformly
+\item \code{"random"}: uniform probability of choosing a focal at each scan
+}
+\item a user-defined function (\code{"function"}): a function of the adjacency matrix \code{Adj} (can be
+named anything) that returns a vector of the probabilities of choosing a focal node at each
+scan
+\item WIP: more option to be added, like with the possibility to pass a \code{focalList} object directly
+}}
 
-\item{all.sampled}{TO WRITE}
-
-\item{sampling_fun}{TO WRITE}
+\item{all.sampled}{logical scalar, should all nodes be sampled at least once? (TO CHECK: does it
+work with group-scan sampling?)}
 }
 \value{
-TO WRITE
+named integer vector representing the node's index (row/column) to be sampled for each
+scan. Names are obtain from the adjacency matrix \code{Adj}, the vector's length is equal to
+\code{n.scans}
 }
 \description{
-TO WRITE
+Draw the list of focals to sample at each scan
 }
 \keyword{internal}

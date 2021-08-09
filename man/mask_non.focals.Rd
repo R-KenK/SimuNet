@@ -2,19 +2,23 @@
 % Please edit documentation in R/expDesign_sampling.R
 \name{mask_non.focals}
 \alias{mask_non.focals}
-\title{TO WRITE}
+\title{Mask edges not-involving the scan's focal node (applies the focal list)
+Internal.}
 \usage{
 mask_non.focals(scan.list, focalList)
 }
 \arguments{
-\item{scan.list}{TO WRITE}
+\item{scan.list}{a \code{scanList} object}
 
-\item{focalList}{TO WRITE}
+\item{focalList}{named integer vector, returned by draw_focalList representing the node's index
+(row/column) to be sampled for each scan. Names are obtain from the adjacency matrix \code{Adj}, the
+vector's length is equal to \code{n.scans}}
 }
 \value{
-TO WRITE
+a 3D array where edges not-involving the scan's focal node are replaced by\code{NA}s
 }
 \description{
-TO WRITE
+Mask edges not-involving the scan's focal node (applies the focal list)
+Internal.
 }
 \keyword{internal}

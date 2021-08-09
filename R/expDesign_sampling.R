@@ -146,12 +146,12 @@ customize_sampling <- function(method = c("group","focal"),
   )
 }
 
-#' TO WRITE
+#' Checks if the method and sampling parameter combination is adequate
 #'
-#' @param method TO WRITE
-#' @param sampling TO WRITE
+#' @param method inputted `method` parameter, see [`customize_sampling()`][customize_sampling()]
+#' @param sampling inputted `sampling` parameter, see [`customize_sampling()`][customize_sampling()]
 #'
-#' @return TO WRITE
+#' @return nothing, but returns an error if the combination is not adequate
 #' @export
 #'
 #' @keywords internal
@@ -200,14 +200,31 @@ check_sampling_parameters <-
 
 ## Group-scan sampling ----
 
-#'  TO WRITE
+#' Performs a group-scan sampling over a `scanList` object
+#' Internal.
 #'
-#' @param sampling TO WRITE
-#' @param all.sampled TO WRITE
-#' @param scan.list TO WRITE
+#' @param scan.list a `scanList` object
+#' @param sampling for `method = "group`, users should input either:
+#'   * a numeric scalar (`"constant"`): the constant probability of observing an edge for all edges
+#'   * a numeric matrix (`"matrix"`): the probabilities of observing an edge for each edges
+#'   * a character scalar: for common sampling regimes:
+#'     * `"random"`: random edge observation probabilities
+#'   * a user-defined function (`"function"`): a function of the adjacency matrix `Adj` (can be
+#'   named anything) that returns a matrix of the probabilities of observing an edge for each edges
+#' @param all.sampled logical scalar, should all nodes be sampled at least once? (TO CHECK: does it
+#'   work with group-scan sampling?)
 #'
-#' @return  TO WRITE
+#' @return  an empirical `scanList` object in which, compared to the `theoretical.scanList` (added
+#'   to `attrs`), unobserved edges are replaced by `NA`s (regardless of them being 0 or 1).
+#'
+#' Returned `scanList` has new attributes added to attrs:
+#' * `obs.P`: matrix of probabilities of observing an edge (whether it is 0 or 1)
+#' * `theoretical.scanList`: the original theoretical `scanList` from which some edges have not been
+#' observed
+#'
 #' @export
+#'
+#' @seealso [customize_sampling()], [determine_obsProb()].
 #'
 #' @importFrom stats rbinom
 #'
@@ -237,13 +254,24 @@ group_sample <- function(scan.list,sampling = c("constant","matrix","random","fu
   groupSampled
 }
 
-#' TO WRITE
+#' Determine the matrix of probabilities of observing the edges
+#' Internal.
 #'
-#' @param scan.list TO WRITE
-#' @param sampling TO WRITE
-#' @param all.sampled TO WRITE
+#' @param scan.list a `scanList` object
+#' @param sampling for `method = "group`, users should input either:
+#'   * a numeric scalar (`"constant"`): the constant probability of observing an edge for all edges
+#'   * a numeric matrix (`"matrix"`): the probabilities of observing an edge for each edges
+#'   * a character scalar: for common sampling regimes:
+#'     * `"random"`: random edge observation probabilities
+#'   * a user-defined function (`"function"`): a function of the adjacency matrix `Adj` (can be
+#'   named anything) that returns a matrix of the probabilities of observing an edge for each edges
+#' @param all.sampled logical scalar, should all nodes be sampled at least once? (TO CHECK: does it
+#'   work with group-scan sampling?)
 #'
-#' @return TO WRITE
+#' @return an `obsProb` object, being:
+#' * a matrix of probabilities of observing an edge (whether it is 0 or 1)
+#' * with attribute `"sampling"`, one of `"constant"`,`"matrix"`,`"random"`,`"function"`,
+#' accordingly
 #' @export
 #'
 #' @importFrom scales rescale_max
@@ -291,14 +319,33 @@ determine_obsProb <- function(scan.list,sampling = c("constant","matrix","random
 
 ## Focal-scan sampling ----
 
-#'  TO WRITE
+#' Performs a focal-scan sampling over a `scanList` object
+#' Internal.
 #'
-#' @param scan.list TO WRITE
-#' @param sampling TO WRITE
-#' @param all.sampled TO WRITE
+#' @param scan.list a `scanList` object
+#' @param sampling for `method = "focal`, users should input either:
+#'   * a character scalar: for common sampling regimes:
+#'     * `"even"`: select focals as evenly as possible, and the extra scans uniformly
+#'     * `"random"`: uniform probability of choosing a focal at each scan
+#'   * a user-defined function (`"function"`): a function of the adjacency matrix `Adj` (can be
+#'   named anything) that returns a vector of the probabilities of choosing a focal node at each
+#'   scan
+#'   * WIP: more option to be added, like with the possibility to pass a `focalList` object directly
+#' @param all.sampled logical scalar, should all nodes be sampled at least once? (TO CHECK: does it
+#'   work with group-scan sampling?)
 #'
-#' @return  TO WRITE
+#' @return  an empirical `scanList` object in which, compared to the `theoretical.scanList` (added
+#'   to `attrs`), edges not involving the scan's focal are replaced by `NA`s (regardless of them
+#'   being 0 or 1).
+#'
+#' Returned `scanList` has new attributes added to attrs:
+#' * `focalList`: named integer vector representing the node's index (row/column) to be sampled for
+#' each scan. Names are obtain from the adjacency matrix `Adj`, the vector's length is equal
+#' * `theoretical.scanList`: the original theoretical `scanList` from which some edges have not been
+#' observed
+#'
 #' @export
+#' @seealso [customize_sampling()], [draw_focalList()].
 #'
 #' @keywords internal
 focal_sample <- function(scan.list,sampling = c("even","random","function"),all.sampled = TRUE){
@@ -312,14 +359,23 @@ focal_sample <- function(scan.list,sampling = c("even","random","function"),all.
   focalSampled
 }
 
-#' TO WRITE
+#' Draw the list of focals to sample at each scan
 #'
-#' @param scan.list TO WRITE
-#' @param sampling TO WRITE
-#' @param sampling_fun TO WRITE
-#' @param all.sampled TO WRITE
+#' @param scan.list a `scanList` object
+#' @param sampling for `method = "focal`, users should input either:
+#'   * a character scalar: for common sampling regimes:
+#'     * `"even"`: select focals as evenly as possible, and the extra scans uniformly
+#'     * `"random"`: uniform probability of choosing a focal at each scan
+#'   * a user-defined function (`"function"`): a function of the adjacency matrix `Adj` (can be
+#'   named anything) that returns a vector of the probabilities of choosing a focal node at each
+#'   scan
+#'   * WIP: more option to be added, like with the possibility to pass a `focalList` object directly
+#' @param all.sampled logical scalar, should all nodes be sampled at least once? (TO CHECK: does it
+#'   work with group-scan sampling?)
 #'
-#' @return TO WRITE
+#' @return named integer vector representing the node's index (row/column) to be sampled for each
+#'   scan. Names are obtain from the adjacency matrix `Adj`, the vector's length is equal to
+#'   `n.scans`
 #' @export
 #'
 #' @keywords internal
@@ -377,12 +433,15 @@ draw_focalList<- function(scan.list,sampling = c("even","random","function"),all
   focal.list
 }
 
-#' TO WRITE
+#' Mask edges not-involving the scan's focal node (applies the focal list)
+#' Internal.
 #'
-#' @param scan.list TO WRITE
-#' @param focalList TO WRITE
+#' @param scan.list a `scanList` object
+#' @param focalList named integer vector, returned by draw_focalList representing the node's index
+#'   (row/column) to be sampled for each scan. Names are obtain from the adjacency matrix `Adj`, the
+#'   vector's length is equal to `n.scans`
 #'
-#' @return TO WRITE
+#' @return a 3D array where edges not-involving the scan's focal node are replaced by`NA`s
 #' @export
 #'
 #' @keywords internal

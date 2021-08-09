@@ -2,7 +2,7 @@
 % Please edit documentation in R/expDesign_sampling.R
 \name{check_sampling_parameters}
 \alias{check_sampling_parameters}
-\title{TO WRITE}
+\title{Checks if the method and sampling parameter combination is adequate}
 \usage{
 check_sampling_parameters(
   method,
@@ -10,14 +10,14 @@ check_sampling_parameters(
 )
 }
 \arguments{
-\item{method}{TO WRITE}
+\item{method}{inputted \code{method} parameter, see \code{\link[=customize_sampling]{customize_sampling()}}}
 
-\item{sampling}{TO WRITE}
+\item{sampling}{inputted \code{sampling} parameter, see \code{\link[=customize_sampling]{customize_sampling()}}}
 }
 \value{
-TO WRITE
+nothing, but returns an error if the combination is not adequate
 }
 \description{
-TO WRITE
+Checks if the method and sampling parameter combination is adequate
 }
 \keyword{internal}
