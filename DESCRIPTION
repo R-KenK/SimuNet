@@ -10,6 +10,7 @@ Description: Provides a framework that simulate empirically-inspired weighted ne
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Depends: 
     R (>= 4.1)
