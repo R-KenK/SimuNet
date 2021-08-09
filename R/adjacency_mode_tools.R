@@ -5,7 +5,10 @@
 #' @param mode Character scalar, specifies how igraph should interpret the supplied matrix. See also the weighted argument, the interpretation depends on that too. Possible values are: directed, undirected, upper, lower, max, min, plus. See details \link[igraph]{graph_from_adjacency_matrix}. Added also a vector mode.
 #'
 #' @return a subsetting function among `non.diagonal`, `upper.tri`, `lower.tri` or `function(V) {rep(TRUE,length(V))}`
-  #' @noRd
+#'
+#' @keywords internal
+#'
+#' @export
 determine_Adj.subfun <- function(mode){
   switch(mode,
          "directed" = ,
