@@ -2,7 +2,7 @@
 % Please edit documentation in R/expDesign_sampling.R
 \name{customize_sampling}
 \alias{customize_sampling}
-\title{TO WRITE}
+\title{Customize a sampling regime to perform on a theoretical \code{scanList}}
 \usage{
 customize_sampling(
   method = c("group", "focal"),
@@ -11,18 +11,149 @@ customize_sampling(
 )
 }
 \arguments{
-\item{method}{TO WRITE}
+\item{method}{character scalar, either \code{"group"} or \code{"focal"}}
 
-\item{sampling}{TO WRITE}
+\item{sampling}{depending on chosen \code{method}, users should input either:
+\itemize{
+\item a numeric scalar (\code{"constant"}): the constant probability of observing an edge for all edges
+\item a numeric matrix (\code{"matrix"}): the probabilities of observing an edge for each edges
+\item a character scalar: for common sampling regimes:
+\itemize{
+\item \code{"even"}: in the case of \code{method = "focal"}: select focals as evenly as possible, and the
+extra scans uniformly
+\item \code{"random"}: random edge observation probabilities or uniform probability of choosing a
+focal at each scan
+}
+\item a user-defined function (\code{"function"}): a function of the adjacency matrix \code{Adj} (can be
+named anything) that:
+\itemize{
+\item in the case of \code{method = "group"}: returns a matrix of the probabilities of observing an
+edge for each edges
+\item in the case of \code{method = "focal"}: returns a vector of the probabilities of choosing a
+focal node at each scan
+}
+\item WIP: more option to be added, like with the possibility to pass a \code{focalList} object directly
+}}
 
-\item{all.sampled}{TO WRITE}
+\item{all.sampled}{logical scalar, should all nodes be sampled at least once? (TO CHECK: does it
+work with group-scan sampling?)}
 }
 \value{
-TO WRITE
+a function of a theoretical \code{scan.list} simulating the empirical sampling of the
+network's edges at each scan. To be used as part of an \code{expDesign} object (see
+\code{\link[=design_exp]{design_exp()}})
 }
 \description{
-TO WRITE
+This function returns a function tailored to be used as part of an \code{expDesign} object (see
+\code{\link[=design_exp]{design_exp()}}). It is written as a convenient wrapper for commonly used
+sampling methods: group-scan sampling and focal-scan sampling.
+}
+\details{
+the function accepts as \code{sampling} parameter:
+\itemize{
+\item character scalar: common options like random edge observation probability or even focal
+sampling
+\item for \code{method = "group"}: numeric scalar (constant) or matrix representing edge observation
+probabilities
+\item user-defined functions of the adjacency matrix \code{Adj} that returns either an edge observation
+probability matrix, or a vector of the probabilities of selecting a given node at each focal
+scan. If the user-defined function returns invalid probabilities e.g.:
+\itemize{
+\item a value > 1 for \code{method = "group"}: the function tries to rescale values via \code{scales}
+package's \code{\link[scales:rescale_max]{rescale_max()}} function
+\item some probabilities of being a focal = 0 for \code{method = "focal"}: the function adds the
+non-null minimum probability to all probabilities (values > 1 should be handled correctly as
+the \code{prob} argument of the \code{\link[=sample]{sample()}} function)
+}
+}
+
+The empirical sampling works by replacing unobserved edges by \code{NA}s in the 3D array, either:
+\itemize{
+\item because a given edge hasn't been observed during the group-scan sampling
+\item or because the masked edge was not involving the focal node during the scan
+}
+
+Convenience "building blocks" functions - respectively \code{\link[=count_NA]{count_NA()}} and
+\code{\link[=count_nonNA]{count_nonNA()}} - can be used to count masked and sampled edges throughout the
+whole simulation.
+
+New attributes are added to \code{attrs}:
+\itemize{
+\item in the case of \code{method = "group"}:
+\itemize{
+\item \code{obs.P}: matrix of probabilities of observing an edge (whether it is 0 or 1)
+}
+\item in the case of \code{method = "focal"}:
+\itemize{
+\item \code{focalList}: named integer vector representing the node's index (row/column) to be sampled
+for each scan. Names are obtain from the adjacency matrix \code{Adj}, the vector's length is equal
+to \code{n.scans}
+}
+}
 }
 \examples{
-# TO WRITE
+set.seed(42)
+n <- 5L
+samp.effort <- 100L
+
+# Adjacency matrix import
+## random directed adjacency matrix
+Adj <- sample(1:samp.effort,n * n) |>
+  matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
+Adj[lower.tri(Adj,diag = TRUE)] <- 0L
+Adj
+
+# Designing sampling regimes:
+## setting a constant probability of not observing edges
+group.constant <- customize_sampling(method = "group",sampling = 0.8)
+
+## setting a random probability of not observing edges
+group.random <- customize_sampling(method = "group",sampling = "random")
+
+## setting probability of not observing edges via user-defined functions
+g.fun1 <- function(Adj) Adj     # observation proportional to the network's weights,
+                                # will be rescaled as probabilities internally
+group.fun1 <- customize_sampling(method = "group",sampling = g.fun1)
+
+### user-defined functions can also be passed as anonymous functions
+group.fun2 <- customize_sampling(method = "group",sampling = function(Adj) Adj^2)
+
+## evenly select focals
+focal.even <- customize_sampling(method = "focal",sampling = "even")
+
+## randomly select focals
+focal.random <- customize_sampling(method = "focal",sampling = "random")
+
+## setting probability of selecting focals via user-defined functions
+f.fun1 <- function(Adj) 1:nrow(Adj)       # linear increase of probability of being focal,
+                                          # akin to a linear trait
+focal.fun1 <- customize_sampling(method = "focal",sampling = f.fun1)
+
+### user-defined functions can also be passed as anonymous functions
+focal.fun2 <- customize_sampling(method = "focal",sampling = function(Adj) Adj |>
+                                   igraph::graph.adjacency(mode = "upper",weighted = TRUE) |>
+                                   igraph::eigen_centrality() |> {\(x) x$vector}()
+)                            # probabilities proportional to nodes' eigen-vector centralities
+
+# Design and run experiment based on these sampling regime
+## sampling regimes can be included in an `expDesign` object and passed to `simunet()`...
+g.const.exp <- design_exp(group.constant)
+simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L,g.const.exp)
+
+## ... or passed to `perform_exp()`...
+g.rand.periRemoved <- design_exp(remove_mostPeripheral,group.random)
+
+sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L)
+sL |> perform_exp(g.rand.periRemoved)
+
+## ... or used "in situ" in either `simunet()` or `perform_exp()`,
+## but need to be passed to `design_exp()`
+## (TO DO: recognize sampling regime and manage this automatically)
+simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L,design_exp(group.fun2))
+sL |> perform_exp(design_exp(focal.even))
+sL |> perform_exp(design_exp(customize_sampling("focal","random")))
+}
+\seealso{
+\code{\link[=simunet]{simunet()}}, \code{\link[=design_exp]{design_exp()}}, \code{\link[=perform_exp]{perform_exp()}}, \code{\link[=group_sample]{group_sample()}}, \code{\link[=determine_obsProb]{determine_obsProb()}},
+\code{\link[=focal_sample]{focal_sample()}}, \code{\link[=draw_focalList]{draw_focalList()}}, \code{\link[=mask_non.focals]{mask_non.focals()}}, \code{\link[=count_NA]{count_NA()}}, \code{\link[=count_nonNA]{count_nonNA()}}.
 }
