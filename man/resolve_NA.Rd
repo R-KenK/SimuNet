@@ -2,9 +2,9 @@
 % Please edit documentation in R/empirical_NA_tools.R
 \name{resolve_NA}
 \alias{resolve_NA}
-\title{Replace `NA`s with known values when they can be determined
-Internal use. When the `"min"` or `"max"` algorithm is chosen to convert directed networks into
-undirected one, some `NA`s can be deduced from their transposed values (cf. below).}
+\title{Replace \code{NA}s with known values when they can be determined
+Internal use. When the \code{"min"} or \code{"max"} algorithm is chosen to convert directed networks into
+undirected one, some \code{NA}s can be deduced from their transposed values (cf. below).}
 \usage{
 resolve_NA(
   scan.list,
@@ -12,28 +12,28 @@ resolve_NA(
 )
 }
 \arguments{
-\item{scan.list}{a list of binary adjacency matrix potentially containing `NA`s, in which some
-`NA`s' value can actually be resolved depending on the chosen mode:
- \itemize{
-   \item{`scan[i,j] = NA & scan[j,i] = 0 => scan[i,j] = 0` when `mode = "min"`}
-   \item{`scan[i,j] = NA & scan[j,i] = 1 => scan[i,j] = 1` when `mode = "max"`}
- }}
+\item{scan.list}{a list of binary adjacency matrix potentially containing \code{NA}s, in which some
+\code{NA}s' value can actually be resolved depending on the chosen mode:
+\itemize{
+\item{\verb{scan[i,j] = NA & scan[j,i] = 0 => scan[i,j] = 0} when \code{mode = "min"}}
+\item{\verb{scan[i,j] = NA & scan[j,i] = 1 => scan[i,j] = 1} when \code{mode = "max"}}
+}}
 
 \item{mode}{Character scalar, specifies how igraph should interpret the supplied matrix. Default
 here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus.
 Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.}
 }
 \value{
-a list of binary adjacency matrix where resolvable `NA`s are changed depending on the
-  chosen mode:
-   \itemize{
-     \item{`scan[i,j] = NA & scan[j,i] = 0 => scan[i,j] = 0` when `mode = "min"`}
-     \item{`scan[i,j] = NA & scan[j,i] = 1 => scan[i,j] = 1` when `mode = "max"`}
-   }
+a list of binary adjacency matrix where resolvable \code{NA}s are changed depending on the
+chosen mode:
+\itemize{
+\item{\verb{scan[i,j] = NA & scan[j,i] = 0 => scan[i,j] = 0} when \code{mode = "min"}}
+\item{\verb{scan[i,j] = NA & scan[j,i] = 1 => scan[i,j] = 1} when \code{mode = "max"}}
+}
 }
 \description{
-Replace `NA`s with known values when they can be determined
-Internal use. When the `"min"` or `"max"` algorithm is chosen to convert directed networks into
-undirected one, some `NA`s can be deduced from their transposed values (cf. below).
+Replace \code{NA}s with known values when they can be determined
+Internal use. When the \code{"min"} or \code{"max"} algorithm is chosen to convert directed networks into
+undirected one, some \code{NA}s can be deduced from their transposed values (cf. below).
 }
 \keyword{internal}
