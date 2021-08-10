@@ -1,15 +1,21 @@
-#' TO WRITE
+#' `edgeProb` object generator
 #'
-#' @param Adj TO WRITE
-#' @param samp.effort TO WRITE
-#' @param mode TO WRITE
-#' @param Adj.subfun TO WRITE
+#' @param Adj integer matrix, the adjacency matrix (see [`simunet()`][simunet()])
+#' @param samp.effort integer scalar, the sampling effort (see [`simunet()`][simunet()])
+#' @param mode character scalar, the network igraph's mode (see [`simunet()`][simunet()])
+#' @param Adj.subfun function, the matrix subsetting function relevant for the adjacency matrix
+#'   `mode` (see [`simunet()`][simunet()])
 #'
-#' @return TO WRITE
+#' @return an `edgeProb` object, i.e. a list containing:
+#' * `P`: the edge presence probability matrix
+#' * `Adj`: the inputted `Adj`
+#' * `samp.effort`: the inputted `samp.effort`
+#' * `mode`: the inputted `mode`
+#' * `Adj.subfun`: the inputted `Adj.subfun`
+#'
 #' @export
 #'
-#' @examples
-#' # TO WRITE
+#' @keywords internal
 generate_edgeProb <- function(Adj,samp.effort,mode,
                                   Adj.subfun = NULL){
   Adj[] <- as.integer(Adj)
@@ -28,14 +34,19 @@ generate_edgeProb <- function(Adj,samp.effort,mode,
   edge.Prob
 }
 
-#' TO WRITE
+#' Determine if an `edgeProb` object should be generated from inputs
 #'
-#' @param Adj TO WRITE
-#' @param mode TO WRITE
-#' @param samp.effort TO WRITE
-#' @param edge.Prob TO WRITE
+#' @param Adj integer matrix, the adjacency matrix (see [`simunet()`][simunet()])
+#' @param mode character scalar, the network igraph's mode (see [`simunet()`][simunet()])
+#' @param samp.effort integer scalar, the sampling effort (see [`simunet()`][simunet()])
+#' @param edge.Prob optional, an `edgeProb` object (see [`generate_edgeProb()`][generate_edgeProb()])
 #'
-#' @return TO WRITE
+#' @return an `edgeProb` object, i.e. a list containing:
+#' * `P`: the edge presence probability matrix
+#' * `Adj`: the inputted `Adj`
+#' * `samp.effort`: the inputted `samp.effort`
+#' * `mode`: the inputted `mode`
+#' * `Adj.subfun`: the inputted `Adj.subfun`
 #' @noRd
 determine_edgeProb <- function(Adj = NULL,mode = NULL,samp.effort = NULL,edge.Prob = NULL) {
   if (!is.null(edge.Prob)) {
@@ -52,30 +63,52 @@ determine_edgeProb <- function(Adj = NULL,mode = NULL,samp.effort = NULL,edge.Pr
 }
 
 
-#' Binarize from adjacency matrix
-#' Internal use. Provide binary probability for each weight, taking into account the sampling effort.
+#' Draw edge presence probability matrix from posterior Beta distribution
+#' Internal use.
 #'
-#' @param Adj square integers matrix of occurrences of dyads. WIP: implement method for association matrices...
-#' @param Adj.subfun  TO WRITE
-#' @param alpha.prior  TO WRITE
-#' @param beta.prior  TO WRITE
-#' @param samp.effort integer, sampling effort. Note that 1/samp.effort should be relatively small, increasingly small with increasing precision.
+#' Edge presence probabilities are drawn from a posterior Beta distribution
+#' \eqn{Beta(\alpha,\beta)}, in which parameters \eqn{\alpha} and \eqn{\beta} correspond to total
+#' (pseudo-)counts of the times when an edge was 1 and 0, respectively. By default, an uninformative
+#' prior (Jeffrey's prior, i.e. \eqn{\alpha.prior = \beta.prior = 0.5}) is used, and is added to the
+#' observed edge weights in `Adj`, so that: \deqn{\alpha = Adj + \alpha.prior, \beta = samp.effort -
+#' Adj + \beta.prior} where \eqn{samp.effort - Adj} is a positive or null integer.
 #'
-#' @details
+#' For Bayesian inference and conjugation, a prior beta distribution
+#' \eqn{Beta(\alpha.prior,\beta.prior)} is used, with default \deqn{\alpha.prior = \beta.prior =
+#' 0.5} which corresponds to Jeffrey's prior. Alternative parametrization can rely on
+#' \deqn{\alpha.prior = \beta.prior = 1} for a prior beta distribution equivalent to a uniform
+#' distribution over \eqn{[0,1]}.
 #'
-#' At the moment the probabilities are calculated to be quasi-proportional to the input weights,
-#' with a factor closer to 1/samp.effort as 1/samp.effort become small relatively to 1 and to the weights themselves.
+#' In [`simunet()`][simunet()], a new `edgeProb` is drawn before simulating binary scans. Two
+#' `scanList`s outputted from an identical `Adj` matrix and `samp.effort` will result in different
+#' `edgeProb`s, but these `edgeProb`s are drawn from the same posterior Beta distribution
+#' \eqn{Beta(\alpha,\beta)}.
 #'
-#' The formula used in the function is to constrained output probabilities between:
-#' * min_resol = 1/samp.effort instead of 0 (with min_resol supposedly small),
-#' * and 1-min_resol instead of 1  (with min_resol supposedly small compared to 1)
-#' * cf. Keuk, unpublished yet for further details
+#' The `edgeProb` used is stored in the `scanList` outputted by `simunet()` as an attribute in the
+#' attributes list `attrs`, and can be retrieved via `attrs(scan.list,"edgeProb")`).
 #'
-#' @return matrix of probability of presence for each dyad
+#' This procedure is equivalent to drawing a `scanList` from a Beta-Binomial distribution
+#' \eqn{BetaBinom(n.scans,\alpha,\beta)}, but allows "decomposing" the simulated edge weights into a
+#' list of binary scans instead of outputting only a new weighted adjacency matrix.
+#'
+#' @param Adj integer matrix, the adjacency matrix (see [`simunet()`][simunet()])
+#' @param Adj.subfun function, the matrix subsetting function relevant for the adjacency matrix
+#'   `mode` (see [`simunet()`][simunet()])
+#' @param alpha.prior positive numeric scalar, the parameter alpha (added to shape1 in `rbeta()`)
+#'   used in the prior beta distribution. See [`rbeta()`][stats::rbeta()]
+#' @param beta.prior  positive numeric scalar, the parameter beta (added to shape2 in `rbeta()`)
+#'   used in the prior beta distribution. See [`rbeta()`][stats::rbeta()]
+#' @param samp.effort integer scalar, the sampling effort (see [`simunet()`][simunet()])
+#'
+#' @return numeric matrix of edge presence probabilities
 #'
 #' @importFrom stats rbeta
 #'
-#' @noRd
+#' @seealso [simunet()].
+#'
+#' @export
+#'
+#' @keywords internal
 draw_edgeProb <- function(Adj,samp.effort,
                           Adj.subfun = NULL,
                           alpha.prior = 0.5,
@@ -89,12 +122,21 @@ draw_edgeProb <- function(Adj,samp.effort,
   P
 }
 
-#' TO WRITE
+#' Convenience function to reconstruct an `edgeProb` object from what has been stored in `scanList` object's attributes
+#' Avoid `edgeProb` stored in `scanList` to store duplicates of `Adj`, `samp.effort`, `mode`, and `Adj.subfun`
 #'
-#' @param scan.list TO WRITE
+#' @param scan.list a `scanList` object (see [`simunet()`][simunet()])
 #'
-#' @return TO WRITE
-#' @noRd
+#' @return an `edgeProb` object, i.e. a list containing:
+#' * `P`: the edge presence probability matrix
+#' * `Adj`: the inputted `Adj`
+#' * `samp.effort`: the inputted `samp.effort`
+#' * `mode`: the inputted `mode`
+#' * `Adj.subfun`: the inputted `Adj.subfun`
+#'
+#' @export
+#'
+#' @keywords internal
 reconstruct_edgeProb <- function(scan.list) {
   edge.Prob <- list(
     P = attrs(scan.list,"edge.Prob"),

@@ -2,25 +2,31 @@
 % Please edit documentation in R/edgeProb.R
 \name{generate_edgeProb}
 \alias{generate_edgeProb}
-\title{TO WRITE}
+\title{\code{edgeProb} object generator}
 \usage{
 generate_edgeProb(Adj, samp.effort, mode, Adj.subfun = NULL)
 }
 \arguments{
-\item{Adj}{TO WRITE}
+\item{Adj}{integer matrix, the adjacency matrix (see \code{\link[=simunet]{simunet()}})}
 
-\item{samp.effort}{TO WRITE}
+\item{samp.effort}{integer scalar, the sampling effort (see \code{\link[=simunet]{simunet()}})}
 
-\item{mode}{TO WRITE}
+\item{mode}{character scalar, the network igraph's mode (see \code{\link[=simunet]{simunet()}})}
 
-\item{Adj.subfun}{TO WRITE}
+\item{Adj.subfun}{function, the matrix subsetting function relevant for the adjacency matrix
+\code{mode} (see \code{\link[=simunet]{simunet()}})}
 }
 \value{
-TO WRITE
+an \code{edgeProb} object, i.e. a list containing:
+\itemize{
+\item \code{P}: the edge presence probability matrix
+\item \code{Adj}: the inputted \code{Adj}
+\item \code{samp.effort}: the inputted \code{samp.effort}
+\item \code{mode}: the inputted \code{mode}
+\item \code{Adj.subfun}: the inputted \code{Adj.subfun}
+}
 }
 \description{
-TO WRITE
+\code{edgeProb} object generator
 }
-\examples{
-# TO WRITE
-}
+\keyword{internal}
