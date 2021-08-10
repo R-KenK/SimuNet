@@ -1,6 +1,6 @@
 Package: SimuNet
 Title: Network simulation framework, with a zest of empirism
-Version: 1.4.0.9000
+Version: 2.0.0.9000
 Authors@R: 
     person(given = "Kenneth",
            family = "Keuk",
