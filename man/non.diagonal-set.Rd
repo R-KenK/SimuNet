@@ -3,21 +3,21 @@
 \name{non.diagonal<-}
 \alias{non.diagonal<-}
 \title{Reassign values in the non diagonal part of a matrix
-similar use as its `diag(x)` and `diag(x) <- value` equivalent}
+similar use as its \code{diag(x)} and \code{diag(x) <- value} equivalent}
 \usage{
 non.diagonal(x) <- value
 }
 \arguments{
-\item{x}{matrix or other R object with `length(dim(x)) == 2`}
+\item{x}{matrix or other R object with \code{length(dim(x)) == 2}}
 
-\item{value}{scalar or vector of values to replace the non diagonal part of `x` with. Filled in by increasing row then by increasing column,}
+\item{value}{scalar or vector of values to replace the non diagonal part of \code{x} with. Filled in by increasing row then by increasing column,}
 }
 \value{
-a matrix with similar dimensions as `x` where the non-diagonal parts have been replaced by the value in `value`
+a matrix with similar dimensions as \code{x} where the non-diagonal parts have been replaced by the value in \code{value}
 }
 \description{
 Reassign values in the non diagonal part of a matrix
-similar use as its `diag(x)` and `diag(x) <- value` equivalent
+similar use as its \code{diag(x)} and \code{diag(x) <- value} equivalent
 }
 \examples{
 set.seed(42)

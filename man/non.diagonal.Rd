@@ -9,13 +9,13 @@ non.diagonal(M, output = c("matrix.logical", "vector.values"))
 \arguments{
 \item{M}{square matrix.}
 
-\item{output}{choose to either return a matrix of logical values (`TRUE`s, `FALSE`s on the diagonal, i.e. comparable behavior than `upper.tri` for instance) or a vector of the subsetted values of the matrix.}
+\item{output}{choose to either return a matrix of logical values (\code{TRUE}s, \code{FALSE}s on the diagonal, i.e. comparable behavior than \code{upper.tri} for instance) or a vector of the subsetted values of the matrix.}
 }
 \value{
-either return a matrix of logical values (`TRUE`s, `FALSE`s on the diagonal) or a vector of the subsetted values of the matrix.
+either return a matrix of logical values (\code{TRUE}s, \code{FALSE}s on the diagonal) or a vector of the subsetted values of the matrix.
 }
 \description{
-Similarly to `upper.tri` and `lower.tri`, returns a matrix of `logical`s to identify the diagonal of a square matrix
+Similarly to \code{upper.tri} and \code{lower.tri}, returns a matrix of \code{logical}s to identify the diagonal of a square matrix
 }
 \examples{
 M<- matrix(sample(1:10,16,replace = TRUE),4,4)
