@@ -1,3 +1,19 @@
+#' Quick optimized equivalent to sample(x,size,replace=TRUE)
+#'
+#' @param x a vector
+#' @param size number of elements to sample
+#'
+#' @importFrom stats runif
+#'
+#' @return sample of size "size" taken from x
+#' @export
+#'
+#' @examples
+#' quick_sample(1:20,5)
+quick_sample<- function(x,size){
+  x[ceiling(stats::runif(size,0,length(x)))]
+}
+
 # #' Row bind list of data frames
 # #' wrapper to one-function do.call rbind over a lapply list
 # #'
@@ -74,22 +90,6 @@
 #   cl<- snow::makeCluster(n.cores);snow::clusterExport(cl,list = .export);
 #   cl
 # }
-
-#' Quick optimized equivalent to sample(x,size,replace=TRUE)
-#'
-#' @param x a vector
-#' @param size number of elements to sample
-#'
-#' @importFrom stats runif
-#'
-#' @return sample of size "size" taken from x
-#' @export
-#'
-#' @examples
-#' quick_sample(1:20,5)
-quick_sample<- function(x,size){
-  x[ceiling(stats::runif(size,0,length(x)))]
-}
 
 # Two-sample t-tests from sample statistics
 # cf. https://stats.stackexchange.com/a/30450/255116

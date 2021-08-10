@@ -12,23 +12,16 @@ resolve_NA(
 )
 }
 \arguments{
-\item{scan.list}{a list of binary adjacency matrix potentially containing \code{NA}s, in which some
-\code{NA}s' value can actually be resolved depending on the chosen mode:
-\itemize{
-\item{\verb{scan[i,j] = NA & scan[j,i] = 0 => scan[i,j] = 0} when \code{mode = "min"}}
-\item{\verb{scan[i,j] = NA & scan[j,i] = 1 => scan[i,j] = 1} when \code{mode = "max"}}
-}}
+\item{scan.list}{a \code{scanList} object. See objects returned by \code{\link[=simunet]{simunet()}}}
 
-\item{mode}{Character scalar, specifies how igraph should interpret the supplied matrix. Default
-here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus.
-Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.}
+\item{mode}{character scalar, See \code{\link[=simunet]{simunet()}}}
 }
 \value{
 a list of binary adjacency matrix where resolvable \code{NA}s are changed depending on the
 chosen mode:
 \itemize{
-\item{\verb{scan[i,j] = NA & scan[j,i] = 0 => scan[i,j] = 0} when \code{mode = "min"}}
-\item{\verb{scan[i,j] = NA & scan[j,i] = 1 => scan[i,j] = 1} when \code{mode = "max"}}
+\item \verb{scan[i,j] = NA & scan[j,i] = 0 => scan[i,j] = 0} when \code{mode = "min"}
+\item \verb{scan[i,j] = NA & scan[j,i] = 1 => scan[i,j] = 1} when \code{mode = "max"}
 }
 }
 \description{

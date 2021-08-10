@@ -2,22 +2,14 @@
 #' Internal use. When the `"min"` or `"max"` algorithm is chosen to convert directed networks into
 #' undirected one, some `NA`s can be deduced from their transposed values (cf. below).
 #'
-#' @param scan.list a list of binary adjacency matrix potentially containing `NA`s, in which some
-#'   `NA`s' value can actually be resolved depending on the chosen mode:
-#'    \itemize{
-#'      \item{`scan[i,j] = NA & scan[j,i] = 0 => scan[i,j] = 0` when `mode = "min"`}
-#'      \item{`scan[i,j] = NA & scan[j,i] = 1 => scan[i,j] = 1` when `mode = "max"`}
-#'    }
-#' @param mode Character scalar, specifies how igraph should interpret the supplied matrix. Default
-#'   here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus.
-#'   Added vector too. See details \link[igraph]{graph_from_adjacency_matrix}.
+#' @param scan.list a `scanList` object. See objects returned by [`simunet()`][simunet()]
+#' @param mode character scalar, See [`simunet()`][simunet()]
+#'
 #'
 #' @return a list of binary adjacency matrix where resolvable `NA`s are changed depending on the
 #'   chosen mode:
-#'    \itemize{
-#'      \item{`scan[i,j] = NA & scan[j,i] = 0 => scan[i,j] = 0` when `mode = "min"`}
-#'      \item{`scan[i,j] = NA & scan[j,i] = 1 => scan[i,j] = 1` when `mode = "max"`}
-#'    }
+#'    * `scan[i,j] = NA & scan[j,i] = 0 => scan[i,j] = 0` when `mode = "min"`
+#'    * `scan[i,j] = NA & scan[j,i] = 1 => scan[i,j] = 1` when `mode = "max"`
 #'
 #' @keywords internal
 #' @export
