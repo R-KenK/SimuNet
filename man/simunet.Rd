@@ -24,7 +24,7 @@ from the \href{https://github.com/bansallab/asnr}{Animal Social Network Reposito
 }}
 
 \item{samp.effort}{integer scalar, the sampling effort, or number of scans, that led to obtaining
-of Adj}
+of \code{Adj}}
 
 \item{mode}{character scalar, specifies what igraph network \code{mode} should be used to convert the
 supplied matrix. Ignored if \code{sampling.param} is provided. Possible values are:

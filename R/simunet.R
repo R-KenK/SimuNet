@@ -6,7 +6,7 @@
 #'   * or rely on the [`import_from_asnr()`][import_from_asnr()] function to interact with networks
 #'   from the [Animal Social Network Repository](https://github.com/bansallab/asnr)
 #' @param samp.effort integer scalar, the sampling effort, or number of scans, that led to obtaining
-#'   of Adj
+#'   of `Adj`
 #' @param mode character scalar, specifies what igraph network `mode` should be used to convert the
 #'   supplied matrix. Ignored if `sampling.param` is provided. Possible values are:
 #'   * `"directed"` (the default): for non-symmetrical adjacency matrix where `Adj[i,j]` doesn't
