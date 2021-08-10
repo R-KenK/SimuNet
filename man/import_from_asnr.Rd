@@ -29,28 +29,28 @@ name Supports partial matching.}
 .graphml file. Otherwise the .graphml file name to import. Supports partial
 matching.}
 
-\item{url}{character scalar. Optional if argument `class` and `species` (and
-`network` in the case of several graphml in one folder). URL of the
+\item{url}{character scalar. Optional if argument \code{class} and \code{species} (and
+\code{network} in the case of several graphml in one folder). URL of the
 .graphml file to import.}
 
-\item{output}{character scalar. Either "graph" for an `igraph` graph object,
+\item{output}{character scalar. Either "graph" for an \code{igraph} graph object,
 or "adjacency" for an adjacency matrix}
 
 \item{type}{character scalar. One of "both", "upper", and "lower". In the
 case of undirected network, "upper" or "lower" should probably be
 preferred.}
 
-\item{...}{additional argument. Useful to pass a `asnr.df` argument to
+\item{...}{additional argument. Useful to pass a \code{asnr.df} argument to
 construct_full.path.}
 
 \item{default_prefix}{character scalar. URL "prefix" used to retrieve the
-graphml _file_ from github.}
+graphml \emph{file} from github.}
 
 \item{full.path}{character scalar. Optional, can be used to input directly an
 URL to a graphml file.}
 }
 \value{
-TO WRITE
+According to output, either a igraph object or an adjacency matrix.
 }
 \description{
 Import network from asnr package

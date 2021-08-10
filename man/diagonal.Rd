@@ -7,15 +7,15 @@
 diagonal(M, output = c("matrix.logical", "vector.values"))
 }
 \arguments{
-\item{M}{matrix or other R object with `length(dim(x)) == 2`. For back compatibility reasons, when the above is not fulfilled, `as.matrix(x)` is called first}
+\item{M}{matrix or other R object with \code{length(dim(x)) == 2}. For back compatibility reasons, when the above is not fulfilled, \code{as.matrix(x)} is called first}
 
-\item{output}{choose to either return a matrix of logical values (`TRUE`s on the diagonal, i.e. comparable behavior than `diag` for instance) or a vector of the subsetted values of the matrix}
+\item{output}{choose to either return a matrix of logical values (\code{TRUE}s on the diagonal, i.e. comparable behavior than \code{diag} for instance) or a vector of the subsetted values of the matrix}
 }
 \value{
-square logical matrix with diagonal of `TRUE`s
+square logical matrix with diagonal of \code{TRUE}s
 }
 \description{
-Similarly to `upper.tri` and `lower.tri`, returns a matrix of `logical`s to identify the diagonal of a square matrix
+Similarly to \code{upper.tri} and \code{lower.tri}, returns a matrix of \code{logical}s to identify the diagonal of a square matrix
 }
 \examples{
 M<- matrix(sample(1:10,16,replace = TRUE),4,4)

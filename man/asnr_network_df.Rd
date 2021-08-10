@@ -15,7 +15,7 @@ Default is "asnr".}
 }
 \value{
 a character data frame with the column "class", "species", and
-  "network"
+"network"
 }
 \description{
 Generate a data frame of all networks in the Animal Social Network Repository (asnr)

@@ -1,6 +1,6 @@
 Package: SimuNet
 Title: Network simulation framework, with a zest of empirism
-Version: 1.4.0.9000
+Version: 2.0.0.9000
 Authors@R: 
     person(given = "Kenneth",
            family = "Keuk",
@@ -10,11 +10,14 @@ Description: Provides a framework that simulate empirically-inspired weighted ne
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Depends: 
-    R (>= 2.10)
+    R (>= 4.1)
 Imports: 
     stats,
     igraph,
-    Matrix,
-    httr
+    httr,
+    magrittr,
+    purrr,
+    scales
