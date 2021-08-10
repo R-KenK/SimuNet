@@ -2,21 +2,71 @@
 % Please edit documentation in R/expDesign_building.blocks.R
 \name{sum_scans}
 \alias{sum_scans}
-\title{TO WRITE}
+\title{Sum list of binary scans into a weighted adjacency matrix
+Written as a S3 method to be applied to \code{scanList} or \code{sLlist} (list of \code{scanList}) objects.}
 \usage{
 sum_scans(scan.list, ...)
 }
 \arguments{
-\item{scan.list}{TO WRITE}
+\item{scan.list}{a \code{scanList} or \code{sLlist} object. See objects returned by
+\code{\link[=simunet]{simunet()}}}
 
-\item{...}{TO WRITE}
+\item{...}{additional arguments to be passed.
+
+\code{sum_scans()} can use argument:
+\itemize{
+\item \code{which}: character scalar, either:
+\itemize{
+\item \code{"auto"}: determine automatically which \code{scanList} to sum
+\item \code{"theoretical"}: sum the \code{theoretical.scanList} (useful in the case of empirical
+\code{scanList}s)
+\item \code{"raw"}: sum the \code{raw.scanList} (useful to see the impact of chosen \code{mode})
+}
+}}
 }
 \value{
-TO WRITE
+a \code{sum} object, or list of such, consisting mainly on a weighted adjacency matrix where
+each edge weight is equal to the sum of all binary edges. Inherits from the previous \code{scanList}
+class (theoretical or empirical, inheriting from \code{scanList}), and keeps track of the
+\code{scan.list}'s list of attributes \code{attrs}.
+
+Also adds these attributes to \code{attrs}:
+\itemize{
+\item \code{summed.scanList}: the original \code{scanList} (3D array) that has been summed
+\item \code{sampled}: an integer matrix representing how many time each edge has been sampled (i.e. was
+not \code{NA}). Determined via \code{\link[=count_nonNA]{count_nonNA()}}
+}
 }
 \description{
-TO WRITE
+Sum list of binary scans into a weighted adjacency matrix
+Written as a S3 method to be applied to \code{scanList} or \code{sLlist} (list of \code{scanList}) objects.
 }
 \examples{
-# TO WRITE
+set.seed(42)
+n <- 5L
+samp.effort <- 241L
+
+# Adjacency matrix import
+## random directed adjacency matrix
+Adj <- sample(1:samp.effort,n * n) |>
+  matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
+diag(Adj) <- 0L
+Adj
+
+# social network simulations
+## theoretical scans
+sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "directed",n.scans = 120L)
+sL
+sL |> sum_scans()
+
+## group-scan sampling
+sL |> perform_exp(design_exp(customize_sampling("group",.6))) |> sum_scans()
+
+## comparing group-scan and focal sampling
+sL |> perform_exp(design_exp(customize_sampling("group",.6)),
+                  design_exp(customize_sampling("focal","even"))
+                  ) |> sum_scans()
+}
+\seealso{
+\code{\link[=simunet]{simunet()}}, \code{\link[=design_exp]{design_exp()}}, \code{\link[=perform_exp]{perform_exp()}}.
 }

@@ -2,21 +2,59 @@
 % Please edit documentation in R/expDesign_building.blocks.R
 \name{scale_scans}
 \alias{scale_scans}
-\title{TO WRITE}
+\title{Scale list of binary scans into a weighted adjacency matrix
+Scaling here is dividing by the sum of 1s by the number of time an edge has been observed
+(whether it was 0 or 1).}
 \usage{
-scale_scans(summed, ...)
+scale_scans(scan.list, ...)
 }
 \arguments{
-\item{summed}{TO WRITE}
+\item{scan.list}{a \code{scanList} or \code{sLlist} object. See objects returned by
+\code{\link[=simunet]{simunet()}}}
 
-\item{...}{TO WRITE}
+\item{...}{additional arguments to be passed. At the moment \code{scale_scans()} does not use
+
+At the moment \code{scale_scans()} does not use additional argument, arguments passed will be ignored.}
 }
 \value{
-TO WRITE
+a \code{scaled} object, or list of such, consisting mainly on a weighted adjacency matrix
+where each edge weight is equal to the sum of all binary edges divided by the number of times
+they have been sampled (determined via \code{\link[=count_nonNA]{count_nonNA()}}). Inherits from \code{sum}
+and the previous \code{scanList} class (theoretical or empirical, inheriting from \code{scanList}), and
+keeps track of the \code{scan.list}'s list of attributes \code{attrs}
 }
 \description{
-TO WRITE
+Written as a S3 method to be applied to \code{scanList} or \code{sLlist} (list of \code{scanList}) objects.
 }
 \examples{
-# TO WRITE
+set.seed(42)
+n <- 5L
+samp.effort <- 241L
+
+# Adjacency matrix import
+## random directed adjacency matrix
+Adj <- sample(1:samp.effort,n * n) |>
+  matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
+diag(Adj) <- 0L
+Adj
+
+# social network simulations
+## theoretical scans
+sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "directed",n.scans = 120L)
+sL
+# scale_scans() can scale sum objects...
+sL |> sum_scans() |> scale_scans()
+
+
+# ... or scanList object directly
+## group-scan sampling
+sL |> perform_exp(design_exp(customize_sampling("group",.6))) |> scale_scans()
+
+## comparing group-scan and focal sampling
+sL |> perform_exp(design_exp(customize_sampling("group",.6)),
+                  design_exp(customize_sampling("focal","even"))
+                  ) |> scale_scans()
+}
+\seealso{
+\code{\link[=simunet]{simunet()}}, \code{\link[=design_exp]{design_exp()}}, \code{\link[=perform_exp]{perform_exp()}}, \code{\link[=sum_scans]{sum_scans()}}.
 }

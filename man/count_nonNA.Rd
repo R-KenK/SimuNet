@@ -2,23 +2,49 @@
 % Please edit documentation in R/expDesign_building.blocks.R
 \name{count_nonNA}
 \alias{count_nonNA}
-\title{Count observed edges (non-\code{NA}s) for each edge in list of scans
-Internal use. Used to determine the sampling effort across all scans performed}
+\title{Count number of times edges have not been observed
+For empirical \code{scanList}, an edge that is observed during a scan is \emph{not} \code{NA} (it will be either
+0 or 1). This function counts how many time this was the case in the inputted \code{scan.list} for
+each edge.}
 \usage{
 count_nonNA(scan.list, ...)
 }
 \arguments{
-\item{scan.list}{a list of binary adjacency matrices, where an unobserved dyad (whether it is theoretically 0 or 1) is \code{NA}}
+\item{scan.list}{a \code{scanList} or \code{sLlist} object, where an unobserved edge (whether it is 0 or 1)
+is \code{NA}. See objects returned by \code{\link[=simunet]{simunet()}}}
 
-\item{...}{TO WRITE}
+\item{...}{additional arguments to be passed. At the moment \code{scale_scans()} does not use
+
+At the moment \code{count_nonNA()} does not use additional argument, arguments passed will be ignored.}
 }
 \value{
-an integer matrix representing the sampling effort for each dyad
+an integer matrix, or list of such, representing how many time each edge has been sampled
+(i.e. was \emph{not} \code{NA}).Inherits from the previous \code{scanList} class (theoretical or empirical,
+inheriting from \code{scanList}), and keeps track of the \code{scan.list}'s list of attributes \code{attrs}.
 }
 \description{
-Count observed edges (non-\code{NA}s) for each edge in list of scans
-Internal use. Used to determine the sampling effort across all scans performed
+Written as a S3 method to be applied to \code{scanList} or \code{sLlist} (list of \code{scanList}) objects.
 }
 \examples{
-# TO WRITE
+set.seed(42)
+n <- 5L
+samp.effort <- 241L
+
+# Adjacency matrix import
+## random directed adjacency matrix
+Adj <- sample(1:samp.effort,n * n) |>
+  matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
+diag(Adj) <- 0L
+Adj
+
+# social network simulations
+## theoretical scans
+sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "directed",n.scans = 120L)
+sL
+
+## group-scan sampling
+sL |> perform_exp(design_exp(customize_sampling("group",.6))) |> count_nonNA()
+}
+\seealso{
+\code{\link[=simunet]{simunet()}}, \code{\link[=design_exp]{design_exp()}}, \code{\link[=perform_exp]{perform_exp()}}], \code{\link[=count_NA]{count_NA()}}.
 }

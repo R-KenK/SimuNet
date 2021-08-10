@@ -2,21 +2,58 @@
 % Please edit documentation in R/expDesign_building.blocks.R
 \name{add_scans}
 \alias{add_scans}
-\title{TO WRITE}
+\title{Perform additional scans and add them to the \code{scanList}
+New scans rely on edge probability matrix previously drawn from beta distributions. This can be
+used to compare sampling regime when it is expected that one will sample edges less in a
+predictable fashion (e.g. group-scan vs focal sampling)}
 \usage{
 add_scans(scan.list, ...)
 }
 \arguments{
-\item{scan.list}{TO WRITE}
+\item{scan.list}{a \code{scanList} or \code{sLlist} object. See objects returned by
+\code{\link[=simunet]{simunet()}}}
 
-\item{...}{TO WRITE}
+\item{...}{additional arguments to be passed. At the moment \code{scale_scans()} does not use
+
+\code{add_scans()} can use argument:
+\itemize{
+\item \code{new.scans}: integer scalar, the number of additional new scans to be performed and added to
+the \code{scan.list}
+}}
 }
 \value{
-TO WRITE
+a \code{scanList}, or list of such, to which additional scans have been added to the 3D array. See also \code{\link[=simunet]{simunet()}}.
+
+Also modifies these attributes to \code{attrs}:
+\itemize{
+\item \code{n.scans}: integer indicating how many scans have been performed in total. \code{n.scans} itself
+has the attribute \code{scans.performed} that keeps track of what "batches" of scans have been
+performed, by growing a vector of "scan batch" sizes
+}
 }
 \description{
-TO WRITE
+Written as a S3 method to be applied to \code{scanList} or \code{sLlist} (list of \code{scanList}) objects.
 }
 \examples{
-# TO WRITE
+set.seed(42)
+n <- 5L
+samp.effort <- 241L
+
+# Adjacency matrix import
+## random directed adjacency matrix
+Adj <- sample(1:samp.effort,n * n) |>
+  matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
+diag(Adj) <- 0L
+Adj
+
+# social network simulations
+## theoretical scans
+sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "directed",n.scans = 120L)
+sL
+
+## focal-scan sampling
+sL |> perform_exp(design_exp(customize_sampling("focal","even"))) |> add_scans(50)
+}
+\seealso{
+\code{\link[=simunet]{simunet()}}, \code{\link[=design_exp]{design_exp()}}, \code{\link[=perform_exp]{perform_exp()}}.
 }
