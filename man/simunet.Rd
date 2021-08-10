@@ -117,10 +117,12 @@ Adj <- c(0, 0, 0, 0,0,
 Adj
 
 ## upper adjacency matrix imported from ASNR (https://github.com/bansallab/asnr)
-Adj <- import_from_asnr(class = "Mammalia",
-                        species = "kangaroo_proximity_weighted",
-                        output = "adjacency",type = "upper")
-Adj
+\dontrun{
+  Adj <- import_from_asnr(class = "Mammalia",
+                          species = "kangaroo_proximity_weighted",
+                          output = "adjacency",type = "upper")
+  Adj
+}
 
 # social network simulations
 ## theoretical scans

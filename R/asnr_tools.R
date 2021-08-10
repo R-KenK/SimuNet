@@ -30,21 +30,19 @@
 #' @export
 #'
 #' @examples
-#' import_from_asnr("Aves","cowbird")
-#' # partial matching works, but at the moment not case insensitive
-#' import_from_asnr("Amph","frog",output = "adj")
-#' # Users can also copy-paste a `.graphml`'s URL
-#' # link split into two for line length reason. User can directly copy paste full links, however
-#' import_from_asnr(
-#'   url = paste0(
-#'     "https://github.com/bansallab/asnr/blob/master/Networks/Reptilia/",
-#'     "lizard_proximity_weighted/weighted_network_social_T_rugosa.graphml"
-#'   )
-#' )
-#' # To avoid multiple get querries and longer computation time, users can first
-#' # load a `asnr.df` data frame by calling once the `asnr_network_df` function
-#' asnr.df <- asnr_network_df()
-#' import_from_asnr("Amph","frog",output = "adj",asnr.df = asnr.df)
+#'  \dontrun{
+#'    import_from_asnr("Aves","cowbird")
+#'    # partial matching works, but at the moment not case insensitive
+#'    import_from_asnr("Amph","frog",output = "adj")
+#'    # Users can also copy-paste a `.graphml`'s URL
+#'    import_from_asnr(
+#'      url = "https://github.com/bansallab/asnr/blob/master/Networks/Reptilia/lizard_proximity_weighted/weighted_network_social_T_rugosa.graphml"
+#'    )
+#'    # To avoid multiple get querries and longer computation time, users can first
+#'    # load a `asnr.df` data frame by calling once the `asnr_network_df` function
+#'    asnr.df <- asnr_network_df()
+#'    import_from_asnr("Amph","frog",output = "adj",asnr.df = asnr.df)
+#'  }
 import_from_asnr <-
   function(class = NULL,
            species = NULL,
@@ -83,7 +81,9 @@ import_from_asnr <-
 #' @export
 #'
 #' @examples
-#' asnr_network_df()
+#' \dontrun{
+#'   asnr_network_df()
+#' }
 asnr_network_df <- function(user = "bansallab", repo = "asnr") {
   asnr_graphmls <- retrieve_asnr_graphmls(user = user,repo = repo)
 

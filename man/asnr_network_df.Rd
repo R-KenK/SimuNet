@@ -21,5 +21,7 @@ a character data frame with the column "class", "species", and
 Generate a data frame of all networks in the Animal Social Network Repository (asnr)
 }
 \examples{
-asnr_network_df()
+\dontrun{
+  asnr_network_df()
+}
 }
