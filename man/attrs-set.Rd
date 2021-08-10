@@ -2,23 +2,49 @@
 % Please edit documentation in R/scanList_tools.R
 \name{attrs<-}
 \alias{attrs<-}
-\title{TO WRITE}
+\title{\code{scanList}'s \code{attrs} attributes related convenience functions: retrieve or modify attributes
+\code{attrs()} and \verb{attrs()<-} can be used to retrieve the named attributes contained in the
+attributes list \code{attrs} of a \code{scanList} object}
 \usage{
 attrs(x, which) <- value
 }
 \arguments{
-\item{x}{TO WRITE}
+\item{x}{a \code{scanList} object (see \code{\link[=simunet]{simunet()}})}
 
-\item{which}{TO WRITE}
+\item{which}{character (scalar or vector), the name(s) of the attribute(s) to retrieve, modify or
+add}
 
-\item{value}{TO WRITE}
+\item{value}{object to replace the requested attribute with}
 }
 \value{
-TO WRITE
+the \code{scan.list} which \code{attrs} attribute has been modified
 }
 \description{
-TO WRITE
+\code{scanList}'s \code{attrs} attributes related convenience functions: retrieve or modify attributes
+\code{attrs()} and \verb{attrs()<-} can be used to retrieve the named attributes contained in the
+attributes list \code{attrs} of a \code{scanList} object
 }
 \examples{
-# TO WRITE
+set.seed(42)
+n <- 5L
+samp.effort <- 100L
+
+# Adjacency matrix import
+## random directed adjacency matrix
+Adj <- sample(1:samp.effort,n * n) |>
+  matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
+Adj[lower.tri(Adj,diag = TRUE)] <- 0L
+Adj
+
+sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L)
+
+# retrieve all attributes in `attrs`
+sL |> attrs()
+
+# retrieve a specific attribute from `attrs`
+sL |> attrs("edge.Prob")
+
+# modify a specific attribute from `attrs` (internal use)
+attrs(sL,"scanList.type") <- "empirical"
+attrs(sL,"scanList.type")
 }

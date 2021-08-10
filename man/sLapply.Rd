@@ -2,26 +2,42 @@
 % Please edit documentation in R/scanList_tools.R
 \name{sLapply}
 \alias{sLapply}
-\title{TO WRITE}
+\title{Shortcut to a \code{lapply} equivalent to apply a function to each 2D matrix contained in a \code{scanList}
+Written analogously to \code{\link[=vapply]{vapply()}}. Values returned by \code{.f} should be a similarly dimensionned
+matrix as the first one contained in the 3D array}
 \usage{
 sLapply(sL, .f, ..., USE.NAMES = TRUE)
 }
 \arguments{
-\item{sL}{TO WRITE}
+\item{sL}{a \code{scanList} object (see \code{\link[=simunet]{simunet()}})}
 
-\item{.f}{TO WRITE}
+\item{.f}{a function,to apply a function to each 2D matrix contained in \code{sL}}
 
-\item{...}{TO WRITE}
+\item{...}{extra argument to be passed, notably named arguments used by \code{.f} (see \code{\link[=lapply]{lapply()}})}
 
-\item{USE.NAMES}{TO WRITE}
+\item{USE.NAMES}{logical; if \code{TRUE} and if \code{X} is character, use \code{X} as names for the result
+unless it had names already (see \code{\link[=vapply]{vapply()}})}
 }
 \value{
-TO WRITE
+a 3D array onto which the function has been applied to each scan
 }
 \description{
-TO WRITE
+Shortcut to a \code{lapply} equivalent to apply a function to each 2D matrix contained in a \code{scanList}
+Written analogously to \code{\link[=vapply]{vapply()}}. Values returned by \code{.f} should be a similarly dimensionned
+matrix as the first one contained in the 3D array
 }
 \examples{
-# TO WRITE
+set.seed(42)
+n <- 5L
+samp.effort <- 100L
+
+# Adjacency matrix import
+## random directed adjacency matrix
+Adj <- sample(1:samp.effort,n * n) |>
+  matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
+Adj[lower.tri(Adj,diag = TRUE)] <- 0L
+Adj
+
+sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L)
+sL |> sLapply(\(scan) {scan[1,2] <- NA;scan})
 }
-\keyword{internal}

@@ -2,23 +2,47 @@
 % Please edit documentation in R/scanList_tools.R
 \name{sLlapply}
 \alias{sLlapply}
-\title{TO WRITE}
+\title{Shortcut to a \code{lapply} equivalent to apply a function to a list of \code{scanList}: a \code{sLlist} object
+Written analogously to \code{\link[=lapply]{lapply()}}}
 \usage{
 sLlapply(sLlist, FUN, ...)
 }
 \arguments{
-\item{sLlist}{TO WRITE}
+\item{sLlist}{a \code{sLlist} object, a list of \code{scanList} objects (see
+\code{\link[=perform_exp]{perform_exp()}})}
 
-\item{FUN}{TO WRITE}
+\item{FUN}{function, to be applied to each \code{scanList} objects in \code{sLlist}}
 
-\item{...}{TO WRITE}
+\item{...}{extra argument to be passed, notably named arguments used by \code{FUN} (see \code{\link[=lapply]{lapply()}})}
 }
 \value{
-TO WRITE
+a \code{sLlist} object, a list of \code{scanList} objects on which the function \code{FUN} has been
+applied (see \code{\link[=perform_exp]{perform_exp()}})
 }
 \description{
-TO WRITE
+Shortcut to a \code{lapply} equivalent to apply a function to a list of \code{scanList}: a \code{sLlist} object
+Written analogously to \code{\link[=lapply]{lapply()}}
 }
 \examples{
-# TO WRITE
+set.seed(42)
+n <- 5L
+samp.effort <- 100L
+
+# Adjacency matrix import
+## random directed adjacency matrix
+Adj <- sample(1:samp.effort,n * n) |>
+  matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
+Adj[lower.tri(Adj,diag = TRUE)] <- 0L
+Adj
+
+# Designing the experiments:
+## setting a constant probability of not observing edges
+group.scan <- design_exp(customize_sampling(method = "group",sampling = 0.8))
+
+## setting an even focal sampling
+focal.scan <- design_exp(customize_sampling(method = "focal",sampling = "even"))
+
+sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L)
+
+sL |> perform_exp(group.scan,focal.scan) |> sLlapply(attrs,a = "edge.Prob")
 }

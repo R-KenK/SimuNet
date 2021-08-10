@@ -2,19 +2,17 @@
 % Please edit documentation in R/scanList_tools.R
 \name{get_attrs}
 \alias{get_attrs}
-\title{TO WRITE}
+\title{\code{scanList}'s \code{attrs} attributes related convenience functions: retrieve all attributes}
 \usage{
-get_attrs(scanList)
+get_attrs(scan.list)
 }
 \arguments{
-\item{scanList}{TO WRITE}
+\item{scan.list}{a \code{scanList} object (see \code{\link[=simunet]{simunet()}})}
 }
 \value{
-TO WRITE
+list, the list of attributes stored in \code{scan.list}'s \code{attrs} attribute
 }
 \description{
-TO WRITE
+\code{scanList}'s \code{attrs} attributes related convenience functions: retrieve all attributes
 }
-\examples{
-# TO WRITE
-}
+\keyword{internal}

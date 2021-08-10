@@ -7,7 +7,10 @@
 determine_Adj.subfun(mode)
 }
 \arguments{
-\item{mode}{Character scalar, specifies how igraph should interpret the supplied matrix. See also the weighted argument, the interpretation depends on that too. Possible values are: directed, undirected, upper, lower, max, min, plus. See details \link[igraph]{graph_from_adjacency_matrix}. Added also a vector mode.}
+\item{mode}{Character scalar, specifies how igraph should interpret the supplied matrix. Default
+here is directed. Possible values are: directed, undirected, upper, lower, max, min, plus.
+Added vector too. See details
+\code{\link[igraph:graph_from_adjacency_matrix]{graph_from_adjacency_matrix()}}.}
 }
 \value{
 a subsetting function among \code{non.diagonal}, \code{upper.tri}, \code{lower.tri} or \code{function(V) {rep(TRUE,length(V))}}

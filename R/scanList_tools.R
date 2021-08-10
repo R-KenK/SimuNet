@@ -1,31 +1,40 @@
 #' Generator for `scanList` objects
-#' Internal use. The user should rather rely on `simunet` as a wrapper for the
-#' different steps needed to perform the scan from inputted data.
+#' Internal use. The user should rather rely on `simunet` as a wrapper for the different steps
+#' needed to perform the simulations from inputted data.
 #'
-#' @param edge.Prob a `edgeProb` object
-#' @param n.scans TO WRIte
+#' @param edge.Prob an `edgeProb` object, i.e. a list containing:
+#' * `P`: the edge presence probability matrix
+#' * `Adj`: the inputted `Adj`
+#' * `samp.effort`: the inputted `samp.effort`
+#' * `mode`: the inputted `mode`
+#' * `Adj.subfun`: the inputted `Adj.subfun`
+#' @param samp.effort integer scalar, the sampling effort, or number of scans, that led to obtaining
+#'   of `Adj`
 #'
-#' @return a `scanList` object (S3 class) containing:
-#' \itemize{
-#'   \item{`raw.scan.list`: a list of raw binary adjacency matrix shaped like the
-#'   `Adj` contained in `edge.Prob`, considered directed in the
-#'   algorithm}
-#'   \item{`theoretical.scan.list`: a list of binary adjacency matrix, where all ties were
-#'   observed but the `mode` has been applied}
-#'   \item{`scanList.type`: character scalar. `generate_scan` sets it to
-#'   "theoretical", `sample_from_scan` will set it to "empirical" and append the
-#'   empirical matrix}
-#'   \item{`Adj`: `Adj` data contained in `edge.Prob`}
-#'   \item{`total_scan`: `total_scan` data contained in `edge.Prob`}
-#'   \item{`n.scans`: inputted `n.scans`}
-#'   \item{`mode`: `mode` data contained in `edge.Prob`}
-#'   \item{`Adj.subfun`: `Adj.subfun` data contained in `edge.Prob`}
-#'   \item{`edge.Prob`: `edge.Prob$P` (only the probability matrix) data}
-#'   \item{`use.snPackMat`: logical, if scans should be `snPackMat` objects or
-#'   regular matrices}
-#' }
+#' @return a `theoretical` inheriting from `scanList` object, primarily a 3 dimensional array
+#'   representing the (binary) adjacency matrices (coded within the first two dimensions of the
+#'   3D-array) obtained at each simulated scan (coded as the 3rd dimension of the 3D-array), and a
+#'   list of attributes, `attrs`.
 #'
-#' @noRd
+#'   The list of attributes `attrs` contains:
+#'  * `scanList.type`: character scalar, `"theoretical"` at first and `"empirical"` after a non-`NULL`
+#'  experimental manipulation has been applied to the `scanList` (via [`perform_exp()`][perform_exp()]
+#'  and a `expDesign` object)
+#'  * `raw.scanList`: the 3D binary array, directed, before potential symmetrization attempt by
+#'  applying the igraph's mode via [`apply_mode()`][apply_mode()]
+#'  * `Adj`: integer matrix, `Adj` contained in `edge.Prob`
+#'  * `samp.effort`: integer, `samp.effort` contained in `edge.Prob`
+#'  * `n.scans`: inputted `n.scans`
+#'  * `mode`: character scalar, `mode` contained in `edge.Prob`
+#'  * `Adj.subfun`: function, `Adj.subfun` contained in `edge.Prob`
+#'  * `edge.Prob`: numeric matrix,`edge.Prob$P` (only the probability matrix) data contained in
+#'  `edge.Prob`
+#'
+#' @seealso [simunet()], [generate_edgeProb()], [draw_edgeProb()], [generate_empiscanList()].
+#'
+#' @export
+#'
+#' @keywords internal
 generate_scanList <- function(edge.Prob,n.scans){
   raw.scanList <- draw_raw_scanList(edge.Prob = edge.Prob,n.scans = n.scans)
   scanList <- apply_mode(raw.scanList = raw.scanList,mode = edge.Prob$mode)
@@ -44,13 +53,30 @@ generate_scanList <- function(edge.Prob,n.scans){
   scanList
 }
 
-#'  TO WRITE
+#' Generator for *empirical* `scanList` objects
+#' Internal use. The user should rather rely on [`simunet()`][simunet()] and/or
+#' [`perform_exp()`][perform_exp()] as a wrapper for the different steps needed to perform
+#' simulations and experimental manipulations.
 #'
-#' @param scan.list TO WRITE
-#' @param exp.design TO WRITE
+#' @param scan.list a `scanList` object (see [`simunet()`][simunet()])
+#' @param exp.design an `expDesign` object. See objects returned by [`design_exp()`][design_exp()]
 #'
-#' @return TO WRITE
-#' @noRd
+#' @return an `empirical` inheriting from `scanList` object, primarily a 3 dimensional array
+#'   representing the (binary) adjacency matrices (coded within the first two dimensions of the
+#'   3D-array) obtained at each simulated scan (coded as the 3rd dimension of the 3D-array), and a
+#'   list of attributes, `attrs`.
+#'
+#'   The list of attributes `attrs` contains:
+#'   * all the previous attributes contained in `scan.list`'s `attrs` attributes list, as well as:
+#'     * `scanList.type`: character scalar, changed from `"theoretical"` to `"empirical"`
+#'     * `theoretical.scanList`: the 3D array _before_ the experimental manipulations contained in
+#'     the inputted `exp.design` have been applied
+#'
+#' @export
+#'
+#' @seealso [simunet()], [generate_edgeProb()], [draw_edgeProb()], [generate_scanList()].
+#'
+#' @keywords internal
 generate_empiscanList <- function(scan.list,exp.design) {
   empiscanList <- exp.design$FUN.seq(scan.list)
   attrs(empiscanList,"scanList.type") <- "empirical"
@@ -59,13 +85,23 @@ generate_empiscanList <- function(scan.list,exp.design) {
   empiscanList
 }
 
-#'  TO WRITE
+#'  Draw edge presence according to the edge presence probability matrix
 #'
-#' @param edge.Prob TO WRITE
-#' @param n.scans TO WRITE
+#' @param edge.Prob an `edgeProb` object, i.e. a list containing:
+#' * `P`: the edge presence probability matrix
+#' * `Adj`: the inputted `Adj`
+#' * `samp.effort`: the inputted `samp.effort`
+#' * `mode`: the inputted `mode`
+#' * `Adj.subfun`: the inputted `Adj.subfun`
+#' @param n.scans integer scalar, number of scans to generate in the simulation
 #'
-#' @return TO WRITE
-#' @noRd
+#' @return a 3 dimensional array
+#'   representing the (binary) adjacency matrices (coded within the first two dimensions of the
+#'   3D-array) obtained at each simulated scan (coded as the 3rd dimension of the 3D-array)
+#'
+#' @seealso [simunet()], [generate_edgeProb()], [draw_edgeProb()], [generate_scanList()].
+#'
+#' @keywords internal
 draw_raw_scanList <- function(edge.Prob,n.scans) {
   sL <- vapply(
     1:n.scans,
@@ -79,56 +115,103 @@ draw_raw_scanList <- function(edge.Prob,n.scans) {
 
 # scanList tools ------------------------------------------------------------------------------
 
-#'  TO WRITE
+#' `scanList`'s `attrs` attributes related convenience functions: retrieve all attributes
 #'
-#' @param scanList TO WRITE
+#' @param scan.list a `scanList` object (see [`simunet()`][simunet()])
 #'
-#' @return TO WRITE
+#' @return list, the list of attributes stored in `scan.list`'s `attrs` attribute
 #' @export
 #'
-#' @examples
-#' # TO WRITE
-get_attrs <- function(scanList) {
-  attr(scanList,"attrs")
+#' @keywords internal
+get_attrs <- function(scan.list) {
+  attr(scan.list,"attrs")
 }
 
-#'  TO WRITE
+#' `scanList`'s `attrs` attributes related convenience functions: output the 3D array only
 #'
-#' @param scanList TO WRITE
+#' @param scan.list a `scanList` object (see [`simunet()`][simunet()])
 #'
-#' @return TO WRITE
+#' @return the 3D array without its `attrs` argument
 #' @noRd
-without_attrs <- function(scanList) {
-  attr(scanList,"attrs") <- NULL
-  scanList
+without_attrs <- function(scan.list) {
+  attr(scan.list,"attrs") <- NULL
+  scan.list
 }
 
-#'  TO WRITE
+#' `scanList`'s `attrs` attributes related convenience functions: retrieve or modify attributes
+#' `attrs()` and `attrs()<-` can be used to retrieve the named attributes contained in the
+#' attributes list `attrs` of a `scanList` object
 #'
-#' @param scanList TO WRITE
-#' @param a TO WRITE
+#' @param scan.list a `scanList` object (see [`simunet()`][simunet()])
+#' @param a character (scalar or vector), the name(s) of the attribute(s) to retrieve, modify or add
 #'
-#' @return TO WRITE
+#' @return  the attribute(s) requested, or the `scan.list` which `attrs` attribute has been modified
 #' @export
 #'
 #' @examples
-#' # TO WRITE
-attrs <- function(scanList,a = NULL) {
-  if (is.null(a)) return(get_attrs(scanList))
-  get_attrs(scanList)[[a]]
+#' set.seed(42)
+#' n <- 5L
+#' samp.effort <- 100L
+#'
+#' # Adjacency matrix import
+#' ## random directed adjacency matrix
+#' Adj <- sample(1:samp.effort,n * n) |>
+#'   matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
+#' Adj[lower.tri(Adj,diag = TRUE)] <- 0L
+#' Adj
+#'
+#' sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L)
+#'
+#' # retrieve all attributes in `attrs`
+#' sL |> attrs()
+#'
+#' # retrieve a specific attribute from `attrs`
+#' sL |> attrs("edge.Prob")
+#'
+#' # modify a specific attribute from `attrs` (internal use)
+#' attrs(sL,"scanList.type") <- "empirical"
+#' attrs(sL,"scanList.type")
+attrs <- function(scan.list,a = NULL) {
+  if (is.null(a)) return(get_attrs(scan.list))
+  get_attrs(scan.list)[[a]]
 }
 
-#'  TO WRITE
+#' `scanList`'s `attrs` attributes related convenience functions: retrieve or modify attributes
+#' `attrs()` and `attrs()<-` can be used to retrieve the named attributes contained in the
+#' attributes list `attrs` of a `scanList` object
 #'
-#' @param x TO WRITE
-#' @param which TO WRITE
-#' @param value TO WRITE
+#' @param x a `scanList` object (see [`simunet()`][simunet()])
+#' @param which character (scalar or vector), the name(s) of the attribute(s) to retrieve, modify or
+#'   add
+#' @param value object to replace the requested attribute with
 #'
-#' @return TO WRITE
+#' @return the `scan.list` which `attrs` attribute has been modified
+#'
 #' @export
 #'
 #' @examples
-#' # TO WRITE
+#' set.seed(42)
+#' n <- 5L
+#' samp.effort <- 100L
+#'
+#' # Adjacency matrix import
+#' ## random directed adjacency matrix
+#' Adj <- sample(1:samp.effort,n * n) |>
+#'   matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
+#' Adj[lower.tri(Adj,diag = TRUE)] <- 0L
+#' Adj
+#'
+#' sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L)
+#'
+#' # retrieve all attributes in `attrs`
+#' sL |> attrs()
+#'
+#' # retrieve a specific attribute from `attrs`
+#' sL |> attrs("edge.Prob")
+#'
+#' # modify a specific attribute from `attrs` (internal use)
+#' attrs(sL,"scanList.type") <- "empirical"
+#' attrs(sL,"scanList.type")
 `attrs<-` <- function(x,which,value) {
   new <- get_attrs(x)
   new[[which]] <- value
@@ -136,24 +219,51 @@ attrs <- function(scanList,a = NULL) {
   x
 }
 
+#' `scanList`'s `attrs` attributes related convenience functions: copy attrs from one `scanList` to
+#' another
+#'
+#' @param from a `scanList` object which `attrs` attribute to copy (see [`simunet()`][simunet()])
+#' @param to a `scanList` object to which `attrs` attribute should be pasted (see
+#'   [`simunet()`][simunet()])
+#'
+#' @return a `scanList` object, the 3D array containted in `to` with `from`'s `attrs`
+#' @export
+#'
+#' @keywords internal
 copy_attrs_to <- function(from,to) {
   if (!inherits(to,"scanList")) {class(to) <- class(from)}
   attr(to,"attrs") <- attrs(from)
   to
 }
 
-#' TO WRITE
+#' Shortcut to a `lapply` equivalent to apply a function to each 2D matrix contained in a `scanList`
+#' Written analogously to [vapply()]. Values returned by `.f` should be a similarly dimensionned
+#' matrix as the first one contained in the 3D array
 #'
-#' @param sL TO WRITE
-#' @param .f TO WRITE
-#' @param ... TO WRITE
-#' @param USE.NAMES TO WRITE
+#' @param sL a `scanList` object (see [`simunet()`][simunet()])
+#' @param .f a function,to apply a function to each 2D matrix contained in `sL`
+#' @param ... extra argument to be passed, notably named arguments used by `.f` (see [lapply()])
+#' @param USE.NAMES logical; if `TRUE` and if `X` is character, use `X` as names for the result
+#'   unless it had names already (see [vapply()])
 #'
-#' @return TO WRITE
-#' @keywords internal
+#' @return a 3D array onto which the function has been applied to each scan
+#'
+#' @export
 #'
 #' @examples
-#' # TO WRITE
+#' set.seed(42)
+#' n <- 5L
+#' samp.effort <- 100L
+#'
+#' # Adjacency matrix import
+#' ## random directed adjacency matrix
+#' Adj <- sample(1:samp.effort,n * n) |>
+#'   matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
+#' Adj[lower.tri(Adj,diag = TRUE)] <- 0L
+#' Adj
+#'
+#' sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L)
+#' sL |> sLapply(\(scan) {scan[1,2] <- NA;scan})
 sLapply <- function(sL,.f,...,USE.NAMES = TRUE) {
   vapply(
     X = 1:(dim(sL)[3]),
@@ -164,16 +274,41 @@ sLapply <- function(sL,.f,...,USE.NAMES = TRUE) {
   )
 }
 
-#' TO WRITE
+#' Shortcut to a `lapply` equivalent to apply a function to a list of `scanList`: a `sLlist` object
+#' Written analogously to [lapply()]
 #'
-#' @param sLlist TO WRITE
-#' @param FUN TO WRITE
-#' @param ... TO WRITE
+#' @param sLlist a `sLlist` object, a list of `scanList` objects (see
+#'   [`perform_exp()`][perform_exp()])
+#' @param FUN function, to be applied to each `scanList` objects in `sLlist`
+#' @param ... extra argument to be passed, notably named arguments used by `FUN` (see [lapply()])
 #'
-#' @return TO WRITE
+#' @return a `sLlist` object, a list of `scanList` objects on which the function `FUN` has been
+#'   applied (see [`perform_exp()`][perform_exp()])
+#'
+#' @export
 #'
 #' @examples
-#' # TO WRITE
+#' set.seed(42)
+#' n <- 5L
+#' samp.effort <- 100L
+#'
+#' # Adjacency matrix import
+#' ## random directed adjacency matrix
+#' Adj <- sample(1:samp.effort,n * n) |>
+#'   matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
+#' Adj[lower.tri(Adj,diag = TRUE)] <- 0L
+#' Adj
+#'
+#' # Designing the experiments:
+#' ## setting a constant probability of not observing edges
+#' group.scan <- design_exp(customize_sampling(method = "group",sampling = 0.8))
+#'
+#' ## setting an even focal sampling
+#' focal.scan <- design_exp(customize_sampling(method = "focal",sampling = "even"))
+#'
+#' sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L)
+#'
+#' sL |> perform_exp(group.scan,focal.scan) |> sLlapply(attrs,a = "edge.Prob")
 sLlapply <- function(sLlist,FUN,...) {
   sLlist <- lapply(sLlist,FUN,...)
   class(sLlist) <- "sLlist"
