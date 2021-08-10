@@ -1,4 +1,6 @@
-# SimuNet (development version)
+# SimuNet 2.0.1
+* small edit in import_from_asnr()'s doc: now should pass R CMD check across systems (windows and
+unix)
 
 # SimuNet 2.0.0
 * Switch internal simulation framework to one relying on Bayesian inference:

@@ -34,36 +34,42 @@
 #' # partial matching works, but at the moment not case insensitive
 #' import_from_asnr("Amph","frog",output = "adj")
 #' # Users can also copy-paste a `.graphml`'s URL
-#' import_from_asnr(url = "https://github.com/bansallab/asnr/blob/master/Networks/Reptilia/
-#' lizard_proximity_weighted/weighted_network_social_T_rugosa.graphml")
+#' # link split into two for line length reason. User can directly copy paste full links, however
+#' import_from_asnr(
+#'   url = paste0(
+#'     "https://github.com/bansallab/asnr/blob/master/Networks/Reptilia/",
+#'     "lizard_proximity_weighted/weighted_network_social_T_rugosa.graphml"
+#'   )
+#' )
 #' # To avoid multiple get querries and longer computation time, users can first
 #' # load a `asnr.df` data frame by calling once the `asnr_network_df` function
 #' asnr.df <- asnr_network_df()
 #' import_from_asnr("Amph","frog",output = "adj",asnr.df = asnr.df)
-import_from_asnr <- function(class = NULL,
-                             species = NULL,
-                             network = NULL,
-                             url = NULL,
-                             output = c("graph","adjacency"),
-                             type = c("both", "upper", "lower"),
-                             ...,
-                             default_prefix = "https://raw.githubusercontent.com/bansallab/asnr/master/Networks/",
-                             full.path = NULL) {
-  if (is.null(full.path)) {
-    if (is.null(url)) {
-      full.path <- construct_full.path(class = class,
-                                       species = species,
-                                       network = network,
-                                       default_prefix = default_prefix,
-                                       ...
-      )
-    } else {
-      Networks.post <- sub(pattern = ".*Networks/",replacement = "",url)
-      full.path <- paste0(default_prefix,Networks.post)
+import_from_asnr <-
+  function(class = NULL,
+           species = NULL,
+           network = NULL,
+           url = NULL,
+           output = c("graph","adjacency"),
+           type = c("both", "upper", "lower"),
+           ...,
+           default_prefix = "https://raw.githubusercontent.com/bansallab/asnr/master/Networks/",
+           full.path = NULL) {
+    if (is.null(full.path)) {
+      if (is.null(url)) {
+        full.path <- construct_full.path(class = class,
+                                         species = species,
+                                         network = network,
+                                         default_prefix = default_prefix,
+                                         ...
+        )
+      } else {
+        Networks.post <- sub(pattern = ".*Networks/",replacement = "",url)
+        full.path <- paste0(default_prefix,Networks.post)
+      }
     }
+    import_from_graphml(path = full.path,output = output,type = type)
   }
-  import_from_graphml(path = full.path,output = output,type = type)
-}
 
 #' Generate a data frame of all networks in the Animal Social Network Repository (asnr)
 #'
