@@ -1,5 +1,5 @@
-# SimuNet
-Network simulation framework, with a zest of empiricism
+# SimuNet - Network simulation framework, with a zest of empiricism
+[![R-CMD-check](https://github.com/R-KenK/SimuNet/workflows/R-CMD-check/badge.svg)](https://github.com/R-KenK/SimuNet/actions)
 
 ## Installation
 ### Via devtools
