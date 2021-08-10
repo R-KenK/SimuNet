@@ -35,8 +35,12 @@
 #'    # partial matching works, but at the moment not case insensitive
 #'    import_from_asnr("Amph","frog",output = "adj")
 #'    # Users can also copy-paste a `.graphml`'s URL
+#'    # link split into two for line length reason. User can directly copy paste full links, however
 #'    import_from_asnr(
-#'      url = "https://github.com/bansallab/asnr/blob/master/Networks/Reptilia/lizard_proximity_weighted/weighted_network_social_T_rugosa.graphml"
+#'      url = paste0(
+#'        "https://github.com/bansallab/asnr/blob/master/Networks/Reptilia/",
+#'        "lizard_proximity_weighted/weighted_network_social_T_rugosa.graphml"
+#'      )
 #'    )
 #'    # To avoid multiple get querries and longer computation time, users can first
 #'    # load a `asnr.df` data frame by calling once the `asnr_network_df` function
