@@ -1,3 +1,7 @@
+# SimuNet 2.0.2
+* enclosed asnr related example in \dontrun{} because some example were sometime not passing on unix
+systems
+
 # SimuNet 2.0.1
 * small edit in import_from_asnr()'s doc: now should pass R CMD check across systems (windows and
 unix)
