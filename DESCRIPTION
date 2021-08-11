@@ -1,5 +1,5 @@
 Package: SimuNet
-Title: Network simulation framework, with a zest of empirism
+Title: Network simulation framework, with a zest of empiricism
 Version: 2.0.2
 Authors@R: 
     person(given = "Kenneth",
