@@ -1,0 +1,125 @@
+---
+title: "First network simulations"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Let's first retrieve the kangaroo social network we [imported previously](importing_networks.html):
+```{r setup}
+library(SimuNet)
+
+Adj <- import_from_asnr("Mammalia",
+                        "kangaroo_proximity_weighted",
+                        output = "adjacency",type = "upper")
+samp.effort <- 241L # number of observations reported by the authors
+# data retrieved from (Grant, 1973)
+# DOI: 10.1016/S0003-3472(73)80004-1
+Adj           # note that here, the suitable `mode` is driven by `type`
+samp.effort
+```
+
+This represents an undirected network in the form of an upper-triangular matrix
+
+## Running a simulation
+Simulations are obtained via this package's main function `simunet()`. Let us see the detail of its
+inputs:
+
+```{r first sim}
+set.seed(42)
+
+sL1 <- simunet(
+  Adj = Adj,                 # the first 3 arguments represent what has been observed and will 
+  samp.effort = samp.effort, # serve the purpose of determining a suitable distribution for
+  mode = "upper",            # each edge presence probability.
+        
+  n.scans = 10               # this is how many scans should be _simulated_, which can be
+)                            # different from the sampling effort samp.effort that was used
+                             # to obtain Adj.
+sL1
+```
+We obtain a 17 x 17 x 10 array of 10 binary adjacency matrices, the 10 scans.
+
+## Running more simulations
+Simulating more `scanList`s from the same `Adj` and `samp.effort` will lead not only to different
+scans:
+```{r second sim}
+sL2 <- simunet(Adj,samp.effort,"upper",n.scans = 10)
+sL2
+
+identical(sL1,sL2)
+```
+
+but also internally a different edge presence probability matrix. 
+
+These matrices are stored in `scanList` their attribute list `attrs`, as the `edge.Prob` attribute,
+and can be accessed via `attrs()` in a similar fashion than base `attr()`.
+```{r edge.Probs}
+attrs(sL1,"edge.Prob")
+sL2 |> attrs("edge.Prob") # most of `SimuNet`'s functions have been written to allow for piping
+```
+
+## Collapsing the binary adjacency matrix sequence into a weighted adjacency matrix
+### Summing `scanList`
+`scanList`'s 3D arrays can be summed over their 3rd dimension via `sum_scans()`:
+```{r sum firsts}
+sum_scans(sL1)
+sL2 |> sum_scans()
+```
+
+For future comparison purpose, let us define a function calculating the correlation between the
+edges of two triangular matrices:
+```{r upper_cor}
+upper_cor <- function(X,Y) {
+  cor(X[upper.tri(X)],Y[upper.tri(Y)])
+}
+```
+
+Now, we run a new simulation containing as many scans as the input sampling effort to see how the
+simulation compares to `Adj`
+```{r sum comparison}
+sL3.Adj <- simunet(Adj,samp.effort,"upper",n.scans = samp.effort) |> sum_scans()
+
+Adj
+sL3.Adj
+
+upper_cor(Adj,sL3.Adj)
+
+plot(Adj[upper.tri(Adj)],sL3.Adj[upper.tri(sL3.Adj)],
+    xlab = "Original network edges' weights (Adj)",
+    ylab = "Simulated network edges's weights"
+)
+abline(0,1,col = "red",lty = "dashed")
+```
+
+### Scaling `scanList`
+To compare `scanList` of different size, another "collapsing" function, `scale_scans()`, can be
+applied to `scanList` or their collapsed sums. `scale_scans()` divide the sum of binary edges by the
+number of time they were sampled (see more about sampling with `customize_sampling()` and [empirical
+designs](experiments.html)).
+
+In the case of theoretical scanList, this means dividing the obtained weighted adjacency matrix by
+`n.scans`.
+
+```{r scale firsts}
+scale_scans(sL1)
+sL2 |> scale_scans()
+scale_scans(sL3.Adj)
+```
+
+One can look at how the correlation with a scaled `Adj` evolve with increasing `n.scans`
+```{r scale details}
+scaled.list <- 
+  lapply(
+    round(seq(10,250,length.out = 200)),
+    function(n) simunet(Adj,samp.effort,"upper",n) |> scale_scans()
+  )
+
+scaled.list |>
+  sapply(upper_cor,Y = Adj / samp.effort) |>
+  plot(xlab = "n.scans",ylab = "edge correlation")
+```

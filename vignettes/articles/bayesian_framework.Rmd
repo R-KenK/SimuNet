@@ -1,0 +1,15 @@
+---
+title: "SimuNet's Bayesian framework"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(SimuNet)
+```
+ Under construction

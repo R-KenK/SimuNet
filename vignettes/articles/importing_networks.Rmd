@@ -1,0 +1,145 @@
+---
+title: "Importing Network data"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Before starting with network simulations, `SimuNet` needs networks (e.g. from real-life) to
+"inspire" its internal simulation probabilities. The approach is described in the article on the
+[underlying Bayesian framework](bayesian_framework.html), and is described "code-wise" in the
+`draw_edgeProb()`'s doc.
+
+## Data import
+`SimuNet`requires two types of data: 
+
+* a weighted adjacency matrix `Adj`: matrix of the number of times (integers) two nodes have been
+observed associating or interacting
+* a sampling effort `samp.effort`: number of times the edges haVe been sampled to observe `Adj`
+
+A user willing to run simulations with SimuNet will import an `Adj` matrix and `samp.effort`.
+
+Care regarding the `mode` of `Adj`  - in the `igraph` sense (see `igraph::graph.adjacency()`) - is
+also required. In short, `igraph` defines the `mode`s:
+
+* `"directed"` for directed networks (asymmetrical matrices) where $Adj[i,j] = 1$ does not have the
+same meaning as $Adj[j,i] = 1$
+* `"undirected"` for undirected networks (symmetrical matrices) where $Adj[i,j] = 1$ has the same
+meaning as $Adj[j,i] = 1$.    
+`igraph` actually includes multiple approaches to build undirected networks when an asymmetrical
+matrix is inputted:
+
+    * `"max"`, which takes the $max(Adj[i,j],Adj[j,i])$ for both edges. This is actually the `mode`
+    used when `mode = "undirected"`
+    * `"min"`, which takes the $max(Adj[i,j],Adj[j,i])$ for both edges
+    * `"plus"`, which takes $Adj[i,j] + Adj[j,i]$ for both edges
+    * `"upper"`, for upper-triangular matrices
+    * `"lower"`, for lower-triangular matrices
+
+For unambiguous undirected networks, we recommend using triangular matrices (`mode = "upper"` or
+`mode = "upper"`).
+
+### Creating or importing `Adj` and `samp.effort`
+Any methods leading to such a square integer matrix - triangular or not - is suitable as `Adj`. For
+`samp.effort`, simply assign an integer to a variable.
+
+#### randomly generate an `Adj` matrix and `samp.effort`:  
+```{r random init}
+library(SimuNet)
+set.seed(42)
+
+# for a random directed matrix
+n <- 5L
+nodes <- letters[1:n]
+samp.effort <- runif(1,0,100) |> round()
+Adj <- matrix(data = 0L,nrow = n,
+              ncol = n,
+              dimnames = list(nodes,nodes)
+)
+Adj[non.diagonal(Adj)] <- runif(n * (n - 1),0,samp.effort) |> round()
+
+Adj          # note that the suitable `mode` here would be "directed"
+samp.effort
+```
+
+#### import them manually
+from real-life observations:  
+```{r manual init}
+# input data manually... 
+Adj <- matrix(c( 0,12,34,56,78,
+                 0, 0,23,45,67,
+                 0, 0, 0,34,56,
+                 0, 0, 0, 0,45,
+                 0, 0, 0, 0, 0),
+              ncol = 5,byrow = TRUE,
+              dimnames = list(1:5,1:5)
+)
+samp.effort <- 100L
+
+Adj           # note that the suitable `mode` here would be "upper"
+samp.effort
+# ... or import a matrix using your favorite method (e.g. read.csv)
+```
+
+Or with such data from the literature
+
+#### Import them from the [Animal Social Network Repository](https://bansallab.github.io/asnr/)  
+A helper function, `import_from_asnr()`, can be used to interact with the
+[ASNR](https://bansallab.github.io/asnr/)
+```{r asnr import as matrix}
+Adj <- import_from_asnr("Mammalia",
+                        "kangaroo_proximity_weighted",
+                        output = "adjacency",type = "lower")
+samp.effort <- 241L # number of observations reported by the author
+# data retrieved from (Grant, 1973)
+# DOI: 10.1016/S0003-3472(73)80004-1
+Adj           # note that here, the suitable `mode` is driven by `type`
+samp.effort
+```
+
+That's it! With `Adj`, `samp.effort` and knowing the suitable `mode`, you can start using
+`simunet()` to [generate social network simulations](first_simulations.html)!
+
+Hereafter, we only showcase general network considerations about converting, importing and plotting
+networks.
+
+## Familiarizing with the data  
+Our last example represented a social network of a group of kangaroo, the weights of which
+representing how many times each pair of kangaroos was observed in association, after 241
+observations, or `"scans"`.
+
+The user can reconstruct an [igraph](https://igraph.org/r/) network (or graph) object from
+`igraph::graph.adjacency()`, but `SimuNet`'s `import_from_asnr()` can also output igraph object
+directly by specifying the `output` (among `"graph"` and `"adjacency"`, with support for partial
+matching)
+
+From there, it is easy to plot a visualization of the network:
+```{r plotting original Adj}
+# from Adj...
+G <- igraph::graph.adjacency(Adj,mode = "lower",weighted = TRUE)
+# ... or directly imported
+G <- import_from_asnr("Mammalia",
+                      "kangaroo_proximity_weighted",
+                      output = "graph",type = "lower")
+
+G.deg <- igraph::degree(G)
+G.E <- igraph::E(G)$weight
+plot(G,
+     vertex.size = G.deg * 1.2,
+     vertex.label = NA,
+     edge.width = 15 * (G.E - min(G.E)) /
+       (max(G.E) - min(G.E))
+)
+```
+
+The conversion can be achieve the other-way around:
+```{r network to Adj}
+G.Adj <- igraph::get.adjacency(G,type = "lower",attr = "weight")
+G.Adj
+
+identical(G.Adj |> as.matrix(),Adj)
+```
