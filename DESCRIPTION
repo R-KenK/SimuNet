@@ -21,3 +21,5 @@ Imports:
     magrittr,
     purrr,
     scales
+URL: https://github.com/R-KenK/SimuNet
+BugReports: https://github.com/R-KenK/SimuNet/issues
