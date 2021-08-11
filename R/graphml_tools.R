@@ -18,7 +18,7 @@ import_from_graphml <- function(path,
   G <- igraph::read_graph(path,format = "graphml")
 
   switch(output,
-         "graph" = G,
+         "graph" = add_G_names(G),
          "adjacency" = {
            Adj <- igraph::get.adjacency(G,type = type,attr = "weight",sparse = FALSE)
            add_Adj_names(G,Adj)
@@ -46,4 +46,19 @@ add_Adj_names <- function(G, Adj) {
     rownames(Adj) <- as.character(1:nrow(Adj));colnames(Adj)<- as.character(1:ncol(Adj))
   }
   Adj
+}
+
+#' Add names to Adj from graph G
+#'
+#' @param G an igraph network object
+#' @param Adj an adjacency matrix
+#'
+#' @return an Adjacency matrix which col and row names have been filled with the names contained in G
+#' @importFrom igraph vertex_attr
+#' @noRd
+add_G_names <- function(G, Adj) {
+  if (is.null(igraph::vertex_attr(G,"name")) & !is.null(igraph::vertex_attr(G,"id"))) {
+    igraph::vertex_attr(G,"name") <- igraph::vertex_attr(G,"id")
+  }
+  G
 }
