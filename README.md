@@ -6,6 +6,8 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/R-KenK/SimuNet/workflows/R-CMD-check/badge.svg)](https://github.com/R-KenK/SimuNet/actions)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/SimuNet)](https://CRAN.R-project.org/package=SimuNet)
 <!-- badges: end -->
 
 A network simulation framework, with a zest of empiricism
