@@ -3,7 +3,7 @@
 \name{draw_edgeProb}
 \alias{draw_edgeProb}
 \title{Draw edge presence probability matrix from posterior Beta distribution
-Internal use.}
+(Internal use)}
 \usage{
 draw_edgeProb(
   Adj,
@@ -34,15 +34,18 @@ numeric matrix of edge presence probabilities
 Edge presence probabilities are drawn from a posterior Beta distribution
 \eqn{Beta(\alpha,\beta)}, in which parameters \eqn{\alpha} and \eqn{\beta} correspond to total
 (pseudo-)counts of the times when an edge was 1 and 0, respectively. By default, an uninformative
-prior (Jeffrey's prior, i.e. \eqn{\alpha.prior = \beta.prior = 0.5}) is used, and is added to the
-observed edge weights in \code{Adj}, so that: \deqn{\alpha = Adj + \alpha.prior, \beta = samp.effort -
-Adj + \beta.prior} where \eqn{samp.effort - Adj} is a positive or null integer.
+prior (Jeffrey's prior, i.e. \eqn{\alpha_{prior} = \beta_{prior} = 1 / 2}{\alpha.prior =
+\beta.prior = 0.5}) is used, and is added to the observed edge weights in \code{Adj}, so that:
+\deqn{\alpha = Adj + \alpha_{prior}, \beta = N_{samp.effort} - Adj + \beta_{prior}}{\alpha = Adj
++ \alpha.prior, \beta = samp.effort - Adj + \beta.prior} where \eqn{N_{samp.effort} -
+Adj}{samp.effort - Adj} is a positive or null integer.
 }
 \details{
 For Bayesian inference and conjugation, a prior beta distribution
-\eqn{Beta(\alpha.prior,\beta.prior)} is used, with default \deqn{\alpha.prior = \beta.prior =
-0.5} which corresponds to Jeffrey's prior. Alternative parametrization can rely on
-\deqn{\alpha.prior = \beta.prior = 1} for a prior beta distribution equivalent to a uniform
+\eqn{Beta(\alpha_{prior},\beta_{prior})}{Beta(\alpha.prior,\beta.prior)} is used, with default
+\deqn{\alpha_{prior} = \beta_{prior} = 1 / 2}{\alpha.prior = \beta.prior = 0.5} which corresponds
+to Jeffrey's prior. Alternative parametrization can rely on \deqn{\alpha_{prior} = \beta_{prior}
+= 1}{\alpha.prior = \beta.prior = 1} for a prior beta distribution equivalent to a uniform
 distribution over \eqn{[0,1]}.
 
 In \code{\link[=simunet]{simunet()}}, a new \code{edgeProb} is drawn before simulating binary scans. Two
@@ -54,10 +57,26 @@ The \code{edgeProb} used is stored in the \code{scanList} outputted by \code{sim
 attributes list \code{attrs}, and can be retrieved via \code{attrs(scan.list,"edgeProb")}).
 
 This procedure is equivalent to drawing a \code{scanList} from a Beta-Binomial distribution
-\eqn{BetaBinom(n.scans,\alpha,\beta)}, but allows "decomposing" the simulated edge weights into a
-list of binary scans instead of outputting only a new weighted adjacency matrix.
+\eqn{BetaBinom(n_{scans},\alpha,\beta)}{BetaBinom(n.scans,\alpha,\beta)}, but allows
+"decomposing" the simulated edge weights into a list of binary scans instead of outputting only a
+new weighted adjacency matrix.
+}
+\examples{
+# Internally used in `generate_edgeProb()`, itself used in `simunet()`
+set.seed(42)
+n <- 5L
+samp.effort <- 241L
+
+# Adjacency matrix import
+## random directed adjacency matrix
+Adj <- sample(1:samp.effort,n * n) |>
+  matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
+diag(Adj) <- 0L
+Adj
+
+sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "directed",n.scans = 20L)
+attrs(sL,"edge.Prob")
 }
 \seealso{
 \code{\link[=simunet]{simunet()}}.
 }
-\keyword{internal}
