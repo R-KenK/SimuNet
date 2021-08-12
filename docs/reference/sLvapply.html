@@ -8,7 +8,7 @@
 
 <title>Shortcut to a lapply equivalent to apply a function to each 2D matrix contained in a scanList
 Written analogously to vapply(). Values returned by .f should be a similarly dimensionned
-matrix as the first one contained in the 3D array — sLapply • SimuNet</title>
+matrix as the first one contained in the 3D array — sLvapply • SimuNet</title>
 
 
 <!-- jquery -->
@@ -43,7 +43,7 @@ matrix as the first one contained in the 3D array — sLapply • SimuNet</title
 
 <meta property="og:title" content="Shortcut to a lapply equivalent to apply a function to each 2D matrix contained in a scanList
 Written analogously to vapply(). Values returned by .f should be a similarly dimensionned
-matrix as the first one contained in the 3D array — sLapply" />
+matrix as the first one contained in the 3D array — sLvapply" />
 <meta property="og:description" content="Shortcut to a lapply equivalent to apply a function to each 2D matrix contained in a scanList
 Written analogously to vapply(). Values returned by .f should be a similarly dimensionned
 matrix as the first one contained in the 3D array" />
@@ -145,7 +145,7 @@ matrix as the first one contained in the 3D array" />
 Written analogously to <code><a href='https://rdrr.io/r/base/lapply.html'>vapply()</a></code>. Values returned by <code>.f</code> should be a similarly dimensionned
 matrix as the first one contained in the 3D array</h1>
     <small class="dont-index">Source: <a href='https://github.com/R-KenK/SimuNet/blob/master/R/scanList_tools.R'><code>R/scanList_tools.R</code></a></small>
-    <div class="hidden name"><code>sLapply.Rd</code></div>
+    <div class="hidden name"><code>sLvapply.Rd</code></div>
     </div>
 
     <div class="ref-description">
@@ -154,7 +154,7 @@ Written analogously to <code><a href='https://rdrr.io/r/base/lapply.html'>vapply
 matrix as the first one contained in the 3D array</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sLapply</span><span class='op'>(</span><span class='va'>sL</span>, <span class='va'>FUN</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>sLvapply</span><span class='op'>(</span><span class='va'>sL</span>, <span class='va'>.f</span>, <span class='va'>...</span>, USE.NAMES <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -164,12 +164,17 @@ matrix as the first one contained in the 3D array</p>
       <td><p>a <code>scanList</code> object (see <code><a href='simunet.html'>simunet()</a></code>)</p></td>
     </tr>
     <tr>
-      <th>FUN</th>
+      <th>.f</th>
       <td><p>a function,to apply a function to each 2D matrix contained in <code>sL</code></p></td>
     </tr>
     <tr>
       <th>...</th>
       <td><p>extra argument to be passed, notably named arguments used by <code>.f</code> (see <code><a href='https://rdrr.io/r/base/lapply.html'>lapply()</a></code>)</p></td>
+    </tr>
+    <tr>
+      <th>USE.NAMES</th>
+      <td><p>logical; if <code>TRUE</code> and if <code>X</code> is character, use <code>X</code> as names for the result
+unless it had names already (see <code><a href='https://rdrr.io/r/base/lapply.html'>vapply()</a></code>)</p></td>
     </tr>
     </table>
 
@@ -195,7 +200,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0   0  0  0 30
 #&gt; e 0   0  0  0  0</div><div class='input'>
 <span class='va'>sL</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simunet.html'>simunet</a></span><span class='op'>(</span>Adj <span class='op'>=</span> <span class='va'>Adj</span>,samp.effort <span class='op'>=</span> <span class='va'>samp.effort</span>,mode <span class='op'>=</span> <span class='st'>"upper"</span>,n.scans <span class='op'>=</span> <span class='fl'>120L</span><span class='op'>)</span>
-<span class='va'>sL</span> |&gt; <span class='fu'>sLapply</span><span class='op'>(</span>\<span class='op'>(</span><span class='va'>scan</span><span class='op'>)</span> <span class='op'>{</span><span class='va'>scan</span><span class='op'>[</span><span class='fl'>1</span>,<span class='fl'>2</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='cn'>NA</span>;<span class='va'>scan</span><span class='op'>}</span><span class='op'>)</span>
+<span class='va'>sL</span> |&gt; <span class='fu'><a href='sLapply.html'>sLapply</a></span><span class='op'>(</span>\<span class='op'>(</span><span class='va'>scan</span><span class='op'>)</span> <span class='op'>{</span><span class='va'>scan</span><span class='op'>[</span><span class='fl'>1</span>,<span class='fl'>2</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='cn'>NA</span>;<span class='va'>scan</span><span class='op'>}</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [[1]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 1
