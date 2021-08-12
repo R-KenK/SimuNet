@@ -394,7 +394,7 @@ print.scanList <- function(x,...) {
 #' @export
 #' @noRd
 print.sum <- function(x,...) {
-  mode <- attrs(sL,"mode")
+  mode <- attrs(x,"mode")
   to.print <- without_attrs(x)
   class(to.print) <- NULL
   print_clean_scan(to.print,"Weighted adjacency matrix",mode,...)
@@ -406,7 +406,7 @@ print.sum <- function(x,...) {
 #' @export
 #' @noRd
 print.scaled <- function(x,digits = 2,...) {
-  mode <- attrs(sL,"mode")
+  mode <- attrs(x,"mode")
   to.print <- without_attrs(x) |> round(digits = digits)
   class(to.print) <- NULL
   print_clean_scan(to.print,"Weighted adjacency matrix",mode,...)
