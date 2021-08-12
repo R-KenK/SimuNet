@@ -25,9 +25,9 @@ sum_scans(scan.list, ...)
 }}
 }
 \value{
-a \code{sum} object, or list of such, consisting mainly on a weighted adjacency matrix where
-each edge weight is equal to the sum of all binary edges. Inherits from the previous \code{scanList}
-class (theoretical or empirical, inheriting from \code{scanList}), and keeps track of the
+a \code{weightedAdj} object, or list of such, consisting mainly on a weighted adjacency matrix
+where each edge weight is equal to the sum of all binary edges. Inherits from the previous
+\code{scanList} class (theoretical or empirical, inheriting from \code{scanList}), and keeps track of the
 \code{scan.list}'s list of attributes \code{attrs}.
 
 Also adds these attributes to \code{attrs}:

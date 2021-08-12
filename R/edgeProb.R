@@ -19,6 +19,7 @@
 generate_edgeProb <- function(Adj,samp.effort,mode,
                                   Adj.subfun = NULL){
   Adj[] <- as.integer(Adj)
+  class(Adj) <- "weightedAdj"
   if (is.null(Adj.subfun)) {
     Adj.subfun <- determine_Adj.subfun(mode = mode)
   }

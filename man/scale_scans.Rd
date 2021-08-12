@@ -19,9 +19,9 @@ At the moment \code{scale_scans()} does not use additional argument, arguments p
 \value{
 a \code{scaled} object, or list of such, consisting mainly on a weighted adjacency matrix
 where each edge weight is equal to the sum of all binary edges divided by the number of times
-they have been sampled (determined via \code{\link[=count_nonNA]{count_nonNA()}}). Inherits from \code{sum}
-and the previous \code{scanList} class (theoretical or empirical, inheriting from \code{scanList}), and
-keeps track of the \code{scan.list}'s list of attributes \code{attrs}
+they have been sampled (determined via \code{\link[=count_nonNA]{count_nonNA()}}). Inherits from
+\code{weightedAdj} and the previous \code{scanList} class (theoretical or empirical, inheriting from
+\code{scanList}), and keeps track of the \code{scan.list}'s list of attributes \code{attrs}
 }
 \description{
 Written as a S3 method to be applied to \code{scanList} or \code{sLlist} (list of \code{scanList}) objects.
@@ -42,11 +42,11 @@ Adj
 ## theoretical scans
 sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "directed",n.scans = 120L)
 sL
-# scale_scans() can scale sum objects...
+# scale_scans() can scale `weightedAdj` objects...
 sL |> sum_scans() |> scale_scans()
 
 
-# ... or scanList object directly
+# ... or `scanList` object directly
 ## group-scan sampling
 sL |> perform_exp(design_exp(customize_sampling("group",.6))) |> scale_scans()
 
