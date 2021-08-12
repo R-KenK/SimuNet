@@ -48,7 +48,7 @@ Any methods leading to such a square integer matrix - triangular or not - is sui
 `samp.effort`, simply assign an integer to a variable.
 
 #### randomly generate an `Adj` matrix and `samp.effort`:  
-```{r random init}
+```{r random_init}
 library(SimuNet)
 set.seed(42)
 
@@ -68,7 +68,7 @@ samp.effort
 
 #### import them manually
 from real-life observations:  
-```{r manual init}
+```{r manual_init}
 # input data manually... 
 Adj <- matrix(c( 0,12,34,56,78,
                  0, 0,23,45,67,
@@ -90,7 +90,7 @@ Or with such data from the literature
 #### Import them from the [Animal Social Network Repository](https://bansallab.github.io/asnr/)  
 A helper function, `import_from_asnr()`, can be used to interact with the
 [ASNR](https://bansallab.github.io/asnr/)
-```{r asnr import as matrix}
+```{r asnr import_as_matrix}
 Adj <- import_from_asnr("Mammalia",
                         "kangaroo_proximity_weighted",
                         output = "adjacency",type = "lower")
@@ -118,7 +118,7 @@ directly by specifying the `output` (among `"graph"` and `"adjacency"`, with sup
 matching)
 
 From there, it is easy to plot a visualization of the network:
-```{r plotting original Adj}
+```{r plotting_original_Adj}
 # from Adj...
 G <- igraph::graph.adjacency(Adj,mode = "lower",weighted = TRUE)
 # ... or directly imported
@@ -137,7 +137,7 @@ plot(G,
 ```
 
 The conversion can be achieve the other-way around:
-```{r network to Adj}
+```{r network_to_Adj}
 G.Adj <- igraph::get.adjacency(G,type = "lower",attr = "weight")
 G.Adj
 

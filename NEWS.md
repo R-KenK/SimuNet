@@ -1,3 +1,15 @@
+# SimuNet (development version)
+
+# SimuNet 2.1.0
+* `print` methods are cleaner for SimuNet specific objects:
+    *`scanList` objects printing now relies on Matrix `sparseMatrix` class
+    * so do their "collapsed" weighted adjacency relative: `weightedAdj` (see below).
+* class `sum` (obtained via `sum_scans()`) has been renamed to `weightedAdj`:
+    * `Adj` stored in `attrs` (and created by `generate_edgeProb()`) are now of class `weightedAdj`.
+    * This change allows for homogeneous printing of weighted adjacency matrices
+* pkgdown is now used to update the website's package. Related files are in master branch's `docs/`
+folder
+
 # SimuNet 2.0.2
 * enclosed asnr related example in \dontrun{} because some example were sometime not passing on unix
 systems

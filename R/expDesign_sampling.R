@@ -239,7 +239,7 @@ group_sample <- function(scan.list,sampling = c("constant","matrix","random","fu
   obs.P <- determine_obsProb(scan.list = scan.list,sampling = sampling,all.sampled = all.sampled)
 
   groupSampled <-
-    sLapply(scan.list,
+    sLvapply(scan.list,
             \(s) {
               s[sf(s)] <-
                 s[sf(s)] |>

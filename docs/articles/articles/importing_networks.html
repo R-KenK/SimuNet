@@ -145,7 +145,7 @@
 <h4 class="hasAnchor">
 <a href="#randomly-generate-an-adj-matrix-and-samp-effort" class="anchor"></a>randomly generate an <code>Adj</code> matrix and <code>samp.effort</code>:</h4>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">SimuNet</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/R-KenK/SimuNet">SimuNet</a></span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span>
 
 <span class="co"># for a random directed matrix</span>
@@ -256,33 +256,34 @@
      edge.width <span class="op">=</span> <span class="fl">15</span> <span class="op">*</span> <span class="op">(</span><span class="va">G.E</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">G.E</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span>
        <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">G.E</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">G.E</span><span class="op">)</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
-<p><img src="importing_networks_files/figure-html/plotting%20original%20Adj-1.png" width="700"></p>
+<p><img src="importing_networks_files/figure-html/plotting_original_Adj-1.png" width="700"></p>
 <p>The conversion can be achieve the other-way around:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">G.Adj</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/as_adjacency_matrix.html">get.adjacency</a></span><span class="op">(</span><span class="va">G</span>,type <span class="op">=</span> <span class="st">"lower"</span>,attr <span class="op">=</span> <span class="st">"weight"</span><span class="op">)</span>
 <span class="va">G.Adj</span>
 <span class="co">#&gt; 17 x 17 sparse Matrix of class "dgCMatrix"</span>
-<span class="co">#&gt;                                             </span>
-<span class="co">#&gt;  [1,]  .  .  .  .  . . . . . . . . . . . . .</span>
-<span class="co">#&gt;  [2,] 21  .  .  .  . . . . . . . . . . . . .</span>
-<span class="co">#&gt;  [3,] 10  9  .  .  . . . . . . . . . . . . .</span>
-<span class="co">#&gt;  [4,] 45 19  8  .  . . . . . . . . . . . . .</span>
-<span class="co">#&gt;  [5,] 54 20 10 45  . . . . . . . . . . . . .</span>
-<span class="co">#&gt;  [6,]  7  3  3  7  6 . . . . . . . . . . . .</span>
-<span class="co">#&gt;  [7,] 16  9  5 17 17 4 . . . . . . . . . . .</span>
-<span class="co">#&gt;  [8,]  1  1  1  1  1 1 1 . . . . . . . . . .</span>
-<span class="co">#&gt;  [9,]  3 10  9  1  3 2 . 1 . . . . . . . . .</span>
-<span class="co">#&gt; [10,]  4  4  4  3  4 2 . 1 6 . . . . . . . .</span>
-<span class="co">#&gt; [11,]  7 11 10  6  6 3 5 1 9 8 . . . . . . .</span>
-<span class="co">#&gt; [12,]  3  2  .  3  1 3 3 1 1 1 1 . . . . . .</span>
-<span class="co">#&gt; [13,]  2  2  .  2  2 3 1 . . . 2 . . . . . .</span>
-<span class="co">#&gt; [14,]  3  2  .  3  3 1 3 . . . . . 1 . . . .</span>
-<span class="co">#&gt; [15,]  3  6  3  4  3 4 3 . 2 . 5 . 3 1 . . .</span>
-<span class="co">#&gt; [16,]  .  .  2  .  1 . . . . . . . . . . . .</span>
-<span class="co">#&gt; [17,]  .  .  .  .  . . . . 1 . . . . . . . .</span>
+<span class="co">#&gt;    [[ suppressing 17 column names '1', '2', '3' ... ]]</span>
+<span class="co">#&gt;                                          </span>
+<span class="co">#&gt; 1   .  .  .  .  . . . . . . . . . . . . .</span>
+<span class="co">#&gt; 2  21  .  .  .  . . . . . . . . . . . . .</span>
+<span class="co">#&gt; 3  10  9  .  .  . . . . . . . . . . . . .</span>
+<span class="co">#&gt; 4  45 19  8  .  . . . . . . . . . . . . .</span>
+<span class="co">#&gt; 5  54 20 10 45  . . . . . . . . . . . . .</span>
+<span class="co">#&gt; 6   7  3  3  7  6 . . . . . . . . . . . .</span>
+<span class="co">#&gt; 7  16  9  5 17 17 4 . . . . . . . . . . .</span>
+<span class="co">#&gt; 8   1  1  1  1  1 1 1 . . . . . . . . . .</span>
+<span class="co">#&gt; 9   3 10  9  1  3 2 . 1 . . . . . . . . .</span>
+<span class="co">#&gt; 10  4  4  4  3  4 2 . 1 6 . . . . . . . .</span>
+<span class="co">#&gt; 11  7 11 10  6  6 3 5 1 9 8 . . . . . . .</span>
+<span class="co">#&gt; 12  3  2  .  3  1 3 3 1 1 1 1 . . . . . .</span>
+<span class="co">#&gt; 13  2  2  .  2  2 3 1 . . . 2 . . . . . .</span>
+<span class="co">#&gt; 14  3  2  .  3  3 1 3 . . . . . 1 . . . .</span>
+<span class="co">#&gt; 15  3  6  3  4  3 4 3 . 2 . 5 . 3 1 . . .</span>
+<span class="co">#&gt; 16  .  .  2  .  1 . . . . . . . . . . . .</span>
+<span class="co">#&gt; 17  .  .  .  .  . . . . 1 . . . . . . . .</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/identical.html">identical</a></span><span class="op">(</span><span class="va">G.Adj</span> |&gt; <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="op">)</span>,<span class="va">Adj</span><span class="op">)</span>
-<span class="co">#&gt; [1] FALSE</span></code></pre></div>
+<span class="co">#&gt; [1] TRUE</span></code></pre></div>
 </div>
   </div>
 
