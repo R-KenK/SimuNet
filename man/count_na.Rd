@@ -18,9 +18,9 @@ At the moment \code{count_NA()} does not use additional argument, arguments pass
 }
 \value{
 an integer matrix, or list of such, representing how many time each edge has been
-unobserved (i.e. was \code{NA}). Inherits from the previous \code{scanList} class (theoretical or
-empirical, inheriting from \code{scanList}), and keeps track of the \code{scan.list}'s list of attributes
-\code{attrs}.
+unobserved (i.e. was \code{NA}). Inherits from \code{weightedAdj} and the previous \code{scanList} class (theoretical
+or empirical, inheriting from \code{scanList}), and keeps track of the \code{scan.list}'s list of
+attributes \code{attrs}.
 }
 \description{
 Written as a S3 method to be applied to \code{scanList} or \code{sLlist} (list of \code{scanList}) objects.

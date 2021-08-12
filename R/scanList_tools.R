@@ -390,10 +390,10 @@ print.scanList <- function(x,...) {
   invisible(x)
 }
 
-#' Print method for `sum` objects
+#' Print method for `weightedAdj` objects
 #' @export
 #' @noRd
-print.sum <- function(x,...) {
+print.weightedAdj <- function(x,...) {
   to.print <- without_attrs(x)
   class(to.print) <- NULL
   print_clean_scan(to.print,"Weighted adjacency matrix",...)

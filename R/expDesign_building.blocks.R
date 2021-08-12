@@ -19,9 +19,9 @@
 #'   `scanList`s)
 #'   * `"raw"`: sum the `raw.scanList` (useful to see the impact of chosen `mode`)
 #'
-#' @return a `sum` object, or list of such, consisting mainly on a weighted adjacency matrix where
-#'   each edge weight is equal to the sum of all binary edges. Inherits from the previous `scanList`
-#'   class (theoretical or empirical, inheriting from `scanList`), and keeps track of the
+#' @return a `weightedAdj` object, or list of such, consisting mainly on a weighted adjacency matrix
+#'   where each edge weight is equal to the sum of all binary edges. Inherits from the previous
+#'   `scanList` class (theoretical or empirical, inheriting from `scanList`), and keeps track of the
 #'   `scan.list`'s list of attributes `attrs`.
 #'
 #'   Also adds these attributes to `attrs`:
@@ -79,7 +79,7 @@ sum_scans.scanList <- function(scan.list,which = c("auto","theoretical","raw"),.
   summed <- copy_attrs_to(sL.ori,summed)
   attrs(summed,"summed.scanList") <- without_attrs(sL.ori)
   attrs(summed,"sampled") <- scan.list |> count_nonNA()
-  class(summed) <- c("sum",class(scan.list))
+  class(summed) <- c("weightedAdj",class(scan.list))
   summed
 }
 
@@ -113,9 +113,9 @@ sum_scans.empirical <- function(scan.list,which = c("auto","theoretical","raw"),
 #'
 #' @return a `scaled` object, or list of such, consisting mainly on a weighted adjacency matrix
 #'   where each edge weight is equal to the sum of all binary edges divided by the number of times
-#'   they have been sampled (determined via [`count_nonNA()`][count_nonNA()]). Inherits from `sum`
-#'   and the previous `scanList` class (theoretical or empirical, inheriting from `scanList`), and
-#'   keeps track of the `scan.list`'s list of attributes `attrs`
+#'   they have been sampled (determined via [`count_nonNA()`][count_nonNA()]). Inherits from
+#'   `weightedAdj` and the previous `scanList` class (theoretical or empirical, inheriting from
+#'   `scanList`), and keeps track of the `scan.list`'s list of attributes `attrs`
 #'
 #' @export
 #'
@@ -137,11 +137,11 @@ sum_scans.empirical <- function(scan.list,which = c("auto","theoretical","raw"),
 #' ## theoretical scans
 #' sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "directed",n.scans = 120L)
 #' sL
-#' # scale_scans() can scale sum objects...
+#' # scale_scans() can scale `weightedAdj` objects...
 #' sL |> sum_scans() |> scale_scans()
 #'
 #'
-#' # ... or scanList object directly
+#' # ... or `scanList` object directly
 #' ## group-scan sampling
 #' sL |> perform_exp(design_exp(customize_sampling("group",.6))) |> scale_scans()
 #'
@@ -153,10 +153,10 @@ scale_scans <- function(scan.list,...) {
   UseMethod("scale_scans")
 }
 
-#' scale_scans method for `sum` objects
+#' scale_scans method for `weightedAdj` objects
 #' @export
 #' @noRd
-scale_scans.sum <- function(scan.list,...) {
+scale_scans.weightedAdj <- function(scan.list,...) {
   sf <- attrs(scan.list,"Adj.subfun")
   sampled <- attrs(scan.list,"sampled")
   scaled <- scan.list
@@ -204,9 +204,9 @@ scale_scans.sLlist <- function(scan.list,...) {
 #' At the moment `count_NA()` does not use additional argument, arguments passed will be ignored.
 #'
 #' @return an integer matrix, or list of such, representing how many time each edge has been
-#'   unobserved (i.e. was `NA`). Inherits from the previous `scanList` class (theoretical or
-#'   empirical, inheriting from `scanList`), and keeps track of the `scan.list`'s list of attributes
-#'   `attrs`.
+#'   unobserved (i.e. was `NA`). Inherits from `weightedAdj` and the previous `scanList` class (theoretical
+#'   or empirical, inheriting from `scanList`), and keeps track of the `scan.list`'s list of
+#'   attributes `attrs`.
 #' @export
 #'
 #' @seealso [simunet()], [design_exp()], [perform_exp()], [count_nonNA()].
@@ -242,6 +242,8 @@ count_NA.scanList <- function(scan.list,...) {
   scan.sampled <- scan.list |> is.na() |> ifelse(1L,0L) %>% copy_attrs_to(from = scan.list)
   scan.sampled <- scan.sampled |> rowSums(na.rm = TRUE,dims = 2L)
   scan.sampled[!sf(scan.sampled)] <- 0L
+  scan.sampled <- copy_attrs_to(scan.list,scan.sampled)
+  class(scan.sampled) <- c("weightedAdj",class(scan.list))
   scan.sampled
 }
 
@@ -275,8 +277,9 @@ count_NA.sLlist <- function(scan.list,...) {
 #' At the moment `count_nonNA()` does not use additional argument, arguments passed will be ignored.
 #'
 #' @return an integer matrix, or list of such, representing how many time each edge has been sampled
-#'   (i.e. was *not* `NA`).Inherits from the previous `scanList` class (theoretical or empirical,
-#'   inheriting from `scanList`), and keeps track of the `scan.list`'s list of attributes `attrs`.
+#'   (i.e. was *not* `NA`). Inherits from `weightedAdj` and the previous `scanList` class (theoretical or
+#'   empirical, inheriting from `scanList`), and keeps track of the `scan.list`'s list of attributes
+#'   `attrs`.
 #' @export
 #'
 #' @seealso [simunet()], [design_exp()], [perform_exp()]], [count_NA()].
@@ -312,6 +315,8 @@ count_nonNA.scanList <- function(scan.list,...) {
   scan.sampled <- scan.list |> is.na() |> ifelse(0L,1L) %>% copy_attrs_to(from = scan.list)
   scan.sampled <- scan.sampled |> rowSums(na.rm = TRUE,dims = 2L)
   scan.sampled[!sf(scan.sampled)] <- 0L
+  scan.sampled <- copy_attrs_to(scan.list,scan.sampled)
+  class(scan.sampled) <- c("weightedAdj",class(scan.list))
   scan.sampled
 }
 

@@ -19,8 +19,9 @@ At the moment \code{count_nonNA()} does not use additional argument, arguments p
 }
 \value{
 an integer matrix, or list of such, representing how many time each edge has been sampled
-(i.e. was \emph{not} \code{NA}).Inherits from the previous \code{scanList} class (theoretical or empirical,
-inheriting from \code{scanList}), and keeps track of the \code{scan.list}'s list of attributes \code{attrs}.
+(i.e. was \emph{not} \code{NA}). Inherits from \code{weightedAdj} and the previous \code{scanList} class (theoretical or
+empirical, inheriting from \code{scanList}), and keeps track of the \code{scan.list}'s list of attributes
+\code{attrs}.
 }
 \description{
 Written as a S3 method to be applied to \code{scanList} or \code{sLlist} (list of \code{scanList}) objects.
