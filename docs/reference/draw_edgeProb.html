@@ -79,7 +79,7 @@ Adj\) is a positive or null integer." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0.9001</span>
       </span>
     </div>
 
@@ -239,12 +239,14 @@ new weighted adjacency matrix.</p>
 <span class='va'>sL</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simunet.html'>simunet</a></span><span class='op'>(</span>Adj <span class='op'>=</span> <span class='va'>Adj</span>,samp.effort <span class='op'>=</span> <span class='va'>samp.effort</span>,mode <span class='op'>=</span> <span class='st'>"directed"</span>,n.scans <span class='op'>=</span> <span class='fl'>20L</span><span class='op'>)</span>
 <span class='fu'><a href='attrs.html'>attrs</a></span><span class='op'>(</span><span class='va'>sL</span>,<span class='st'>"edge.Prob"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; 
-#&gt; scan: Weighted adjacency matrix                                                    
-#&gt; a .         0.9353765 0.2069013 0.66034614 0.4280305
-#&gt; b 0.9477619 .         0.1081324 0.42119387 0.5076191
-#&gt; c 0.3187485 0.4697230 .         0.08545041 0.1526193
-#&gt; d 0.5979492 0.9991670 0.4011749 .          0.9570980
-#&gt; e 0.3392540 0.5368474 0.3986425 0.47921588 .        </div></pre>
+#&gt; Edge presence probability matrix                               
+#&gt; a .     0.935 0.207 0.660 0.428
+#&gt; b 0.948 .     0.108 0.421 0.508
+#&gt; c 0.319 0.470 .     0.085 0.153
+#&gt; d 0.598 0.999 0.401 .     0.957
+#&gt; e 0.339 0.537 0.399 0.479 .    
+#&gt; 
+#&gt;  alpha.prior = 0.5 - beta.prior = 0.5</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

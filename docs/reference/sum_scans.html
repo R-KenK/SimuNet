@@ -75,7 +75,7 @@ Written as a S3 method to be applied to scanList or sLlist (list of scanList) ob
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0.9001</span>
       </span>
     </div>
 
@@ -237,7 +237,7 @@ not <code>NA</code>). Determined via <code><a href='count_nonNA.html'>count_nonN
 #&gt; 
 #&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob</div><div class='input'><span class='va'>sL</span> |&gt; <span class='fu'>sum_scans</span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; 
-#&gt; scan: Weighted adjacency matrix                   
+#&gt; Weighted adjacency matrix                   
 #&gt; a   . 115 36 63  48
 #&gt; b 112   . 11 48  64
 #&gt; c  36  60  . 14  17
@@ -249,7 +249,7 @@ not <code>NA</code>). Determined via <code><a href='count_nonNA.html'>count_nonN
 <span class='co'>## group-scan sampling</span>
 <span class='va'>sL</span> |&gt; <span class='fu'><a href='perform_exp.html'>perform_exp</a></span><span class='op'>(</span><span class='fu'><a href='design_exp.html'>design_exp</a></span><span class='op'>(</span><span class='fu'><a href='customize_sampling.html'>customize_sampling</a></span><span class='op'>(</span><span class='st'>"group"</span>,<span class='fl'>.6</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> |&gt; <span class='fu'>sum_scans</span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; 
-#&gt; scan: Weighted adjacency matrix                
+#&gt; Weighted adjacency matrix                
 #&gt; a  . 67 17 37 23
 #&gt; b 65  .  5 25 37
 #&gt; c 26 27  .  8  9
@@ -264,7 +264,7 @@ not <code>NA</code>). Determined via <code><a href='count_nonNA.html'>count_nonN
                   <span class='op'>)</span> |&gt; <span class='fu'>sum_scans</span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [[1]]
 #&gt; 
-#&gt; scan: Weighted adjacency matrix                
+#&gt; Weighted adjacency matrix                
 #&gt; a  . 71 29 41 39
 #&gt; b 70  .  5 30 32
 #&gt; c 22 31  .  8 13
@@ -275,7 +275,7 @@ not <code>NA</code>). Determined via <code><a href='count_nonNA.html'>count_nonN
 #&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob obs.P theoretical.scanList summed.scanList sampled
 #&gt; [[2]]
 #&gt; 
-#&gt; scan: Weighted adjacency matrix                
+#&gt; Weighted adjacency matrix                
 #&gt; a  . 46 17 31 20
 #&gt; b 42  .  5 18 21
 #&gt; c 15 25  .  7  4
