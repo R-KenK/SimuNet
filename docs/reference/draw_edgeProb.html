@@ -238,14 +238,13 @@ new weighted adjacency matrix.</p>
 #&gt; e  74 128  89 114   0</div><div class='input'>
 <span class='va'>sL</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simunet.html'>simunet</a></span><span class='op'>(</span>Adj <span class='op'>=</span> <span class='va'>Adj</span>,samp.effort <span class='op'>=</span> <span class='va'>samp.effort</span>,mode <span class='op'>=</span> <span class='st'>"directed"</span>,n.scans <span class='op'>=</span> <span class='fl'>20L</span><span class='op'>)</span>
 <span class='fu'><a href='attrs.html'>attrs</a></span><span class='op'>(</span><span class='va'>sL</span>,<span class='st'>"edge.Prob"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;           a         b         c          d         e
-#&gt; a 0.0000000 0.9353765 0.2069013 0.66034614 0.4280305
-#&gt; b 0.9477619 0.0000000 0.1081324 0.42119387 0.5076191
-#&gt; c 0.3187485 0.4697230 0.0000000 0.08545041 0.1526193
-#&gt; d 0.5979492 0.9991670 0.4011749 0.00000000 0.9570980
-#&gt; e 0.3392540 0.5368474 0.3986425 0.47921588 0.0000000
-#&gt; attr(,"Beta priors")
-#&gt; [1] 0.5 0.5</div></pre>
+</div><div class='output co'>#&gt; 
+#&gt; scan: Weighted adjacency matrix                                                    
+#&gt; a .         0.9353765 0.2069013 0.66034614 0.4280305
+#&gt; b 0.9477619 .         0.1081324 0.42119387 0.5076191
+#&gt; c 0.3187485 0.4697230 .         0.08545041 0.1526193
+#&gt; d 0.5979492 0.9991670 0.4011749 .          0.9570980
+#&gt; e 0.3392540 0.5368474 0.3986425 0.47921588 .        </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

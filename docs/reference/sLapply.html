@@ -196,8 +196,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; e 0   0  0  0  0</div><div class='input'>
 <span class='va'>sL</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simunet.html'>simunet</a></span><span class='op'>(</span>Adj <span class='op'>=</span> <span class='va'>Adj</span>,samp.effort <span class='op'>=</span> <span class='va'>samp.effort</span>,mode <span class='op'>=</span> <span class='st'>"upper"</span>,n.scans <span class='op'>=</span> <span class='fl'>120L</span><span class='op'>)</span>
 <span class='va'>sL</span> |&gt; <span class='fu'>sLapply</span><span class='op'>(</span>\<span class='op'>(</span><span class='va'>scan</span><span class='op'>)</span> <span class='op'>{</span><span class='va'>scan</span><span class='op'>[</span><span class='fl'>1</span>,<span class='fl'>2</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='cn'>NA</span>;<span class='va'>scan</span><span class='op'>}</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; , , 1
-#&gt; 
+</div><div class='output co'>#&gt; [[1]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 1
 #&gt; b 0  0 0 0 0
@@ -205,8 +204,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 2
-#&gt; 
+#&gt; [[2]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 0
 #&gt; b 0  0 0 0 1
@@ -214,8 +212,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 3
-#&gt; 
+#&gt; [[3]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 0
 #&gt; b 0  0 0 0 1
@@ -223,8 +220,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 4
-#&gt; 
+#&gt; [[4]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 1
 #&gt; b 0  0 0 0 1
@@ -232,8 +228,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 5
-#&gt; 
+#&gt; [[5]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 1 0
@@ -241,8 +236,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 6
-#&gt; 
+#&gt; [[6]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 1
 #&gt; b 0  0 1 0 1
@@ -250,8 +244,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 7
-#&gt; 
+#&gt; [[7]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 1 0
 #&gt; b 0  0 0 1 1
@@ -259,8 +252,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 8
-#&gt; 
+#&gt; [[8]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 0
 #&gt; b 0  0 0 0 1
@@ -268,8 +260,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 9
-#&gt; 
+#&gt; [[9]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 0 1
@@ -277,8 +268,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 10
-#&gt; 
+#&gt; [[10]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 1 1
 #&gt; b 0  0 0 0 0
@@ -286,8 +276,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 11
-#&gt; 
+#&gt; [[11]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 0 0
@@ -295,8 +284,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 12
-#&gt; 
+#&gt; [[12]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 1 1
 #&gt; b 0  0 0 1 1
@@ -304,8 +292,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 13
-#&gt; 
+#&gt; [[13]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 1 0
@@ -313,8 +300,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 14
-#&gt; 
+#&gt; [[14]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 1 1
 #&gt; b 0  0 0 0 0
@@ -322,8 +308,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 15
-#&gt; 
+#&gt; [[15]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 1 0
@@ -331,8 +316,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 16
-#&gt; 
+#&gt; [[16]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 0
 #&gt; b 0  0 1 0 0
@@ -340,8 +324,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 17
-#&gt; 
+#&gt; [[17]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 0 1
@@ -349,8 +332,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 18
-#&gt; 
+#&gt; [[18]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 0 0
@@ -358,8 +340,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 19
-#&gt; 
+#&gt; [[19]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 1 0 0
@@ -367,8 +348,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 20
-#&gt; 
+#&gt; [[20]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 0
 #&gt; b 0  0 0 0 0
@@ -376,8 +356,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 21
-#&gt; 
+#&gt; [[21]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 1
 #&gt; b 0  0 1 1 1
@@ -385,8 +364,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 22
-#&gt; 
+#&gt; [[22]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 0
 #&gt; b 0  0 0 0 0
@@ -394,8 +372,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 23
-#&gt; 
+#&gt; [[23]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 1 1
 #&gt; b 0  0 0 1 0
@@ -403,8 +380,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 24
-#&gt; 
+#&gt; [[24]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 0 1
@@ -412,8 +388,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 25
-#&gt; 
+#&gt; [[25]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 1 0
@@ -421,8 +396,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 26
-#&gt; 
+#&gt; [[26]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 1
 #&gt; b 0  0 1 0 0
@@ -430,8 +404,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 27
-#&gt; 
+#&gt; [[27]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 1 1
 #&gt; b 0  0 0 0 1
@@ -439,8 +412,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 28
-#&gt; 
+#&gt; [[28]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 1
 #&gt; b 0  0 0 0 0
@@ -448,8 +420,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 29
-#&gt; 
+#&gt; [[29]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 1
 #&gt; b 0  0 1 0 1
@@ -457,8 +428,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 30
-#&gt; 
+#&gt; [[30]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 0
 #&gt; b 0  0 0 1 1
@@ -466,8 +436,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 31
-#&gt; 
+#&gt; [[31]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 0 1
@@ -475,8 +444,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 32
-#&gt; 
+#&gt; [[32]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 1 0 1
@@ -484,8 +452,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 33
-#&gt; 
+#&gt; [[33]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 1 1
 #&gt; b 0  0 0 0 1
@@ -493,8 +460,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 34
-#&gt; 
+#&gt; [[34]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 0 1
@@ -502,8 +468,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 35
-#&gt; 
+#&gt; [[35]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 0
 #&gt; b 0  0 0 0 0
@@ -511,8 +476,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 36
-#&gt; 
+#&gt; [[36]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 0
 #&gt; b 0  0 0 0 0
@@ -520,8 +484,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 37
-#&gt; 
+#&gt; [[37]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 1
 #&gt; b 0  0 0 0 1
@@ -529,8 +492,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 38
-#&gt; 
+#&gt; [[38]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 0
 #&gt; b 0  0 0 1 0
@@ -538,8 +500,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 39
-#&gt; 
+#&gt; [[39]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 0
 #&gt; b 0  0 0 0 0
@@ -547,8 +508,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 40
-#&gt; 
+#&gt; [[40]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 1
 #&gt; b 0  0 1 0 0
@@ -556,8 +516,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 41
-#&gt; 
+#&gt; [[41]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 0
 #&gt; b 0  0 1 0 0
@@ -565,8 +524,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 42
-#&gt; 
+#&gt; [[42]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 1 0 1
@@ -574,8 +532,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 43
-#&gt; 
+#&gt; [[43]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 1 1
 #&gt; b 0  0 0 0 0
@@ -583,8 +540,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 44
-#&gt; 
+#&gt; [[44]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 0
 #&gt; b 0  0 0 0 0
@@ -592,8 +548,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 45
-#&gt; 
+#&gt; [[45]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 1
 #&gt; b 0  0 0 1 0
@@ -601,8 +556,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 46
-#&gt; 
+#&gt; [[46]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 1 1
 #&gt; b 0  0 0 1 1
@@ -610,8 +564,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 47
-#&gt; 
+#&gt; [[47]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 1 0
 #&gt; b 0  0 0 0 0
@@ -619,8 +572,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 48
-#&gt; 
+#&gt; [[48]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 1 0
@@ -628,8 +580,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 49
-#&gt; 
+#&gt; [[49]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 1 1
 #&gt; b 0  0 0 0 0
@@ -637,8 +588,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 50
-#&gt; 
+#&gt; [[50]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 1 1
 #&gt; b 0  0 0 0 0
@@ -646,8 +596,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 51
-#&gt; 
+#&gt; [[51]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 0 0
@@ -655,8 +604,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 52
-#&gt; 
+#&gt; [[52]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 0
 #&gt; b 0  0 0 1 0
@@ -664,8 +612,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 53
-#&gt; 
+#&gt; [[53]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 0
 #&gt; b 0  0 0 1 1
@@ -673,8 +620,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 54
-#&gt; 
+#&gt; [[54]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 0 0
@@ -682,8 +628,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 55
-#&gt; 
+#&gt; [[55]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 0 1
@@ -691,8 +636,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 56
-#&gt; 
+#&gt; [[56]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 0
 #&gt; b 0  0 0 0 0
@@ -700,8 +644,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 57
-#&gt; 
+#&gt; [[57]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 1
 #&gt; b 0  0 0 0 0
@@ -709,8 +652,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 58
-#&gt; 
+#&gt; [[58]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 0
 #&gt; b 0  0 0 0 0
@@ -718,8 +660,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 59
-#&gt; 
+#&gt; [[59]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 0
 #&gt; b 0  0 1 1 0
@@ -727,8 +668,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 60
-#&gt; 
+#&gt; [[60]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 1 0
 #&gt; b 0  0 0 1 0
@@ -736,8 +676,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 61
-#&gt; 
+#&gt; [[61]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 1
 #&gt; b 0  0 0 1 0
@@ -745,8 +684,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 62
-#&gt; 
+#&gt; [[62]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 0
 #&gt; b 0  0 0 1 0
@@ -754,8 +692,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 63
-#&gt; 
+#&gt; [[63]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 0
 #&gt; b 0  0 0 0 0
@@ -763,8 +700,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 64
-#&gt; 
+#&gt; [[64]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 1 0
 #&gt; b 0  0 0 0 1
@@ -772,8 +708,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 65
-#&gt; 
+#&gt; [[65]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 1 0
 #&gt; b 0  0 0 1 1
@@ -781,8 +716,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 66
-#&gt; 
+#&gt; [[66]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 1 0
@@ -790,8 +724,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 67
-#&gt; 
+#&gt; [[67]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 0
 #&gt; b 0  0 0 1 0
@@ -799,8 +732,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 68
-#&gt; 
+#&gt; [[68]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 1 0
 #&gt; b 0  0 1 0 1
@@ -808,8 +740,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 69
-#&gt; 
+#&gt; [[69]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 1
 #&gt; b 0  0 0 0 0
@@ -817,8 +748,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 70
-#&gt; 
+#&gt; [[70]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 1 1
 #&gt; b 0  0 1 1 1
@@ -826,8 +756,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 71
-#&gt; 
+#&gt; [[71]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 0 1
@@ -835,8 +764,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 72
-#&gt; 
+#&gt; [[72]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 1
 #&gt; b 0  0 1 1 1
@@ -844,8 +772,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 73
-#&gt; 
+#&gt; [[73]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 1 1
 #&gt; b 0  0 0 0 1
@@ -853,8 +780,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 74
-#&gt; 
+#&gt; [[74]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 1 1
 #&gt; b 0  0 0 1 0
@@ -862,8 +788,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 75
-#&gt; 
+#&gt; [[75]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 1 1
@@ -871,8 +796,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 76
-#&gt; 
+#&gt; [[76]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 1 0
@@ -880,8 +804,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 77
-#&gt; 
+#&gt; [[77]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 0 1
@@ -889,8 +812,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 78
-#&gt; 
+#&gt; [[78]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 1 1
 #&gt; b 0  0 0 1 0
@@ -898,8 +820,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 79
-#&gt; 
+#&gt; [[79]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 1
 #&gt; b 0  0 0 1 1
@@ -907,8 +828,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 80
-#&gt; 
+#&gt; [[80]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 1 1
 #&gt; b 0  0 1 1 0
@@ -916,8 +836,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 81
-#&gt; 
+#&gt; [[81]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 1 0
 #&gt; b 0  0 0 1 0
@@ -925,8 +844,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 82
-#&gt; 
+#&gt; [[82]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 1 0
 #&gt; b 0  0 0 1 1
@@ -934,8 +852,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 83
-#&gt; 
+#&gt; [[83]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 1
 #&gt; b 0  0 1 0 0
@@ -943,8 +860,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 84
-#&gt; 
+#&gt; [[84]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 1
 #&gt; b 0  0 0 0 0
@@ -952,8 +868,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 85
-#&gt; 
+#&gt; [[85]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 0
 #&gt; b 0  0 0 0 1
@@ -961,8 +876,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 86
-#&gt; 
+#&gt; [[86]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 1 1
 #&gt; b 0  0 0 1 1
@@ -970,8 +884,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 87
-#&gt; 
+#&gt; [[87]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 0
 #&gt; b 0  0 0 1 1
@@ -979,8 +892,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 88
-#&gt; 
+#&gt; [[88]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 1 0 1
@@ -988,8 +900,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 89
-#&gt; 
+#&gt; [[89]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 0
 #&gt; b 0  0 0 0 0
@@ -997,8 +908,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 90
-#&gt; 
+#&gt; [[90]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 0
 #&gt; b 0  0 0 1 0
@@ -1006,8 +916,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 91
-#&gt; 
+#&gt; [[91]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 1
 #&gt; b 0  0 0 0 0
@@ -1015,8 +924,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 92
-#&gt; 
+#&gt; [[92]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 0
 #&gt; b 0  0 0 0 0
@@ -1024,8 +932,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 93
-#&gt; 
+#&gt; [[93]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 1 0
 #&gt; b 0  0 1 0 0
@@ -1033,8 +940,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 94
-#&gt; 
+#&gt; [[94]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 1 1
 #&gt; b 0  0 0 0 0
@@ -1042,8 +948,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 95
-#&gt; 
+#&gt; [[95]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 1 0 0
@@ -1051,8 +956,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 96
-#&gt; 
+#&gt; [[96]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 1 1
 #&gt; b 0  0 0 0 0
@@ -1060,8 +964,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 97
-#&gt; 
+#&gt; [[97]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 1 1
 #&gt; b 0  0 1 0 0
@@ -1069,8 +972,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 98
-#&gt; 
+#&gt; [[98]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 1 1
 #&gt; b 0  0 0 0 1
@@ -1078,8 +980,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 99
-#&gt; 
+#&gt; [[99]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 1 0
 #&gt; b 0  0 0 0 0
@@ -1087,8 +988,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 100
-#&gt; 
+#&gt; [[100]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 1 0
@@ -1096,8 +996,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 101
-#&gt; 
+#&gt; [[101]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 0
 #&gt; b 0  0 0 0 0
@@ -1105,8 +1004,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 102
-#&gt; 
+#&gt; [[102]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 0
 #&gt; b 0  0 0 1 1
@@ -1114,8 +1012,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 103
-#&gt; 
+#&gt; [[103]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 1 1
 #&gt; b 0  0 0 0 0
@@ -1123,8 +1020,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 104
-#&gt; 
+#&gt; [[104]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 1
 #&gt; b 0  0 0 1 0
@@ -1132,8 +1028,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 105
-#&gt; 
+#&gt; [[105]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 0
 #&gt; b 0  0 1 0 0
@@ -1141,8 +1036,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 106
-#&gt; 
+#&gt; [[106]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 1 1 1
@@ -1150,8 +1044,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 107
-#&gt; 
+#&gt; [[107]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 1 0
@@ -1159,8 +1052,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 108
-#&gt; 
+#&gt; [[108]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 0
 #&gt; b 0  0 0 1 0
@@ -1168,8 +1060,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 109
-#&gt; 
+#&gt; [[109]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 1 0
 #&gt; b 0  0 0 0 0
@@ -1177,8 +1068,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 110
-#&gt; 
+#&gt; [[110]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 1
 #&gt; b 0  0 0 0 0
@@ -1186,8 +1076,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 111
-#&gt; 
+#&gt; [[111]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 0
 #&gt; b 0  0 0 1 0
@@ -1195,8 +1084,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 112
-#&gt; 
+#&gt; [[112]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 1 0 1
@@ -1204,8 +1092,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 113
-#&gt; 
+#&gt; [[113]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 1 1 1
@@ -1213,8 +1100,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 114
-#&gt; 
+#&gt; [[114]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 0 1
 #&gt; b 0  0 0 0 1
@@ -1222,8 +1108,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 1
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 115
-#&gt; 
+#&gt; [[115]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 1 1
 #&gt; b 0  0 0 1 1
@@ -1231,8 +1116,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 116
-#&gt; 
+#&gt; [[116]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 1 1 1
@@ -1240,8 +1124,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 117
-#&gt; 
+#&gt; [[117]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 1 1 0
 #&gt; b 0  0 0 0 1
@@ -1249,8 +1132,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 118
-#&gt; 
+#&gt; [[118]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 1 0
 #&gt; b 0  0 0 0 0
@@ -1258,8 +1140,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 119
-#&gt; 
+#&gt; [[119]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 0 1 1
@@ -1267,8 +1148,7 @@ matrix as the first one contained in the 3D array</p>
 #&gt; d 0  0 0 0 0
 #&gt; e 0  0 0 0 0
 #&gt; 
-#&gt; , , 120
-#&gt; 
+#&gt; [[120]]
 #&gt;   a  b c d e
 #&gt; a 0 NA 0 0 1
 #&gt; b 0  0 1 1 0

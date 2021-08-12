@@ -84,7 +84,7 @@ simulation compares to `Adj`
 ```{r sum_comparison}
 sL3.Adj <- simunet(Adj,samp.effort,"upper",n.scans = samp.effort) |> sum_scans()
 
-Adj
+sL3.Adj |> attrs("Adj")
 sL3.Adj
 
 upper_cor(Adj,sL3.Adj)
