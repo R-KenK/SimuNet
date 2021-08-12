@@ -138,6 +138,7 @@ draw_edgeProb <- function(Adj,samp.effort,
   P[Adj.subfun(P)] <-
     Adj[Adj.subfun(Adj)] |>
     {\(x) stats::rbeta(length(x),shape1 = x + alpha.prior,shape2 = samp.effort - x + beta.prior)}()
+  class(P) <- c("edgeProbMat","weightedAdj")
   attr(P,"Beta priors") <- c(alpha.prior,beta.prior)
   P
 }

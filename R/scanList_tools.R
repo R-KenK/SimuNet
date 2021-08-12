@@ -401,6 +401,25 @@ print.weightedAdj <- function(x,...) {
   invisible(x)
 }
 
+#' Print method for `edgeProb` objects
+#' @export
+#' @noRd
+print.edgeProb <- function(x,...) {
+  print(x$P)
+  invisible(x)
+}
+
+#' Print method for `edgeProbMat` objects
+#' @export
+#' @noRd
+print.edgeProbMat <- function(x,digits = 3,...) {
+  to.print <- x |> round(digits = digits)
+  class(to.print) <- NULL
+  print_clean_scan(to.print,"Edge presence probability matrix",...)
+  format_attributes(x,...)
+  invisible(x)
+}
+
 #' Print method for `scaled` objects
 #' @export
 #' @noRd
@@ -482,5 +501,9 @@ print_clean_scan <- function(scan,s,
 #' @noRd
 format_attributes <- function(x,...) {
   if (!is.null(get_attrs(x))) cat("\n\nHidden attributes:",names(get_attrs(x)))
+  if (inherits(x,"edgeProbMat")) {
+    bet <- attr(x,"Beta priors")
+    cat("\n","alpha.prior =",bet[1],"-","beta.prior =",bet[2])
+  }
   invisible(x)
 }
