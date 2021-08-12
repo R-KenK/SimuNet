@@ -76,7 +76,7 @@ Scaling here is dividing by the sum of 1s by the number of time an edge has been
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0.9001</span>
       </span>
     </div>
 
@@ -227,12 +227,12 @@ they have been sampled (determined via <code><a href='count_nonNA.html'>count_no
 #&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob</div><div class='input'><span class='co'># scale_scans() can scale `weightedAdj` objects...</span>
 <span class='va'>sL</span> |&gt; <span class='fu'><a href='sum_scans.html'>sum_scans</a></span><span class='op'>(</span><span class='op'>)</span> |&gt; <span class='fu'>scale_scans</span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; 
-#&gt; scan: Weighted adjacency matrix                          
-#&gt; a .    0.96 0.30 0.52 0.40
-#&gt; b 0.93 .    0.09 0.40 0.53
-#&gt; c 0.30 0.50 .    0.12 0.14
-#&gt; d 0.59 1.00 0.38 .    0.96
-#&gt; e 0.24 0.50 0.39 0.45 .   
+#&gt; Scaled weighted adjacency matrix                               
+#&gt; a .     0.958 0.300 0.525 0.400
+#&gt; b 0.933 .     0.092 0.400 0.533
+#&gt; c 0.300 0.500 .     0.117 0.142
+#&gt; d 0.592 1.000 0.375 .     0.958
+#&gt; e 0.242 0.500 0.392 0.450 .    
 #&gt; 
 #&gt; 
 #&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob summed.scanList sampled</div><div class='input'>
@@ -241,12 +241,12 @@ they have been sampled (determined via <code><a href='count_nonNA.html'>count_no
 <span class='co'>## group-scan sampling</span>
 <span class='va'>sL</span> |&gt; <span class='fu'><a href='perform_exp.html'>perform_exp</a></span><span class='op'>(</span><span class='fu'><a href='design_exp.html'>design_exp</a></span><span class='op'>(</span><span class='fu'><a href='customize_sampling.html'>customize_sampling</a></span><span class='op'>(</span><span class='st'>"group"</span>,<span class='fl'>.6</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> |&gt; <span class='fu'>scale_scans</span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; 
-#&gt; scan: Weighted adjacency matrix                          
-#&gt; a .    0.94 0.26 0.49 0.35
-#&gt; b 0.93 .    0.06 0.35 0.49
-#&gt; c 0.34 0.42 .    0.12 0.14
-#&gt; d 0.67 1.00 0.34 .    0.95
-#&gt; e 0.22 0.51 0.41 0.47 .   
+#&gt; Scaled weighted adjacency matrix                               
+#&gt; a .     0.944 0.258 0.487 0.354
+#&gt; b 0.929 .     0.063 0.347 0.493
+#&gt; c 0.338 0.422 .     0.121 0.136
+#&gt; d 0.667 1.000 0.338 .     0.950
+#&gt; e 0.224 0.507 0.408 0.467 .    
 #&gt; 
 #&gt; 
 #&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob obs.P theoretical.scanList summed.scanList sampled</div><div class='input'>
@@ -256,23 +256,23 @@ they have been sampled (determined via <code><a href='count_nonNA.html'>count_no
                   <span class='op'>)</span> |&gt; <span class='fu'>scale_scans</span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [[1]]
 #&gt; 
-#&gt; scan: Weighted adjacency matrix                          
-#&gt; a .    0.97 0.39 0.56 0.49
-#&gt; b 0.92 .    0.07 0.41 0.46
-#&gt; c 0.29 0.43 .    0.11 0.18
-#&gt; d 0.58 1.00 0.38 .    0.96
-#&gt; e 0.25 0.47 0.39 0.45 .   
+#&gt; Scaled weighted adjacency matrix                               
+#&gt; a .     0.973 0.387 0.562 0.488
+#&gt; b 0.921 .     0.071 0.405 0.464
+#&gt; c 0.293 0.431 .     0.110 0.183
+#&gt; d 0.580 1.000 0.379 .     0.958
+#&gt; e 0.254 0.466 0.395 0.447 .    
 #&gt; 
 #&gt; 
 #&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob obs.P theoretical.scanList summed.scanList sampled
 #&gt; [[2]]
 #&gt; 
-#&gt; scan: Weighted adjacency matrix                          
-#&gt; a .    0.96 0.35 0.65 0.42
-#&gt; b 0.88 .    0.10 0.38 0.44
-#&gt; c 0.31 0.52 .    0.15 0.08
-#&gt; d 0.60 1.00 0.40 .    1.00
-#&gt; e 0.19 0.58 0.33 0.44 .   
+#&gt; Scaled weighted adjacency matrix                               
+#&gt; a .     0.958 0.354 0.646 0.417
+#&gt; b 0.875 .     0.104 0.375 0.438
+#&gt; c 0.312 0.521 .     0.146 0.083
+#&gt; d 0.604 1.000 0.396 .     1.000
+#&gt; e 0.188 0.583 0.333 0.438 .    
 #&gt; 
 #&gt; 
 #&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob focalList theoretical.scanList summed.scanList sampled

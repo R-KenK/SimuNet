@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0.9001</span>
       </span>
     </div>
 
@@ -138,6 +138,30 @@
       <small>Source: <a href='https://github.com/R-KenK/SimuNet/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="simunet-development-version" class="section level1">
+<h1 class="page-header" data-toc-text="development version">
+<a href="#simunet-development-version" class="anchor"></a>SimuNet (development version)</h1>
+</div>
+    <div id="simunet-210" class="section level1">
+<h1 class="page-header" data-toc-text="2.1.0">
+<a href="#simunet-210" class="anchor"></a>SimuNet 2.1.0</h1>
+<ul>
+<li>
+<code>print</code> methods are cleaner for SimuNet specific objects: *<code>scanList</code> objects printing now relies on Matrix <code>sparseMatrix</code> class
+<ul>
+<li>so do their “collapsed” weighted adjacency relative: <code>weightedAdj</code> (see below).</li>
+</ul>
+</li>
+<li>class <code>sum</code> (obtained via <code><a href="../reference/sum_scans.html">sum_scans()</a></code>) has been renamed to <code>weightedAdj</code>:
+<ul>
+<li>
+<code>Adj</code> stored in <code>attrs</code> (and created by <code><a href="../reference/generate_edgeProb.html">generate_edgeProb()</a></code>) are now of class <code>weightedAdj</code>.</li>
+<li>This change allows for homogeneous printing of weighted adjacency matrices</li>
+</ul>
+</li>
+<li>pkgdown is now used to update the website’s package. Related files are in master branch’s <code>docs/</code> folder</li>
+</ul>
+</div>
     <div id="simunet-202" class="section level1">
 <h1 class="page-header" data-toc-text="2.0.2">
 <a href="#simunet-202" class="anchor"></a>SimuNet 2.0.2</h1>
