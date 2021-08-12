@@ -154,7 +154,7 @@ Written analogously to <code><a href='https://rdrr.io/r/base/lapply.html'>vapply
 matrix as the first one contained in the 3D array</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sLapply</span><span class='op'>(</span><span class='va'>sL</span>, <span class='va'>.f</span>, <span class='va'>...</span>, USE.NAMES <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>sLapply</span><span class='op'>(</span><span class='va'>sL</span>, <span class='va'>FUN</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -164,17 +164,12 @@ matrix as the first one contained in the 3D array</p>
       <td><p>a <code>scanList</code> object (see <code><a href='simunet.html'>simunet()</a></code>)</p></td>
     </tr>
     <tr>
-      <th>.f</th>
+      <th>FUN</th>
       <td><p>a function,to apply a function to each 2D matrix contained in <code>sL</code></p></td>
     </tr>
     <tr>
       <th>...</th>
       <td><p>extra argument to be passed, notably named arguments used by <code>.f</code> (see <code><a href='https://rdrr.io/r/base/lapply.html'>lapply()</a></code>)</p></td>
-    </tr>
-    <tr>
-      <th>USE.NAMES</th>
-      <td><p>logical; if <code>TRUE</code> and if <code>X</code> is character, use <code>X</code> as names for the result
-unless it had names already (see <code><a href='https://rdrr.io/r/base/lapply.html'>vapply()</a></code>)</p></td>
     </tr>
     </table>
 

@@ -20,7 +20,9 @@ Imports:
     httr,
     magrittr,
     purrr,
-    scales
+    scales,
+    Matrix,
+    methods
 URL: https://github.com/R-KenK/SimuNet
 BugReports: https://github.com/R-KenK/SimuNet/issues
 Suggests: 

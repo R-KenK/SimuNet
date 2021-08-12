@@ -241,6 +241,38 @@ copy_attrs_to <- function(from,to) {
 #' matrix as the first one contained in the 3D array
 #'
 #' @param sL a `scanList` object (see [`simunet()`][simunet()])
+#' @param FUN a function,to apply a function to each 2D matrix contained in `sL`
+#' @param ... extra argument to be passed, notably named arguments used by `.f` (see [lapply()])
+#'
+#' @return a 3D array onto which the function has been applied to each scan
+#'
+#' @export
+#'
+#' @examples
+#' set.seed(42)
+#' n <- 5L
+#' samp.effort <- 100L
+#'
+#' # Adjacency matrix import
+#' ## random directed adjacency matrix
+#' Adj <- sample(1:samp.effort,n * n) |>
+#'   matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
+#' Adj[lower.tri(Adj,diag = TRUE)] <- 0L
+#' Adj
+#'
+#' sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L)
+#' sL |> sLapply(\(scan) {scan[1,2] <- NA;scan})
+sLapply <- function(sL,FUN,...) {
+  lapply(
+    X = 1:(dim(sL)[3]),
+    FUN = function(x) FUN(sL[,,x],...)
+  )
+}
+#' Shortcut to a `lapply` equivalent to apply a function to each 2D matrix contained in a `scanList`
+#' Written analogously to [vapply()]. Values returned by `.f` should be a similarly dimensionned
+#' matrix as the first one contained in the 3D array
+#'
+#' @param sL a `scanList` object (see [`simunet()`][simunet()])
 #' @param .f a function,to apply a function to each 2D matrix contained in `sL`
 #' @param ... extra argument to be passed, notably named arguments used by `.f` (see [lapply()])
 #' @param USE.NAMES logical; if `TRUE` and if `X` is character, use `X` as names for the result
@@ -264,7 +296,7 @@ copy_attrs_to <- function(from,to) {
 #'
 #' sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L)
 #' sL |> sLapply(\(scan) {scan[1,2] <- NA;scan})
-sLapply <- function(sL,.f,...,USE.NAMES = TRUE) {
+sLvapply <- function(sL,.f,...,USE.NAMES = TRUE) {
   vapply(
     X = 1:(dim(sL)[3]),
     FUN = function(x) .f(sL[,,x]),
@@ -315,14 +347,6 @@ sLlapply <- function(sLlist,FUN,...) {
   sLlist
 }
 
-#' Print method for `scanList` objects
-#' @export
-#' @noRd
-print.scanList <- function(x,...) {
-  print.default(without_attrs(x))
-  cat("\n\nHidden attributes:",names(get_attrs(x)))
-}
-
 #' transpose method for `scanList` objects
 #' @export
 #' @noRd
@@ -352,4 +376,120 @@ rbind_2scanList <- function(sL1,sL2) {
 #' @noRd
 rbind.scanList <- function(...,deparse.level = 1) {
   Reduce(rbind_2scanList,list(...))
+}
+
+# printing related functions ----
+
+## printing methods ----
+#' Print method for `scanList` objects
+#' @export
+#' @noRd
+print.scanList <- function(x,...) {
+  print_sLarray(x)
+  cat("\n\nHidden attributes:",names(get_attrs(x)))
+  invisible(x)
+}
+
+#' Print method for `sum` objects
+#' @export
+#' @noRd
+print.sum <- function(x,...) {
+  mode <- attrs(sL,"mode")
+  to.print <- without_attrs(x)
+  class(to.print) <- NULL
+  print_clean_scan(to.print,"Weighted adjacency matrix",mode,...)
+  cat("\n\nHidden attributes:",names(get_attrs(x)))
+  invisible(x)
+}
+
+#' Print method for `sum` objects
+#' @export
+#' @noRd
+print.scaled <- function(x,digits = 2,...) {
+  mode <- attrs(sL,"mode")
+  to.print <- without_attrs(x) |> round(digits = digits)
+  class(to.print) <- NULL
+  print_clean_scan(to.print,"Weighted adjacency matrix",mode,...)
+  cat("\n\nHidden attributes:",names(get_attrs(x)))
+  invisible(x)
+}
+
+## printing tools ----
+
+#' Cleaner 3D array print
+#'
+#' @param sL a `scanList` object
+#' @param ... additional arguments to be passed to `Matrix::printSpMatrix()`
+#'
+#' @return `sL` invisibly, but print a cleaner 3D array via `Matrix::printSpMatrix()`
+#' @noRd
+print_sLarray <- function(sL,...) {
+  mode <- attrs(sL,"mode")
+  scan.ind <- choose_scan_to_print(sL)
+  truncated <- attr(scan.ind,"truncated")
+  # prints all but the last
+  lapply(scan.ind,\(s) print_clean_scan(sL[,,s],s,mode = mode,...))
+  if (truncated) cat("\n... (",dim(sL)[3] - 3," more scans)\n")
+  print_clean_scan(sL[,,dim(sL)[3]],dim(sL)[3],mode = mode,...)
+  invisible(sL)
+}
+
+#' Choose what scan index to display, truncate if too many
+#'
+#' @param sL a `scanList` object
+#'
+#' @return integer vector, indices of scan to print
+#' @noRd
+choose_scan_to_print <- function(sL) {
+  truncated <- dim(sL)[3] > 5
+  scan.ind <-
+    if (truncated) c(1,2) else scan.ind <- 1:(dim(sL)[3] - 1)
+  attr(scan.ind,"truncated") <- truncated
+  attr(scan.ind,"last.scan") <- dim(sL)[3]
+  scan.ind
+}
+
+#' Cleaner adjacency matrix print
+#'
+#' @param scan numeric matrix, a scan
+#' @param s integer, scan index
+#' @param ... additional arguments to be passed to
+#'   [`Matrix::printSpMatrix()`][Matrix::printSpMatrix()]
+#' @param mode character, igraph's mode
+#' @param col.names logical, see [`Matrix::printSpMatrix()`][Matrix::printSpMatrix()]
+#' @param note.dropping.colnames logical, see [`Matrix::printSpMatrix()`][Matrix::printSpMatrix()]
+#'
+#' @return `scan` invisibly, but print a cleaner scan via
+#'   [`Matrix::printSpMatrix()`][Matrix::printSpMatrix()]
+#'
+#' @importFrom Matrix printSpMatrix
+#' @importFrom methods as
+#'
+#' @noRd
+print_clean_scan <- function(scan,s,mode,
+                             col.names = FALSE,
+                             note.dropping.colnames = FALSE,
+                             ...) {
+  spM_class <- determine_spM_class(mode)
+  cat("\nscan: ",s,sep = "")
+  methods::as(scan,spM_class) |>
+    Matrix::printSpMatrix(col.names = col.names,note.dropping.colnames = note.dropping.colnames,
+                          ...)
+  invisible(scan)
+}
+
+#' Determine sparse Matrix class to use to print
+#'
+#' @param mode character, igraph's mode
+#' @noRd
+determine_spM_class <- function(mode) {
+  switch(mode,
+         "directed" = ,
+         "undirected" = ,
+         "max" = ,
+         "min" = ,
+         "plus" = "dgCMatrix",
+         "upper" = ,
+         "lower" =  "dtCMatrix"
+  )
 }
