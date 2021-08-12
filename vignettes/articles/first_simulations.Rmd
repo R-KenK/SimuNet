@@ -29,7 +29,7 @@ This represents an undirected network in the form of an upper-triangular matrix
 Simulations are obtained via this package's main function `simunet()`. Let us see the detail of its
 inputs:
 
-```{r first sim}
+```{r first_sim}
 set.seed(42)
 
 sL1 <- simunet(
@@ -47,7 +47,7 @@ We obtain a 17 x 17 x 10 array of 10 binary adjacency matrices, the 10 scans.
 ## Running more simulations
 Simulating more `scanList`s from the same `Adj` and `samp.effort` will lead not only to different
 scans:
-```{r second sim}
+```{r second_sim}
 sL2 <- simunet(Adj,samp.effort,"upper",n.scans = 10)
 sL2
 
@@ -66,7 +66,7 @@ sL2 |> attrs("edge.Prob") # most of `SimuNet`'s functions have been written to a
 ## Collapsing the binary adjacency matrix sequence into a weighted adjacency matrix
 ### Summing `scanList`
 `scanList`'s 3D arrays can be summed over their 3rd dimension via `sum_scans()`:
-```{r sum firsts}
+```{r sum_firsts}
 sum_scans(sL1)
 sL2 |> sum_scans()
 ```
@@ -81,7 +81,7 @@ upper_cor <- function(X,Y) {
 
 Now, we run a new simulation containing as many scans as the input sampling effort to see how the
 simulation compares to `Adj`
-```{r sum comparison}
+```{r sum_comparison}
 sL3.Adj <- simunet(Adj,samp.effort,"upper",n.scans = samp.effort) |> sum_scans()
 
 Adj
@@ -105,14 +105,14 @@ designs](experiments.html)).
 In the case of theoretical scanList, this means dividing the obtained weighted adjacency matrix by
 `n.scans`.
 
-```{r scale firsts}
+```{r scale_firsts}
 scale_scans(sL1)
 sL2 |> scale_scans()
 scale_scans(sL3.Adj)
 ```
 
 One can look at how the correlation with a scaled `Adj` evolve with increasing `n.scans`
-```{r scale details}
+```{r scale_details}
 scaled.list <- 
   lapply(
     round(seq(10,250,length.out = 200)),

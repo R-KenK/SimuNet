@@ -256,7 +256,7 @@
      edge.width <span class="op">=</span> <span class="fl">15</span> <span class="op">*</span> <span class="op">(</span><span class="va">G.E</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">G.E</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span>
        <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">G.E</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">G.E</span><span class="op">)</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
-<p><img src="importing_networks_files/figure-html/plotting%20original%20Adj-1.png" width="700"></p>
+<p><img src="importing_networks_files/figure-html/plotting_original_Adj-1.png" width="700"></p>
 <p>The conversion can be achieve the other-way around:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">G.Adj</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/as_adjacency_matrix.html">get.adjacency</a></span><span class="op">(</span><span class="va">G</span>,type <span class="op">=</span> <span class="st">"lower"</span>,attr <span class="op">=</span> <span class="st">"weight"</span><span class="op">)</span>
