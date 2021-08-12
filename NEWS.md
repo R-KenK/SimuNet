@@ -1,4 +1,7 @@
-# SimuNet (development version)
+# SimuNet 2.1.1
+* `print` method is cleaner for `edgeProb` and newly introduced `edgeProbMat` classes:
+    * `edgeProbMat` is the matrix itself stored in `edgeProb` object (their `$P`), with attribute
+    `Beta prior`
 
 # SimuNet 2.1.0
 * `print` methods are cleaner for SimuNet specific objects:
