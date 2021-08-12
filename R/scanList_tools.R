@@ -386,7 +386,7 @@ rbind.scanList <- function(...,deparse.level = 1) {
 #' @noRd
 print.scanList <- function(x,...) {
   print_sLarray(x)
-  cat("\n\nHidden attributes:",names(get_attrs(x)))
+  format_attributes(x,...)
   invisible(x)
 }
 
@@ -397,7 +397,7 @@ print.weightedAdj <- function(x,...) {
   to.print <- without_attrs(x)
   class(to.print) <- NULL
   print_clean_scan(to.print,"Weighted adjacency matrix",...)
-  cat("\n\nHidden attributes:",names(get_attrs(x)))
+  format_attributes(x,...)
   invisible(x)
 }
 
@@ -408,7 +408,7 @@ print.scaled <- function(x,digits = 2,...) {
   to.print <- without_attrs(x) |> round(digits = digits)
   class(to.print) <- NULL
   print_clean_scan(to.print,"Weighted adjacency matrix",...)
-  cat("\n\nHidden attributes:",names(get_attrs(x)))
+  format_attributes(x,...)
   invisible(x)
 }
 
@@ -472,4 +472,15 @@ print_clean_scan <- function(scan,s,
     Matrix::printSpMatrix(col.names = col.names,note.dropping.colnames = note.dropping.colnames,
                           ...)
   invisible(scan)
+}
+
+#' Display and format attribute names in attrs if they exist
+#'
+#' @param x a `scanList` or `weightedAdj` object
+#' @param ... ignored
+#'
+#' @noRd
+format_attributes <- function(x,...) {
+  if (!is.null(get_attrs(x))) cat("\n\nHidden attributes:",names(get_attrs(x)))
+  invisible(x)
 }
