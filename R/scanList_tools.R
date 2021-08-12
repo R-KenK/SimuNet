@@ -109,7 +109,7 @@ draw_raw_scanList <- function(edge.Prob,n.scans) {
       stats::rbinom(edge.Prob$P,1L,edge.Prob$P)
     },edge.Prob$Adj
   )
-  class(sL) <- "scanList"
+  class(sL) <- c("raw","scanList")
   sL
 }
 
@@ -394,22 +394,20 @@ print.scanList <- function(x,...) {
 #' @export
 #' @noRd
 print.sum <- function(x,...) {
-  mode <- attrs(x,"mode")
   to.print <- without_attrs(x)
   class(to.print) <- NULL
-  print_clean_scan(to.print,"Weighted adjacency matrix",mode,...)
+  print_clean_scan(to.print,"Weighted adjacency matrix",...)
   cat("\n\nHidden attributes:",names(get_attrs(x)))
   invisible(x)
 }
 
-#' Print method for `sum` objects
+#' Print method for `scaled` objects
 #' @export
 #' @noRd
 print.scaled <- function(x,digits = 2,...) {
-  mode <- attrs(x,"mode")
   to.print <- without_attrs(x) |> round(digits = digits)
   class(to.print) <- NULL
-  print_clean_scan(to.print,"Weighted adjacency matrix",mode,...)
+  print_clean_scan(to.print,"Weighted adjacency matrix",...)
   cat("\n\nHidden attributes:",names(get_attrs(x)))
   invisible(x)
 }
@@ -424,13 +422,12 @@ print.scaled <- function(x,digits = 2,...) {
 #' @return `sL` invisibly, but print a cleaner 3D array via `Matrix::printSpMatrix()`
 #' @noRd
 print_sLarray <- function(sL,...) {
-  mode <- attrs(sL,"mode")
   scan.ind <- choose_scan_to_print(sL)
   truncated <- attr(scan.ind,"truncated")
   # prints all but the last
-  lapply(scan.ind,\(s) print_clean_scan(sL[,,s],s,mode = mode,...))
+  lapply(scan.ind,\(s) print_clean_scan(sL[,,s],s,...))
   if (truncated) cat("\n... (",dim(sL)[3] - 3," more scans)\n")
-  print_clean_scan(sL[,,dim(sL)[3]],dim(sL)[3],mode = mode,...)
+  print_clean_scan(sL[,,dim(sL)[3]],dim(sL)[3],...)
   invisible(sL)
 }
 
@@ -466,30 +463,13 @@ choose_scan_to_print <- function(sL) {
 #' @importFrom methods as
 #'
 #' @noRd
-print_clean_scan <- function(scan,s,mode,
+print_clean_scan <- function(scan,s,
                              col.names = FALSE,
                              note.dropping.colnames = FALSE,
                              ...) {
-  spM_class <- determine_spM_class(mode)
   cat("\nscan: ",s,sep = "")
-  methods::as(scan,spM_class) |>
+  methods::as(scan,"dgCMatrix") |>
     Matrix::printSpMatrix(col.names = col.names,note.dropping.colnames = note.dropping.colnames,
                           ...)
   invisible(scan)
-}
-
-#' Determine sparse Matrix class to use to print
-#'
-#' @param mode character, igraph's mode
-#' @noRd
-determine_spM_class <- function(mode) {
-  switch(mode,
-         "directed" = ,
-         "undirected" = ,
-         "max" = ,
-         "min" = ,
-         "plus" = "dgCMatrix",
-         "upper" = ,
-         "lower" =  "dtCMatrix"
-  )
 }
