@@ -4,6 +4,7 @@ template:
   package: preferably
   params:
     toggle: manual
+    highlightcss: false
 
 reference:
   - title: Main Functions
