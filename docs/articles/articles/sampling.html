@@ -148,14 +148,548 @@
 
     
     
+<p>Within experimental designs, sampling via a given method is considered similarly to other “building blocks” manipulations. Conceptually, they also:</p>
+<ul>
+<li>take a theoretical <code>scanList</code> as an input</li>
+<li>alter it in some way:
+<ul>
+<li>
+<strong>group-scan sampling</strong> can lead to missing some edges: they are turned into <code>NA</code> in the scanList regardless of them being <code>1</code> or <code>0</code> originally</li>
+<li>
+<strong>focal(-scan) sampling</strong> allows to sample all edges involving the focal, but misses all the others: they are also turned to <code>NA</code>s</li>
+</ul>
+</li>
+<li>and return an empirical <code>scanList</code>
+</li>
+</ul>
+<div id="designin-a-sampling-method" class="section level2">
+<h2 class="hasAnchor">
+<a href="#designin-a-sampling-method" class="anchor"></a>Designin a sampling method</h2>
+<p>Designing a sampling method - or creating a <code>expDesign</code> object in <code>SimuNet</code> - relies on <code><a href="../../reference/customize_sampling.html">customize_sampling()</a></code> and <code><a href="../../reference/design_exp.html">design_exp()</a></code>:</p>
+<ul>
+<li>
+<code><a href="../../reference/customize_sampling.html">customize_sampling()</a></code> tailors a sampling function of <code>scanList</code>
+</li>
+<li>
+<code><a href="../../reference/design_exp.html">design_exp()</a></code>, a general wrapper to create a sequence of experimental manipulations, takes the function returned by <code><a href="../../reference/customize_sampling.html">customize_sampling()</a></code> to include the sampling as part of the manipulation sequence.</li>
+</ul>
+<p>Sampling can be only part of the overall experimental design, and for instance follow a sequence of other manipulations. See them in action in the following examples!</p>
+<div id="group-scan-sampling" class="section level3">
+<h3 class="hasAnchor">
+<a href="#group-scan-sampling" class="anchor"></a>Group-scan sampling</h3>
+<p>Group-scan sampling is the act of looking at the whole group during scans, and seeing who is associated/interacting with whom.</p>
+<ul>
+<li>Empirically, the scan can diverge from theory by missing individuals and/or edges.</li>
+<li>Internally, group-scan sampling method:
+<ul>
+<li>requires setting the argument <code>method = "group"</code>
+</li>
+<li>relies on a edge observation probability matrix, named <code>obs.P</code>, and stored in resulting <code>scanList</code>’s attributes list <code>attrs</code>.</li>
+</ul>
+</li>
+</ul>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/R-KenK/SimuNet">SimuNet</a></span><span class="op">)</span></code></pre></div>
-<p>under construction</p>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/R-KenK/SimuNet">SimuNet</a></span><span class="op">)</span>
+<span class="fu"><a href="../../reference/customize_sampling.html">customize_sampling</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"group"</span>,sampling <span class="op">=</span> <span class="st">"random"</span><span class="op">)</span>
+<span class="co">#&gt; function (scan.list) </span>
+<span class="co">#&gt; group_sample(scan.list = scan.list, sampling = sampling, all.sampled = all.sampled)</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000002326a450&gt;</span>
+<span class="co">#&gt; &lt;environment: 0x0000000023269ce0&gt;</span></code></pre></div>
+<p>The returned function can be passed to <code><a href="../../reference/design_exp.html">design_exp()</a></code></p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">group.rand</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/customize_sampling.html">customize_sampling</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"group"</span>,sampling <span class="op">=</span> <span class="st">"random"</span><span class="op">)</span> |&gt; <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="op">)</span>
+ <span class="co"># or </span>
+<span class="va">group.fun</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/customize_sampling.html">customize_sampling</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"group"</span>,sampling <span class="op">=</span> <span class="st">"random"</span><span class="op">)</span>
+<span class="va">group.rand</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="va">group.fun</span><span class="op">)</span></code></pre></div>
+<p>Let’s apply it to a <code>scanList</code>:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span>
+<span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">5L</span>
+<span class="va">samp.effort</span> <span class="op">&lt;-</span> <span class="fl">100L</span>
+<span class="va">Adj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">samp.effort</span>,<span class="va">n</span> <span class="op">*</span> <span class="va">n</span><span class="op">)</span> |&gt;
+  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">5</span>,dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span>,<span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>
+<span class="va">Adj</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/lower.tri.html">lower.tri</a></span><span class="op">(</span><span class="va">Adj</span>,diag <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0L</span>
+<span class="va">Adj</span>
+<span class="co">#&gt;   a   b  c  d  e</span>
+<span class="co">#&gt; a 0 100 37 27 58</span>
+<span class="co">#&gt; b 0   0 20 36 42</span>
+<span class="co">#&gt; c 0   0  0  5 93</span>
+<span class="co">#&gt; d 0   0  0  0 30</span>
+<span class="co">#&gt; e 0   0  0  0  0</span>
+
+<span class="va">sL.group</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simunet.html">simunet</a></span><span class="op">(</span><span class="va">Adj</span>,<span class="va">samp.effort</span>,<span class="st">"upper"</span>,<span class="fl">10</span>,<span class="va">group.rand</span><span class="op">)</span>
+<span class="va">sL.group</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 1               </span>
+<span class="co">#&gt; a . NA NA NA NA</span>
+<span class="co">#&gt; b .  . NA  .  .</span>
+<span class="co">#&gt; c .  .  . NA NA</span>
+<span class="co">#&gt; d .  .  .  . NA</span>
+<span class="co">#&gt; e .  .  .  .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 2              </span>
+<span class="co">#&gt; a . 1 NA  . NA</span>
+<span class="co">#&gt; b . . NA  . NA</span>
+<span class="co">#&gt; c . .  . NA NA</span>
+<span class="co">#&gt; d . .  .  .  .</span>
+<span class="co">#&gt; e . .  .  .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ... ( 7  more scans)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 10              </span>
+<span class="co">#&gt; a . NA .  1 NA</span>
+<span class="co">#&gt; b .  . .  .  .</span>
+<span class="co">#&gt; c .  . . NA NA</span>
+<span class="co">#&gt; d .  . .  .  .</span>
+<span class="co">#&gt; e .  . .  .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob obs.P theoretical.scanList</span>
+<span class="va">sL.group</span> |&gt; <span class="fu"><a href="../../reference/attrs.html">attrs</a></span><span class="op">(</span><span class="st">"theoretical.scanList"</span><span class="op">)</span>  <span class="co"># see what intermediate scanList was generated</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 1           </span>
+<span class="co">#&gt; a . 1 1 . 1</span>
+<span class="co">#&gt; b . . . . .</span>
+<span class="co">#&gt; c . . . . 1</span>
+<span class="co">#&gt; d . . . . .</span>
+<span class="co">#&gt; e . . . . .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 2           </span>
+<span class="co">#&gt; a . 1 . . .</span>
+<span class="co">#&gt; b . . . . 1</span>
+<span class="co">#&gt; c . . . . 1</span>
+<span class="co">#&gt; d . . . . .</span>
+<span class="co">#&gt; e . . . . .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ... ( 7  more scans)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 10           </span>
+<span class="co">#&gt; a . 1 . 1 1</span>
+<span class="co">#&gt; b . . . . .</span>
+<span class="co">#&gt; c . . . . 1</span>
+<span class="co">#&gt; d . . . . .</span>
+<span class="co">#&gt; e . . . . .</span>
+<span class="va">sL.group</span> |&gt; <span class="fu"><a href="../../reference/attrs.html">attrs</a></span><span class="op">(</span><span class="st">"obs.P"</span><span class="op">)</span>                 <span class="co"># see what obs.P was used</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Weighted adjacency matrix                                           </span>
+<span class="co">#&gt; a . 0.3170534 0.1161747 0.7297301 0.4803101</span>
+<span class="co">#&gt; b . .         0.1861022 0.4118721 0.4274945</span>
+<span class="co">#&gt; c . .         .         0.4140497 0.1364904</span>
+<span class="co">#&gt; d . .         .         .         0.8246794</span>
+<span class="co">#&gt; e . .         .         .         .</span>
+
+<span class="va">sL</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simunet.html">simunet</a></span><span class="op">(</span><span class="va">Adj</span>,<span class="va">samp.effort</span>,<span class="st">"upper"</span>,<span class="fl">10</span><span class="op">)</span>
+<span class="va">sL</span> |&gt; <span class="fu"><a href="../../reference/perform_exp.html">perform_exp</a></span><span class="op">(</span><span class="va">group.rand</span><span class="op">)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 1              </span>
+<span class="co">#&gt; a . NA .  1  1</span>
+<span class="co">#&gt; b .  . . NA NA</span>
+<span class="co">#&gt; c .  . .  . NA</span>
+<span class="co">#&gt; d .  . .  . NA</span>
+<span class="co">#&gt; e .  . .  .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 2              </span>
+<span class="co">#&gt; a . 1 NA  . NA</span>
+<span class="co">#&gt; b . .  . NA NA</span>
+<span class="co">#&gt; c . .  .  . NA</span>
+<span class="co">#&gt; d . .  .  . NA</span>
+<span class="co">#&gt; e . .  .  .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ... ( 7  more scans)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 10            </span>
+<span class="co">#&gt; a . 1 1 . NA</span>
+<span class="co">#&gt; b . . . . NA</span>
+<span class="co">#&gt; c . . . 1 NA</span>
+<span class="co">#&gt; d . . . . NA</span>
+<span class="co">#&gt; e . . . .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob obs.P theoretical.scanList</span></code></pre></div>
+<div id="types-of-group-scan-sampling" class="section level4">
+<h4 class="hasAnchor">
+<a href="#types-of-group-scan-sampling" class="anchor"></a>Types of group-scan sampling</h4>
+<p><code>obs.P</code> can be defined via several routines</p>
+</div>
+<div id="random-probabilities" class="section level4">
+<h4 class="hasAnchor">
+<a href="#random-probabilities" class="anchor"></a>Random probabilities</h4>
+<p>Like in the previous example, observation probabilities can be determined at random. Input <code>sampling</code> as the character string <code>"random"</code></p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">group.rand</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/customize_sampling.html">customize_sampling</a></span><span class="op">(</span><span class="st">"group"</span>,sampling <span class="op">=</span> <span class="st">"random"</span><span class="op">)</span> |&gt; <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+</div>
+<div id="constant-probability" class="section level4">
+<h4 class="hasAnchor">
+<a href="#constant-probability" class="anchor"></a>Constant probability</h4>
+<p>All probabilities can be set to a constant probability. Input this constant as the sampling argument:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">group.cst</span> <span class="op">&lt;-</span>
+  <span class="fu"><a href="../../reference/customize_sampling.html">customize_sampling</a></span><span class="op">(</span><span class="st">"group"</span>,sampling <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span> |&gt; <span class="co"># an edge has 80% chances of being observed</span>
+  <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="op">)</span>
+
+<span class="va">sL.cst</span> <span class="op">&lt;-</span> <span class="va">sL</span> |&gt; <span class="fu"><a href="../../reference/perform_exp.html">perform_exp</a></span><span class="op">(</span><span class="va">group.cst</span><span class="op">)</span>
+<span class="va">sL.cst</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 1            </span>
+<span class="co">#&gt; a . 1 . 1  1</span>
+<span class="co">#&gt; b . . . 1  .</span>
+<span class="co">#&gt; c . . . .  1</span>
+<span class="co">#&gt; d . . . . NA</span>
+<span class="co">#&gt; e . . . .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 2              </span>
+<span class="co">#&gt; a . NA NA . NA</span>
+<span class="co">#&gt; b .  .  . 1  1</span>
+<span class="co">#&gt; c .  .  . .  .</span>
+<span class="co">#&gt; d .  .  . . NA</span>
+<span class="co">#&gt; e .  .  . .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ... ( 7  more scans)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 10           </span>
+<span class="co">#&gt; a . 1 1 . .</span>
+<span class="co">#&gt; b . . . . .</span>
+<span class="co">#&gt; c . . . 1 1</span>
+<span class="co">#&gt; d . . . . .</span>
+<span class="co">#&gt; e . . . . .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob obs.P theoretical.scanList</span>
+<span class="va">sL.cst</span> |&gt; <span class="fu"><a href="../../reference/count_nonNA.html">count_nonNA</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Weighted adjacency matrix             </span>
+<span class="co">#&gt; a . 6 8  9  8</span>
+<span class="co">#&gt; b . . 9 10  9</span>
+<span class="co">#&gt; c . . .  8 10</span>
+<span class="co">#&gt; d . . .  .  7</span>
+<span class="co">#&gt; e . . .  .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob obs.P theoretical.scanList</span></code></pre></div>
+</div>
+<div id="determined-from-a-user-defined-function" class="section level4">
+<h4 class="hasAnchor">
+<a href="#determined-from-a-user-defined-function" class="anchor"></a>Determined from a user-defined function</h4>
+<p>By inputting a function of Adj returning a similarly-dimensioned probability matrix, you can design several routines. To do so, pass the function as the <code>sampling</code>argument</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">central.bias_fun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">Adj</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">str</span> <span class="op">&lt;-</span> 
+    <span class="va">Adj</span> |&gt;
+    <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">graph.adjacency</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"upper"</span>,weighted <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> |&gt; 
+    <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/strength.html">strength</a></span><span class="op">(</span><span class="op">)</span>
+  <span class="va">obs.P</span> <span class="op">&lt;-</span> <span class="va">str</span> <span class="op">%o%</span> <span class="va">str</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/diag.html">diag</a></span><span class="op">(</span><span class="va">obs.P</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">0</span>
+  <span class="va">obs.P</span> <span class="op">/</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">obs.P</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span>
+<span class="op">}</span>
+<span class="fu">central.bias_fun</span><span class="op">(</span><span class="va">Adj</span><span class="op">)</span> <span class="co"># </span>
+<span class="co">#&gt;           a         b         c         d         e</span>
+<span class="co">#&gt; a 0.0000000 0.8878744 0.6950532 0.4394530 0.9999798</span>
+<span class="co">#&gt; b 0.8878744 0.0000000 0.6199123 0.3919446 0.8918739</span>
+<span class="co">#&gt; c 0.6950532 0.6199123 0.0000000 0.3068253 0.6981841</span>
+<span class="co">#&gt; d 0.4394530 0.3919446 0.3068253 0.0000000 0.4414325</span>
+<span class="co">#&gt; e 0.9999798 0.8918739 0.6981841 0.4414325 0.0000000</span>
+
+<span class="va">group.bias</span> <span class="op">&lt;-</span>
+  <span class="fu"><a href="../../reference/customize_sampling.html">customize_sampling</a></span><span class="op">(</span><span class="st">"group"</span>,sampling <span class="op">=</span> <span class="va">central.bias_fun</span><span class="op">)</span> |&gt;
+  <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="op">)</span>
+
+<span class="va">sL.bias</span> <span class="op">&lt;-</span> <span class="va">sL</span> |&gt; <span class="fu"><a href="../../reference/perform_exp.html">perform_exp</a></span><span class="op">(</span><span class="va">group.bias</span><span class="op">)</span>
+<span class="va">sL.bias</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 1             </span>
+<span class="co">#&gt; a . 1 .  1  1</span>
+<span class="co">#&gt; b . . .  1  .</span>
+<span class="co">#&gt; c . . . NA  1</span>
+<span class="co">#&gt; d . . .  . NA</span>
+<span class="co">#&gt; e . . .  .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 2              </span>
+<span class="co">#&gt; a . 1  . NA  .</span>
+<span class="co">#&gt; b . . NA  1  1</span>
+<span class="co">#&gt; c . .  . NA  .</span>
+<span class="co">#&gt; d . .  .  . NA</span>
+<span class="co">#&gt; e . .  .  .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ... ( 7  more scans)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 10             </span>
+<span class="co">#&gt; a . 1  1  . .</span>
+<span class="co">#&gt; b . . NA  . .</span>
+<span class="co">#&gt; c . .  . NA 1</span>
+<span class="co">#&gt; d . .  .  . .</span>
+<span class="co">#&gt; e . .  .  . .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob obs.P theoretical.scanList</span>
+<span class="va">sL.bias</span> |&gt; <span class="fu"><a href="../../reference/count_nonNA.html">count_nonNA</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Weighted adjacency matrix            </span>
+<span class="co">#&gt; a . 8 7 3 10</span>
+<span class="co">#&gt; b . . 3 8  8</span>
+<span class="co">#&gt; c . . . .  8</span>
+<span class="co">#&gt; d . . . .  4</span>
+<span class="co">#&gt; e . . . .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob obs.P theoretical.scanList</span>
+<span class="va">sL.bias</span> |&gt; <span class="fu"><a href="../../reference/attrs.html">attrs</a></span><span class="op">(</span><span class="st">"obs.P"</span><span class="op">)</span>
+<span class="co">#&gt;   a         b         c         d         e</span>
+<span class="co">#&gt; a 0 0.8878744 0.6950532 0.4394530 0.9999798</span>
+<span class="co">#&gt; b 0 0.0000000 0.6199123 0.3919446 0.8918739</span>
+<span class="co">#&gt; c 0 0.0000000 0.0000000 0.3068253 0.6981841</span>
+<span class="co">#&gt; d 0 0.0000000 0.0000000 0.0000000 0.4414325</span>
+<span class="co">#&gt; e 0 0.0000000 0.0000000 0.0000000 0.0000000</span>
+<span class="co">#&gt; attr(,"sampling_fun")</span>
+<span class="co">#&gt; function(Adj) {</span>
+<span class="co">#&gt;   str &lt;- </span>
+<span class="co">#&gt;     Adj |&gt;</span>
+<span class="co">#&gt;     igraph::graph.adjacency(mode = "upper",weighted = TRUE) |&gt; </span>
+<span class="co">#&gt;     igraph::strength()</span>
+<span class="co">#&gt;   obs.P &lt;- str %o% str</span>
+<span class="co">#&gt;   diag(obs.P) &lt;- 0</span>
+<span class="co">#&gt;   obs.P / (max(obs.P) + 1)</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000022c802e8&gt;</span>
+<span class="co">#&gt; attr(,"sampling")</span>
+<span class="co">#&gt; [1] "function"</span>
+
+<span class="va">sL</span> |&gt; <span class="fu"><a href="../../reference/scale_scans.html">scale_scans</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Scaled weighted adjacency matrix                 </span>
+<span class="co">#&gt; a . 1 0.3 0.1 0.4</span>
+<span class="co">#&gt; b . . 0.1 0.5 0.4</span>
+<span class="co">#&gt; c . . .   0.2 0.9</span>
+<span class="co">#&gt; d . . .   .   0.2</span>
+<span class="co">#&gt; e . . .   .   .  </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob summed.scanList sampled</span>
+<span class="va">sL.bias</span> |&gt; <span class="fu"><a href="../../reference/scale_scans.html">scale_scans</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Scaled weighted adjacency matrix                       </span>
+<span class="co">#&gt; a . 1 0.143 0.333 0.400</span>
+<span class="co">#&gt; b . . 0.333 0.625 0.375</span>
+<span class="co">#&gt; c . . .       NaN 0.875</span>
+<span class="co">#&gt; d . . .     .     0.250</span>
+<span class="co">#&gt; e . . .     .     .    </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob obs.P theoretical.scanList summed.scanList sampled</span></code></pre></div>
+</div>
+</div>
+<div id="focal-scan-sampling" class="section level3">
+<h3 class="hasAnchor">
+<a href="#focal-scan-sampling" class="anchor"></a>Focal(-scan) sampling</h3>
+<p>Focal(-scan) sampling is the act of following a focal individual, and record all associations/interactions involving it. a focal-scan sampling would be recording data “on the tick”, but focal scans can also be defined as continuous. We argue that by dividing a continuous focal sampling into segment, one can “binarize” a continuous scan into a scan equivalent, should it require dividing the continuous scan into the smallest segments sampling resolution allows (e.g. each minute).</p>
+<ul>
+<li>Empirically, the scan can diverge from theory by showing only edges involving the focal.</li>
+<li>Internally, group-scan sampling method:
+<ul>
+<li>requires setting the argument <code>method = "focal"</code>
+</li>
+<li>relies on a focal selection probability vector, leading to drawing a <code>focalList</code>, and stored in resulting <code>scanList</code>’s attributes list <code>attrs</code>.</li>
+</ul>
+</li>
+</ul>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co">## randomly select focals</span>
+<span class="va">focal.rand</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/customize_sampling.html">customize_sampling</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"focal"</span>,sampling <span class="op">=</span> <span class="st">"random"</span><span class="op">)</span> |&gt;
+  <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="op">)</span>
+
+<span class="va">sL.foc</span> <span class="op">&lt;-</span> <span class="va">sL</span> |&gt; <span class="fu"><a href="../../reference/perform_exp.html">perform_exp</a></span><span class="op">(</span><span class="va">focal.rand</span><span class="op">)</span>
+<span class="va">sL.foc</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 1              </span>
+<span class="co">#&gt; a . 1 NA NA NA</span>
+<span class="co">#&gt; b . .  .  1  .</span>
+<span class="co">#&gt; c . .  . NA NA</span>
+<span class="co">#&gt; d . .  .  . NA</span>
+<span class="co">#&gt; e . .  .  .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 2              </span>
+<span class="co">#&gt; a . 1 NA NA NA</span>
+<span class="co">#&gt; b . .  .  1  1</span>
+<span class="co">#&gt; c . .  . NA NA</span>
+<span class="co">#&gt; d . .  .  . NA</span>
+<span class="co">#&gt; e . .  .  .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ... ( 7  more scans)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 10              </span>
+<span class="co">#&gt; a . 1  1  .  .</span>
+<span class="co">#&gt; b . . NA NA NA</span>
+<span class="co">#&gt; c . .  . NA NA</span>
+<span class="co">#&gt; d . .  .  . NA</span>
+<span class="co">#&gt; e . .  .  .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob focalList theoretical.scanList</span>
+<span class="va">sL.foc</span> |&gt; <span class="fu"><a href="../../reference/attrs.html">attrs</a></span><span class="op">(</span><span class="st">"focalList"</span><span class="op">)</span>
+<span class="co">#&gt; b b e d a d c b a a </span>
+<span class="co">#&gt; 2 2 5 4 1 4 3 2 1 1</span></code></pre></div>
+<div id="types-of-focal-scan-sampling" class="section level4">
+<h4 class="hasAnchor">
+<a href="#types-of-focal-scan-sampling" class="anchor"></a>Types of focal-scan sampling</h4>
+<p><code>focalList</code> can be defined via several routines</p>
+</div>
+<div id="random-probabilities-1" class="section level4">
+<h4 class="hasAnchor">
+<a href="#random-probabilities-1" class="anchor"></a>Random probabilities</h4>
+<p>Like in the previous example, focals can be selected at random. Input <code>sampling</code> as the character string <code>"random"</code></p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co">## randomly select focals</span>
+<span class="va">focal.rand</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/customize_sampling.html">customize_sampling</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"focal"</span>,sampling <span class="op">=</span> <span class="st">"random"</span><span class="op">)</span> |&gt;
+  <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+</div>
+<div id="even-focal-list" class="section level4">
+<h4 class="hasAnchor">
+<a href="#even-focal-list" class="anchor"></a>Even focal list</h4>
+<p>Efforts can be made to draw a focal list as evenly as possible (each node is sampled almost as many time). Input <code>sampling</code> as the character string <code>"even"</code> (the default).</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co">## randomly select focals</span>
+<span class="va">focal.even</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/customize_sampling.html">customize_sampling</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"focal"</span>,sampling <span class="op">=</span> <span class="st">"even"</span><span class="op">)</span> |&gt;
+  <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="op">)</span>
+
+<span class="va">sL.even</span> <span class="op">&lt;-</span> <span class="va">sL</span> |&gt; <span class="fu"><a href="../../reference/perform_exp.html">perform_exp</a></span><span class="op">(</span><span class="va">focal.even</span><span class="op">)</span>
+<span class="va">sL.even</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 1              </span>
+<span class="co">#&gt; a . NA . NA NA</span>
+<span class="co">#&gt; b .  . . NA NA</span>
+<span class="co">#&gt; c .  . .  .  1</span>
+<span class="co">#&gt; d .  . .  . NA</span>
+<span class="co">#&gt; e .  . .  .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 2              </span>
+<span class="co">#&gt; a . NA . NA NA</span>
+<span class="co">#&gt; b .  . . NA NA</span>
+<span class="co">#&gt; c .  . .  .  .</span>
+<span class="co">#&gt; d .  . .  . NA</span>
+<span class="co">#&gt; e .  . .  .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ... ( 7  more scans)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 10              </span>
+<span class="co">#&gt; a . 1  1  .  .</span>
+<span class="co">#&gt; b . . NA NA NA</span>
+<span class="co">#&gt; c . .  . NA NA</span>
+<span class="co">#&gt; d . .  .  . NA</span>
+<span class="co">#&gt; e . .  .  .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob focalList theoretical.scanList</span>
+<span class="va">sL.even</span> |&gt; <span class="fu"><a href="../../reference/attrs.html">attrs</a></span><span class="op">(</span><span class="st">"focalList"</span><span class="op">)</span>
+<span class="co">#&gt; c c a d e b b e d a </span>
+<span class="co">#&gt; 3 3 1 4 5 2 2 5 4 1</span></code></pre></div>
+</div>
+<div id="determined-from-a-user-defined-function-1" class="section level4">
+<h4 class="hasAnchor">
+<a href="#determined-from-a-user-defined-function-1" class="anchor"></a>Determined from a user-defined function</h4>
+<p>By inputting a function of Adj returning a probability vector (which length is the number of nodes), you can design several focal selection routines. To do so, pass the function as the <code>sampling</code>argument</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">trait_bias</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">Adj</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">Adj</span><span class="op">)</span>
+  <span class="fl">1</span><span class="op">:</span><span class="va">n</span> <span class="co"># imagine the node index to be a trait that bias (favor) the selection of the node as focal</span>
+<span class="op">}</span>
+<span class="fu">trait_bias</span><span class="op">(</span><span class="va">Adj</span><span class="op">)</span> <span class="co"># </span>
+<span class="co">#&gt; [1] 1 2 3 4 5</span>
+
+<span class="va">group.bias</span> <span class="op">&lt;-</span>
+  <span class="fu"><a href="../../reference/customize_sampling.html">customize_sampling</a></span><span class="op">(</span><span class="st">"group"</span>,sampling <span class="op">=</span> <span class="va">central.bias_fun</span><span class="op">)</span> |&gt;
+  <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="op">)</span>
+
+<span class="va">sL.bias</span> <span class="op">&lt;-</span> <span class="va">sL</span> |&gt; <span class="fu"><a href="../../reference/perform_exp.html">perform_exp</a></span><span class="op">(</span><span class="va">group.bias</span><span class="op">)</span>
+<span class="va">sL.bias</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 1           </span>
+<span class="co">#&gt; a . 1 . 1 1</span>
+<span class="co">#&gt; b . . . 1 .</span>
+<span class="co">#&gt; c . . . . 1</span>
+<span class="co">#&gt; d . . . . .</span>
+<span class="co">#&gt; e . . . . .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 2              </span>
+<span class="co">#&gt; a . NA .  .  .</span>
+<span class="co">#&gt; b .  . .  1  1</span>
+<span class="co">#&gt; c .  . . NA  .</span>
+<span class="co">#&gt; d .  . .  . NA</span>
+<span class="co">#&gt; e .  . .  .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ... ( 7  more scans)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 10              </span>
+<span class="co">#&gt; a . 1 NA NA  .</span>
+<span class="co">#&gt; b . .  . NA  .</span>
+<span class="co">#&gt; c . .  . NA  1</span>
+<span class="co">#&gt; d . .  .  . NA</span>
+<span class="co">#&gt; e . .  .  .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob obs.P theoretical.scanList</span>
+<span class="va">sL.bias</span> |&gt; <span class="fu"><a href="../../reference/count_nonNA.html">count_nonNA</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Weighted adjacency matrix            </span>
+<span class="co">#&gt; a . 9 9 4 10</span>
+<span class="co">#&gt; b . . 7 5  8</span>
+<span class="co">#&gt; c . . . 3 10</span>
+<span class="co">#&gt; d . . . .  2</span>
+<span class="co">#&gt; e . . . .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob obs.P theoretical.scanList</span>
+<span class="va">sL.bias</span> |&gt; <span class="fu"><a href="../../reference/attrs.html">attrs</a></span><span class="op">(</span><span class="st">"obs.P"</span><span class="op">)</span>
+<span class="co">#&gt;   a         b         c         d         e</span>
+<span class="co">#&gt; a 0 0.8878744 0.6950532 0.4394530 0.9999798</span>
+<span class="co">#&gt; b 0 0.0000000 0.6199123 0.3919446 0.8918739</span>
+<span class="co">#&gt; c 0 0.0000000 0.0000000 0.3068253 0.6981841</span>
+<span class="co">#&gt; d 0 0.0000000 0.0000000 0.0000000 0.4414325</span>
+<span class="co">#&gt; e 0 0.0000000 0.0000000 0.0000000 0.0000000</span>
+<span class="co">#&gt; attr(,"sampling_fun")</span>
+<span class="co">#&gt; function(Adj) {</span>
+<span class="co">#&gt;   str &lt;- </span>
+<span class="co">#&gt;     Adj |&gt;</span>
+<span class="co">#&gt;     igraph::graph.adjacency(mode = "upper",weighted = TRUE) |&gt; </span>
+<span class="co">#&gt;     igraph::strength()</span>
+<span class="co">#&gt;   obs.P &lt;- str %o% str</span>
+<span class="co">#&gt;   diag(obs.P) &lt;- 0</span>
+<span class="co">#&gt;   obs.P / (max(obs.P) + 1)</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000022c802e8&gt;</span>
+<span class="co">#&gt; attr(,"sampling")</span>
+<span class="co">#&gt; [1] "function"</span>
+
+<span class="va">sL</span> |&gt; <span class="fu"><a href="../../reference/scale_scans.html">scale_scans</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Scaled weighted adjacency matrix                 </span>
+<span class="co">#&gt; a . 1 0.3 0.1 0.4</span>
+<span class="co">#&gt; b . . 0.1 0.5 0.4</span>
+<span class="co">#&gt; c . . .   0.2 0.9</span>
+<span class="co">#&gt; d . . .   .   0.2</span>
+<span class="co">#&gt; e . . .   .   .  </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob summed.scanList sampled</span>
+<span class="va">sL.bias</span> |&gt; <span class="fu"><a href="../../reference/scale_scans.html">scale_scans</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Scaled weighted adjacency matrix                     </span>
+<span class="co">#&gt; a . 1 0.222 0.250 0.4</span>
+<span class="co">#&gt; b . . 0.143 0.600 0.5</span>
+<span class="co">#&gt; c . . .     0.333 0.9</span>
+<span class="co">#&gt; d . . .     .     .  </span>
+<span class="co">#&gt; e . . .     .     .  </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob obs.P theoretical.scanList summed.scanList sampled</span></code></pre></div>
+</div>
+</div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 

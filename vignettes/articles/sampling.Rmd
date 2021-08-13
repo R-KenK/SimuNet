@@ -8,8 +8,183 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+Within experimental designs, sampling via a given method is considered similarly to other "building blocks" manipulations. Conceptually, they also:
 
-```{r setup}
+* take a theoretical `scanList` as an input
+* alter it in some way:
+    * **group-scan sampling** can lead to missing some edges: they are turned into `NA` in the
+    scanList regardless of them being `1` or `0` originally
+    * **focal(-scan) sampling** allows to sample all edges involving the focal, but misses all the
+    others: they are also turned to `NA`s
+* and return an empirical `scanList`
+
+## Designin a sampling method
+Designing a sampling method - or creating a `expDesign` object in `SimuNet` - relies on `customize_sampling()` and `design_exp()`:
+
+* `customize_sampling()` tailors a sampling function of `scanList`
+* `design_exp()`, a general wrapper to create a sequence of experimental manipulations, takes the function returned by `customize_sampling()` to include the sampling as part of the manipulation sequence.
+
+Sampling can be only part of the overall experimental design, and for instance follow a sequence of other manipulations. See them in action in the following examples!
+
+### Group-scan sampling
+Group-scan sampling is the act of looking at the whole group during scans, and seeing who is
+associated/interacting with whom. 
+
+* Empirically, the scan can diverge from theory by missing individuals and/or edges.
+* Internally, group-scan sampling method:
+    * requires setting the argument `method = "group"`
+    * relies on a edge observation probability matrix, named `obs.P`, and stored in resulting
+    `scanList`'s attributes list `attrs`.
+```{r group_exp1_1}
 library(SimuNet)
+customize_sampling(method = "group",sampling = "random")
 ```
-under construction
+
+The returned function can be passed to `design_exp()`
+```{r group_exp1_2}
+group.rand <- customize_sampling(method = "group",sampling = "random") |> design_exp()
+ # or 
+group.fun <- customize_sampling(method = "group",sampling = "random")
+group.rand <- design_exp(group.fun)
+```
+
+Let's apply it to a `scanList`:
+```{r group_exp1_3}
+set.seed(42)
+n <- 5L
+samp.effort <- 100L
+Adj <- sample(1:samp.effort,n * n) |>
+  matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
+Adj[lower.tri(Adj,diag = TRUE)] <- 0L
+Adj
+
+sL.group <- simunet(Adj,samp.effort,"upper",10,group.rand)
+sL.group
+sL.group |> attrs("theoretical.scanList")  # see what intermediate scanList was generated
+sL.group |> attrs("obs.P")                 # see what obs.P was used
+
+sL <- simunet(Adj,samp.effort,"upper",10)
+sL |> perform_exp(group.rand)
+```
+#### Types of group-scan sampling
+`obs.P` can be defined via several routines
+
+#### Random probabilities
+Like in the previous example, observation probabilities can be determined at random. Input
+`sampling` as the character string `"random"`
+```{r group_rand}
+group.rand <- customize_sampling("group",sampling = "random") |> design_exp()
+```
+
+#### Constant probability
+All probabilities can be set to a constant probability. Input this constant as the sampling
+argument:
+```{r group_constant}
+group.cst <-
+  customize_sampling("group",sampling = 0.8) |> # an edge has 80% chances of being observed
+  design_exp()
+
+sL.cst <- sL |> perform_exp(group.cst)
+sL.cst
+sL.cst |> count_nonNA()
+```
+
+#### Determined from a user-defined function
+By inputting a function of Adj returning a similarly-dimensioned probability matrix, you can design several routines. To do so, pass the function as the `sampling`argument
+```{r group_fun}
+central.bias_fun <- function(Adj) {
+  str <- 
+    Adj |>
+    igraph::graph.adjacency(mode = "upper",weighted = TRUE) |> 
+    igraph::strength()
+  obs.P <- str %o% str
+  diag(obs.P) <- 0
+  obs.P / (max(obs.P) + 1)
+}
+central.bias_fun(Adj) # 
+
+group.bias <-
+  customize_sampling("group",sampling = central.bias_fun) |>
+  design_exp()
+
+sL.bias <- sL |> perform_exp(group.bias)
+sL.bias
+sL.bias |> count_nonNA()
+sL.bias |> attrs("obs.P")
+
+sL |> scale_scans()
+sL.bias |> scale_scans()
+```
+
+### Focal(-scan) sampling
+Focal(-scan) sampling is the act of following a focal individual, and record all
+associations/interactions involving it. a focal-scan sampling would be recording data "on the tick",
+but focal scans can also be defined as continuous. We argue that by dividing a continuous focal
+sampling into segment, one can "binarize" a continuous scan into a scan equivalent, should it
+require dividing the continuous scan into the smallest segments sampling resolution allows (e.g.
+each minute).
+
+* Empirically, the scan can diverge from theory by showing only edges involving the focal.
+* Internally, group-scan sampling method:
+    * requires setting the argument `method = "focal"`
+    * relies on a focal selection probability vector, leading to drawing a `focalList`, and stored
+    in resulting `scanList`'s attributes list `attrs`.
+
+```{r focal_exp1_1}
+## randomly select focals
+focal.rand <- customize_sampling(method = "focal",sampling = "random") |>
+  design_exp()
+
+sL.foc <- sL |> perform_exp(focal.rand)
+sL.foc
+sL.foc |> attrs("focalList")
+```
+
+#### Types of focal-scan sampling
+`focalList` can be defined via several routines
+
+#### Random probabilities
+Like in the previous example, focals can be selected at random. Input
+`sampling` as the character string `"random"`
+```{r focal_rand}
+## randomly select focals
+focal.rand <- customize_sampling(method = "focal",sampling = "random") |>
+  design_exp()
+```
+
+#### Even focal list
+Efforts can be made to draw a focal list as evenly as possible (each node is sampled almost as many
+time). Input `sampling` as the character string `"even"` (the default).
+```{r focal_even}
+## randomly select focals
+focal.even <- customize_sampling(method = "focal",sampling = "even") |>
+  design_exp()
+
+sL.even <- sL |> perform_exp(focal.even)
+sL.even
+sL.even |> attrs("focalList")
+```
+
+#### Determined from a user-defined function
+By inputting a function of Adj returning a probability vector (which length is the number of nodes),
+you can design several focal selection routines. To do so, pass the function as the
+`sampling`argument
+```{r focal_fun}
+trait_bias <- function(Adj) {
+  n <- nrow(Adj)
+  1:n # imagine the node index to be a trait that bias (favor) the selection of the node as focal
+}
+trait_bias(Adj) # 
+
+group.bias <-
+  customize_sampling("group",sampling = central.bias_fun) |>
+  design_exp()
+
+sL.bias <- sL |> perform_exp(group.bias)
+sL.bias
+sL.bias |> count_nonNA()
+sL.bias |> attrs("obs.P")
+
+sL |> scale_scans()
+sL.bias |> scale_scans()
+```

@@ -89,6 +89,7 @@ sL3.Adj
 
 upper_cor(Adj,sL3.Adj)
 
+par(bg = "white")
 plot(Adj[upper.tri(Adj)],sL3.Adj[upper.tri(sL3.Adj)],
     xlab = "Original network edges' weights (Adj)",
     ylab = "Simulated network edges's weights"
@@ -119,6 +120,7 @@ scaled.list <-
     function(n) simunet(Adj,samp.effort,"upper",n) |> scale_scans()
   )
 
+par(bg = "white")
 scaled.list |>
   sapply(upper_cor,Y = Adj / samp.effort) |>
   plot(xlab = "n.scans",ylab = "edge correlation")
