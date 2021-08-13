@@ -49,9 +49,12 @@ reference:
       - '`quick_sample`'
 
 navbar:
+ structure:
+   left:  [home, intro, index, articles, reference, news]
+   right: [github, lab]
  components:
    articles:
-    text: Articles
+    text: "How to use"
     menu:
     - text: "First steps"
     - text: Importing networks
@@ -70,3 +73,9 @@ navbar:
       href: articles/articles/bayesian_framework.html
     - text: Network Uncertainty
       href: articles/articles/uncertainty.html
+   reference:
+    text: "Documentation"
+    href: reference/index.html
+   lab:
+    icon: fa-user
+    href: https://www.macintoshlab.com/members
