@@ -1,0 +1,71 @@
+title: SimuNet
+url: https://r-kenk.github.io/SimuNet/
+template:
+  package: preferably
+  params:
+    toggle: manual
+
+reference:
+  - title: Main Functions
+    desc: Running simulations and experiments
+    contents:
+      - '`simunet`'
+      - '`design_exp`'
+      - '`perform_exp`'
+      - '`customize_sampling`'
+  - title: Building Blocks
+    desc: Provided experimental manipulations - combine them with your own!
+    contents:
+      - '`add_scans`'
+      - '`count_NA`'
+      - '`count_nonNA`'
+      - '`remove_mostPeripheral`'
+      - '`scale_scans`'
+      - '`sum_scans`'
+  - title: ASNR Import
+    desc: Import social networks from ASNR
+    contents:
+      - '`asnr_network_df`'
+      - '`import_from_asnr`'
+  - title: SimuNet objects related functions
+    desc: Interact with some specificities of SimuNet classes of objects
+    contents:
+      - '`attrs`'
+      - '`matList2scanList`'
+      - '`scanList2matList`'
+      - '`sLapply`'
+      - '`sLlapply`'
+      - '`sLvapply`'
+  - title: Internals
+    desc: Internal functions and helpers
+    contents:
+      - '`attrs<-`'
+      - '`diagonal`'
+      - '`draw_edgeProb`'
+      - '`draw_edgeProb`'
+      - '`non.diagonal<-`'
+      - '`non.diagonal`'
+      - '`quick_sample`'
+
+navbar:
+ components:
+   articles:
+    text: Articles
+    menu:
+    - text: "First steps"
+    - text: Importing networks
+      href: articles/articles/importing_networks.html
+    - text: First simulations
+      href: articles/articles/first_simulations.html
+    - text: -------
+    - text: "Performing experiments"
+    - text: Sampling methods
+      href: articles/articles/sampling.html
+    - text: Experimental manipulations
+      href: articles/articles/experiments.html
+    - text: -------
+    - text: "SimuNet in details"
+    - text: SimuNet's Bayesian framework
+      href: articles/articles/bayesian_framework.html
+    - text: Network Uncertainty
+      href: articles/articles/uncertainty.html
