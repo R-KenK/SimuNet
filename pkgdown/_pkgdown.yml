@@ -63,6 +63,8 @@ navbar:
       href: articles/articles/first_simulations.html
     - text: -------
     - text: "Performing experiments"
+    - text: General approach
+      href: articles/articles/design_exp.html
     - text: Sampling methods
       href: articles/articles/sampling.html
     - text: Experimental manipulations
