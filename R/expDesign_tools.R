@@ -104,8 +104,11 @@
 #' )
 design_exp <- function(...,.dir = c("forward", "backward")) {
   .dir <- match.arg(.dir)
+  named.list <- namedList(...)
   FUN.seq <- purrr::compose(... = ...,.dir = .dir)
-  generate_expDesign(FUN.seq = FUN.seq)
+  generate_expDesign(FUN.seq = FUN.seq,
+                     fun.input = named.list
+  )
 }
 
 #' Perform an experimental design on theoretical `scanList`
@@ -197,18 +200,49 @@ perform_exp <- function(scan.list,exp.design = NULL,...){
 #' Generate `expDesign` objects
 #'
 #' @param FUN.seq function sequence created by `purrr`'s [`compose()`][purrr::compose()] function
+#' @param fun.input functions of `scanList` objects. Can be a combination of the provided "building
+#'   blocks" and user-defined function (cf. the example section).
 #'
 #' @return an `expDesign` objects, a list consisting in the following elements:
 #' * `FUN.seq`: function sequence created by `purrr`'s [`compose()`][purrr::compose()] function
 #' * WIP: more to come, notably to include more descriptive function names.
 #'
 #' @keywords internal
-generate_expDesign <- function(FUN.seq) {
+generate_expDesign <- function(FUN.seq,fun.input) {
   expD <-
     list(
-      FUN.seq = FUN.seq
+      FUN.seq = FUN.seq,
+      FUN.names = names(fun.input),
+      rest = fun.input
     )
   class(expD) <- "expDesign"
   expD
 }
 
+#' Helper to manage function names in list of functions
+#' modified from <https://stackoverflow.com/a/16951524>
+#'
+#' @param ... functions of `scanList` objects. Can be a combination of the provided "building
+#'   blocks" and user-defined function (cf. the example section).
+#'
+#' @return a named list of functions
+#' @export
+#'
+#' @keywords internal
+namedList <- function(...) {
+  L <- list(...)
+  snm <- sapply(substitute(list(...)),deparse)[-1]
+  if (is.null(nm <- names(L))) nm <- snm
+  if (any(nonames <- nm=="")) nm[nonames] <- snm[nonames]
+  custom.f <- substr(nm,1,12) %>% {. == "c(\"function("}
+  nm[custom.f] <- paste0("custom.FUN_",1:length(nm[custom.f]))
+  setNames(L,nm)
+}
+
+#' Print method for `expDesign` objects
+#' @export
+#' @noRd
+print.expDesign <- function(x,...) {
+  cat("Theoretical scanList",x$FUN.names,"empirical scanList",sep = " -> ")
+  cat("\nSee `$FUN.seq` for the functions source code.")
+}

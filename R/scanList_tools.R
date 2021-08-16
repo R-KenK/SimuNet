@@ -381,6 +381,7 @@ rbind.scanList <- function(...,deparse.level = 1) {
 # printing related functions ----
 
 ## printing methods ----
+
 #' Print method for `scanList` objects
 #' @export
 #' @noRd
