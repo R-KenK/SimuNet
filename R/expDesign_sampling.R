@@ -145,7 +145,11 @@ customize_sampling <- function(method = c("group","focal"),
          )
   )
   attr(FUN,"FUN.names") <- paste0(method,"-scan sampling: ",samp.type)
-  FUN
+  FUN.seq <- purrr::compose(FUN)
+  generate_expDesign(FUN.seq = FUN.seq,
+                     fun.input = namedList(FUN),
+                     input = FUN
+  )
 }
 
 #' Checks if the method and sampling parameter combination is adequate
