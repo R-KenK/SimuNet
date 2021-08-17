@@ -13,7 +13,7 @@ reference:
       - '`simunet`'
       - '`design_exp`'
       - '`perform_exp`'
-      - '`customize_sampling`'
+      - '`design_sampling`'
   - title: Building Blocks
     desc: Provided experimental manipulations - combine them with your own!
     contents:
@@ -63,6 +63,8 @@ navbar:
       href: articles/articles/first_simulations.html
     - text: -------
     - text: "Performing experiments"
+    - text: General approach
+      href: articles/articles/design_exp.html
     - text: Sampling methods
       href: articles/articles/sampling.html
     - text: Experimental manipulations

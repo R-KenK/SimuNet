@@ -105,7 +105,7 @@ Written analogously to lapply()" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1.9000</span>
       </span>
     </div>
 
@@ -136,6 +136,9 @@ Written analogously to lapply()" />
     </li>
     <li class="divider"></li>
     <li class="dropdown-header">Performing experiments</li>
+    <li>
+      <a href="../articles/articles/design_exp.html">General approach</a>
+    </li>
     <li>
       <a href="../articles/articles/sampling.html">Sampling methods</a>
     </li>
@@ -251,10 +254,10 @@ applied (see <code><a href='perform_exp.html'>perform_exp()</a></code>)</p>
 #&gt; e 0   0  0  0  0</div><div class='input'>
 <span class='co'># Designing the experiments:</span>
 <span class='co'>## setting a constant probability of not observing edges</span>
-<span class='va'>group.scan</span> <span class='op'>&lt;-</span> <span class='fu'><a href='design_exp.html'>design_exp</a></span><span class='op'>(</span><span class='fu'><a href='customize_sampling.html'>customize_sampling</a></span><span class='op'>(</span>method <span class='op'>=</span> <span class='st'>"group"</span>,sampling <span class='op'>=</span> <span class='fl'>0.8</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>group.scan</span> <span class='op'>&lt;-</span> <span class='fu'><a href='design_sampling.html'>design_sampling</a></span><span class='op'>(</span>method <span class='op'>=</span> <span class='st'>"group"</span>,sampling <span class='op'>=</span> <span class='fl'>0.8</span><span class='op'>)</span>
 
 <span class='co'>## setting an even focal sampling</span>
-<span class='va'>focal.scan</span> <span class='op'>&lt;-</span> <span class='fu'><a href='design_exp.html'>design_exp</a></span><span class='op'>(</span><span class='fu'><a href='customize_sampling.html'>customize_sampling</a></span><span class='op'>(</span>method <span class='op'>=</span> <span class='st'>"focal"</span>,sampling <span class='op'>=</span> <span class='st'>"even"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>focal.scan</span> <span class='op'>&lt;-</span> <span class='fu'><a href='design_sampling.html'>design_sampling</a></span><span class='op'>(</span>method <span class='op'>=</span> <span class='st'>"focal"</span>,sampling <span class='op'>=</span> <span class='st'>"even"</span><span class='op'>)</span>
 
 <span class='va'>sL</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simunet.html'>simunet</a></span><span class='op'>(</span>Adj <span class='op'>=</span> <span class='va'>Adj</span>,samp.effort <span class='op'>=</span> <span class='va'>samp.effort</span>,mode <span class='op'>=</span> <span class='st'>"upper"</span>,n.scans <span class='op'>=</span> <span class='fl'>120L</span><span class='op'>)</span>
 

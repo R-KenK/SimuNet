@@ -22,7 +22,8 @@
   }
 </script>
 
-<title>Draw edge presence according to the edge presence probability matrix — draw_raw_scanList • SimuNet</title>
+<title>Helper to manage function names in list of functions
+modified from https://stackoverflow.com/a/16951524 — namedList • SimuNet</title>
 
 
 <!-- jquery -->
@@ -66,8 +67,10 @@
 
 
 
-<meta property="og:title" content="Draw edge presence according to the edge presence probability matrix — draw_raw_scanList" />
-<meta property="og:description" content="Draw edge presence according to the edge presence probability matrix" />
+<meta property="og:title" content="Helper to manage function names in list of functions
+modified from https://stackoverflow.com/a/16951524 — namedList" />
+<meta property="og:description" content="Helper to manage function names in list of functions
+modified from https://stackoverflow.com/a/16951524" />
 
 
 
@@ -196,44 +199,32 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Draw edge presence according to the edge presence probability matrix</h1>
-    <small class="dont-index">Source: <a href='https://github.com/R-KenK/SimuNet/blob/master/R/scanList_tools.R'><code>R/scanList_tools.R</code></a></small>
-    <div class="hidden name"><code>draw_raw_scanList.Rd</code></div>
+    <h1>Helper to manage function names in list of functions
+modified from <a href='https://stackoverflow.com/a/16951524'>https://stackoverflow.com/a/16951524</a></h1>
+    <small class="dont-index">Source: <a href='https://github.com/R-KenK/SimuNet/blob/master/R/expDesign_tools.R'><code>R/expDesign_tools.R</code></a></small>
+    <div class="hidden name"><code>namedList.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Draw edge presence according to the edge presence probability matrix</p>
+    <p>Helper to manage function names in list of functions
+modified from <a href='https://stackoverflow.com/a/16951524'>https://stackoverflow.com/a/16951524</a></p>
     </div>
 
-    <pre class="usage"><span class='fu'>draw_raw_scanList</span><span class='op'>(</span><span class='va'>edge.Prob</span>, <span class='va'>n.scans</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>namedList</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>edge.Prob</th>
-      <td><p>an <code>edgeProb</code> object, i.e. a list containing:</p><ul>
-<li><p><code>P</code>: the edge presence probability matrix</p></li>
-<li><p><code>Adj</code>: the inputted <code>Adj</code></p></li>
-<li><p><code>samp.effort</code>: the inputted <code>samp.effort</code></p></li>
-<li><p><code>mode</code>: the inputted <code>mode</code></p></li>
-<li><p><code>Adj.subfun</code>: the inputted <code>Adj.subfun</code></p></li>
-</ul></td>
-    </tr>
-    <tr>
-      <th>n.scans</th>
-      <td><p>integer scalar, number of scans to generate in the simulation</p></td>
+      <th>...</th>
+      <td><p>functions of <code>scanList</code> objects. Can be a combination of the provided "building
+blocks" and user-defined function (cf. the example section).</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a 3 dimensional array
-representing the (binary) adjacency matrices (coded within the first two dimensions of the
-3D-array) obtained at each simulated scan (coded as the 3rd dimension of the 3D-array)</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p><code><a href='simunet.html'>simunet()</a></code>, <code><a href='generate_edgeProb.html'>generate_edgeProb()</a></code>, <code><a href='draw_edgeProb.html'>draw_edgeProb()</a></code>, <code><a href='generate_scanList.html'>generate_scanList()</a></code>.</p></div>
+    <p>a named list of functions</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

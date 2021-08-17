@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1.9000</span>
       </span>
     </div>
 
@@ -79,6 +79,9 @@
     </li>
     <li class="divider">
     <li class="dropdown-header">Performing experiments</li>
+    <li>
+      <a href="../../articles/articles/design_exp.html">General approach</a>
+    </li>
     <li>
       <a href="../../articles/articles/sampling.html">Sampling methods</a>
     </li>
@@ -165,13 +168,13 @@
 <div id="designin-a-sampling-method" class="section level2">
 <h2 class="hasAnchor">
 <a href="#designin-a-sampling-method" class="anchor"></a>Designin a sampling method</h2>
-<p>Designing a sampling method - or creating a <code>expDesign</code> object in <code>SimuNet</code> - relies on <code><a href="../../reference/customize_sampling.html">customize_sampling()</a></code> and <code><a href="../../reference/design_exp.html">design_exp()</a></code>:</p>
+<p>Designing a sampling method - or creating a <code>expDesign</code> object in <code>SimuNet</code> - relies on <code><a href="../../reference/design_sampling.html">design_sampling()</a></code> and <code><a href="../../reference/design_exp.html">design_exp()</a></code>:</p>
 <ul>
 <li>
-<code><a href="../../reference/customize_sampling.html">customize_sampling()</a></code> tailors a sampling function of <code>scanList</code>
+<code><a href="../../reference/design_sampling.html">design_sampling()</a></code> tailors a sampling function of <code>scanList</code>
 </li>
 <li>
-<code><a href="../../reference/design_exp.html">design_exp()</a></code>, a general wrapper to create a sequence of experimental manipulations, takes the function returned by <code><a href="../../reference/customize_sampling.html">customize_sampling()</a></code> to include the sampling as part of the manipulation sequence.</li>
+<code><a href="../../reference/design_exp.html">design_exp()</a></code>, a general wrapper to create a sequence of experimental manipulations, takes the function returned by <code><a href="../../reference/design_sampling.html">design_sampling()</a></code> to include the sampling as part of the manipulation sequence.</li>
 </ul>
 <p>Sampling can be only part of the overall experimental design, and for instance follow a sequence of other manipulations. See them in action in the following examples!</p>
 <div id="group-scan-sampling" class="section level3">
@@ -190,16 +193,19 @@
 </ul>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/R-KenK/SimuNet">SimuNet</a></span><span class="op">)</span>
-<span class="fu"><a href="../../reference/customize_sampling.html">customize_sampling</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"group"</span>,sampling <span class="op">=</span> <span class="st">"random"</span><span class="op">)</span>
-<span class="co">#&gt; function (scan.list) </span>
-<span class="co">#&gt; group_sample(scan.list = scan.list, sampling = sampling, all.sampled = all.sampled)</span>
-<span class="co">#&gt; &lt;bytecode: 0x000000002326a450&gt;</span>
-<span class="co">#&gt; &lt;environment: 0x0000000023269ce0&gt;</span></code></pre></div>
+<span class="fu"><a href="../../reference/design_sampling.html">design_sampling</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"group"</span>,sampling <span class="op">=</span> <span class="st">"random"</span><span class="op">)</span>
+<span class="co">#&gt; Theoretical scanList -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  group-scan sampling: random -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  empirical scanList</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; See `$FUN.seq` for the functions source code.</span></code></pre></div>
 <p>The returned function can be passed to <code><a href="../../reference/design_exp.html">design_exp()</a></code></p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">group.rand</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/customize_sampling.html">customize_sampling</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"group"</span>,sampling <span class="op">=</span> <span class="st">"random"</span><span class="op">)</span> |&gt; <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">group.rand</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/design_sampling.html">design_sampling</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"group"</span>,sampling <span class="op">=</span> <span class="st">"random"</span><span class="op">)</span>
  <span class="co"># or </span>
-<span class="va">group.fun</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/customize_sampling.html">customize_sampling</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"group"</span>,sampling <span class="op">=</span> <span class="st">"random"</span><span class="op">)</span>
+<span class="va">group.fun</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/design_sampling.html">design_sampling</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"group"</span>,sampling <span class="op">=</span> <span class="st">"random"</span><span class="op">)</span>
 <span class="va">group.rand</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="va">group.fun</span><span class="op">)</span></code></pre></div>
 <p>Let’s apply it to a <code>scanList</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -316,7 +322,7 @@
 <a href="#random-probabilities" class="anchor"></a>Random probabilities</h4>
 <p>Like in the previous example, observation probabilities can be determined at random. Input <code>sampling</code> as the character string <code>"random"</code></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">group.rand</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/customize_sampling.html">customize_sampling</a></span><span class="op">(</span><span class="st">"group"</span>,sampling <span class="op">=</span> <span class="st">"random"</span><span class="op">)</span> |&gt; <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">group.rand</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/design_sampling.html">design_sampling</a></span><span class="op">(</span><span class="st">"group"</span>,sampling <span class="op">=</span> <span class="st">"random"</span><span class="op">)</span> |&gt; <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="constant-probability" class="section level4">
 <h4 class="hasAnchor">
@@ -324,9 +330,16 @@
 <p>All probabilities can be set to a constant probability. Input this constant as the sampling argument:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">group.cst</span> <span class="op">&lt;-</span>
-  <span class="fu"><a href="../../reference/customize_sampling.html">customize_sampling</a></span><span class="op">(</span><span class="st">"group"</span>,sampling <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span> |&gt; <span class="co"># an edge has 80% chances of being observed</span>
+  <span class="fu"><a href="../../reference/design_sampling.html">design_sampling</a></span><span class="op">(</span><span class="st">"group"</span>,sampling <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span> |&gt; <span class="co"># an edge has 80% chances of being observed</span>
   <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="op">)</span>
-
+<span class="va">group.cst</span>
+<span class="co">#&gt; Theoretical scanList -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  group-scan sampling: constant -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  empirical scanList</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; See `$FUN.seq` for the functions source code.</span>
 <span class="va">sL.cst</span> <span class="op">&lt;-</span> <span class="va">sL</span> |&gt; <span class="fu"><a href="../../reference/perform_exp.html">perform_exp</a></span><span class="op">(</span><span class="va">group.cst</span><span class="op">)</span>
 <span class="va">sL.cst</span>
 <span class="co">#&gt; </span>
@@ -390,7 +403,7 @@
 <span class="co">#&gt; e 0.9999798 0.8918739 0.6981841 0.4414325 0.0000000</span>
 
 <span class="va">group.bias</span> <span class="op">&lt;-</span>
-  <span class="fu"><a href="../../reference/customize_sampling.html">customize_sampling</a></span><span class="op">(</span><span class="st">"group"</span>,sampling <span class="op">=</span> <span class="va">central.bias_fun</span><span class="op">)</span> |&gt;
+  <span class="fu"><a href="../../reference/design_sampling.html">design_sampling</a></span><span class="op">(</span><span class="st">"group"</span>,sampling <span class="op">=</span> <span class="va">central.bias_fun</span><span class="op">)</span> |&gt;
   <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="va">sL.bias</span> <span class="op">&lt;-</span> <span class="va">sL</span> |&gt; <span class="fu"><a href="../../reference/perform_exp.html">perform_exp</a></span><span class="op">(</span><span class="va">group.bias</span><span class="op">)</span>
@@ -449,7 +462,7 @@
 <span class="co">#&gt;   diag(obs.P) &lt;- 0</span>
 <span class="co">#&gt;   obs.P / (max(obs.P) + 1)</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x0000000022c802e8&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000023bc13e8&gt;</span>
 <span class="co">#&gt; attr(,"sampling")</span>
 <span class="co">#&gt; [1] "function"</span>
 
@@ -493,7 +506,7 @@
 </ul>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## randomly select focals</span>
-<span class="va">focal.rand</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/customize_sampling.html">customize_sampling</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"focal"</span>,sampling <span class="op">=</span> <span class="st">"random"</span><span class="op">)</span> |&gt;
+<span class="va">focal.rand</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/design_sampling.html">design_sampling</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"focal"</span>,sampling <span class="op">=</span> <span class="st">"random"</span><span class="op">)</span> |&gt;
   <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="va">sL.foc</span> <span class="op">&lt;-</span> <span class="va">sL</span> |&gt; <span class="fu"><a href="../../reference/perform_exp.html">perform_exp</a></span><span class="op">(</span><span class="va">focal.rand</span><span class="op">)</span>
@@ -526,7 +539,9 @@
 <span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob focalList theoretical.scanList</span>
 <span class="va">sL.foc</span> |&gt; <span class="fu"><a href="../../reference/attrs.html">attrs</a></span><span class="op">(</span><span class="st">"focalList"</span><span class="op">)</span>
 <span class="co">#&gt; b b e d a d c b a a </span>
-<span class="co">#&gt; 2 2 5 4 1 4 3 2 1 1</span></code></pre></div>
+<span class="co">#&gt; 2 2 5 4 1 4 3 2 1 1 </span>
+<span class="co">#&gt; attr(,"sampling")</span>
+<span class="co">#&gt; [1] "random"</span></code></pre></div>
 <div id="types-of-focal-scan-sampling" class="section level4">
 <h4 class="hasAnchor">
 <a href="#types-of-focal-scan-sampling" class="anchor"></a>Types of focal-scan sampling</h4>
@@ -538,7 +553,7 @@
 <p>Like in the previous example, focals can be selected at random. Input <code>sampling</code> as the character string <code>"random"</code></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## randomly select focals</span>
-<span class="va">focal.rand</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/customize_sampling.html">customize_sampling</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"focal"</span>,sampling <span class="op">=</span> <span class="st">"random"</span><span class="op">)</span> |&gt;
+<span class="va">focal.rand</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/design_sampling.html">design_sampling</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"focal"</span>,sampling <span class="op">=</span> <span class="st">"random"</span><span class="op">)</span> |&gt;
   <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="even-focal-list" class="section level4">
@@ -547,7 +562,7 @@
 <p>Efforts can be made to draw a focal list as evenly as possible (each node is sampled almost as many time). Input <code>sampling</code> as the character string <code>"even"</code> (the default).</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## randomly select focals</span>
-<span class="va">focal.even</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/customize_sampling.html">customize_sampling</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"focal"</span>,sampling <span class="op">=</span> <span class="st">"even"</span><span class="op">)</span> |&gt;
+<span class="va">focal.even</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/design_sampling.html">design_sampling</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"focal"</span>,sampling <span class="op">=</span> <span class="st">"even"</span><span class="op">)</span> |&gt;
   <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="va">sL.even</span> <span class="op">&lt;-</span> <span class="va">sL</span> |&gt; <span class="fu"><a href="../../reference/perform_exp.html">perform_exp</a></span><span class="op">(</span><span class="va">focal.even</span><span class="op">)</span>
@@ -580,7 +595,9 @@
 <span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob focalList theoretical.scanList</span>
 <span class="va">sL.even</span> |&gt; <span class="fu"><a href="../../reference/attrs.html">attrs</a></span><span class="op">(</span><span class="st">"focalList"</span><span class="op">)</span>
 <span class="co">#&gt; c c a d e b b e d a </span>
-<span class="co">#&gt; 3 3 1 4 5 2 2 5 4 1</span></code></pre></div>
+<span class="co">#&gt; 3 3 1 4 5 2 2 5 4 1 </span>
+<span class="co">#&gt; attr(,"sampling")</span>
+<span class="co">#&gt; [1] "even"</span></code></pre></div>
 </div>
 <div id="determined-from-a-user-defined-function-1" class="section level4">
 <h4 class="hasAnchor">
@@ -595,7 +612,7 @@
 <span class="co">#&gt; [1] 1 2 3 4 5</span>
 
 <span class="va">group.bias</span> <span class="op">&lt;-</span>
-  <span class="fu"><a href="../../reference/customize_sampling.html">customize_sampling</a></span><span class="op">(</span><span class="st">"group"</span>,sampling <span class="op">=</span> <span class="va">central.bias_fun</span><span class="op">)</span> |&gt;
+  <span class="fu"><a href="../../reference/design_sampling.html">design_sampling</a></span><span class="op">(</span><span class="st">"group"</span>,sampling <span class="op">=</span> <span class="va">central.bias_fun</span><span class="op">)</span> |&gt;
   <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="va">sL.bias</span> <span class="op">&lt;-</span> <span class="va">sL</span> |&gt; <span class="fu"><a href="../../reference/perform_exp.html">perform_exp</a></span><span class="op">(</span><span class="va">group.bias</span><span class="op">)</span>
@@ -654,7 +671,7 @@
 <span class="co">#&gt;   diag(obs.P) &lt;- 0</span>
 <span class="co">#&gt;   obs.P / (max(obs.P) + 1)</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x0000000022c802e8&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000023bc13e8&gt;</span>
 <span class="co">#&gt; attr(,"sampling")</span>
 <span class="co">#&gt; [1] "function"</span>
 

@@ -30,7 +30,7 @@ Generate \code{expDesign} objects that mainly consist on a sequence of functions
 It is best practice to use a combination of:
 \itemize{
 \item provided "building blocks": functions included in the \code{SimuNet} package, such as
-\code{\link[=customize_sampling]{customize_sampling()}}, \code{\link[=add_scans]{add_scans()}},
+\code{\link[=design_sampling]{design_sampling()}}, \code{\link[=add_scans]{add_scans()}},
 \code{\link[=remove_mostPeripheral]{remove_mostPeripheral()}}, or \code{\link[=sum_scans]{sum_scans()}}
 \item user-defined functions: designed to take a \code{scanList} object as a first argument, which is is
 in essence a 3 dimensional array with adjacency matrices on the first 2 dimensions, and the
@@ -70,16 +70,14 @@ Adj
 
 # Designing the experiments:
 ## setting a constant probability of not observing edges
-group.scan <- design_exp(customize_sampling(method = "group",sampling = 0.8))
+group.scan <- design_sampling(method = "group",sampling = 0.8)
 
 ## setting a biased focal sampling favoring central individual (node strength)
-focal.scan <- design_exp(
-  customize_sampling(
-    method = "focal",
-    sampling = function(Adj) Adj |>
-      igraph::graph.adjacency("upper",weighted = TRUE) |>
-      igraph::strength()
-  )
+focal.scan <- design_sampling(
+ method = "focal",
+ sampling = function(Adj) Adj |>
+  igraph::graph.adjacency("upper",weighted = TRUE) |>
+  igraph::strength()
 )
 
 ## Adding more scans, removing the most peripheral individual, before performing an even focal
@@ -87,7 +85,7 @@ focal.scan <- design_exp(
 focal.periRemoved <- design_exp(
   function(Adj) add_scans(Adj,42),     # users can use anonymous function to specify arguments
   remove_mostPeripheral,               # ... or pass functions as arguments directly
-  customize_sampling(method = "focal",sampling = "even")    # customize_sampling: special case
+  design_sampling(method = "focal",sampling = "even")    # design_sampling: special case
                                                             # that returns sampling functions
 )
 
@@ -110,5 +108,5 @@ simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L,
 )
 }
 \seealso{
-\code{\link[=perform_exp]{perform_exp()}}, \code{\link[=simunet]{simunet()}}, \code{\link[=customize_sampling]{customize_sampling()}}.
+\code{\link[=perform_exp]{perform_exp()}}, \code{\link[=simunet]{simunet()}}, \code{\link[=design_sampling]{design_sampling()}}.
 }

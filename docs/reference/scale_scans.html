@@ -106,7 +106,7 @@ Scaling here is dividing by the sum of 1s by the number of time an edge has been
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1.9000</span>
       </span>
     </div>
 
@@ -137,6 +137,9 @@ Scaling here is dividing by the sum of 1s by the number of time an edge has been
     </li>
     <li class="divider"></li>
     <li class="dropdown-header">Performing experiments</li>
+    <li>
+      <a href="../articles/articles/design_exp.html">General approach</a>
+    </li>
     <li>
       <a href="../articles/articles/sampling.html">Sampling methods</a>
     </li>
@@ -297,7 +300,7 @@ they have been sampled (determined via <code><a href='count_nonNA.html'>count_no
 
 <span class='co'># ... or `scanList` object directly</span>
 <span class='co'>## group-scan sampling</span>
-<span class='va'>sL</span> |&gt; <span class='fu'><a href='perform_exp.html'>perform_exp</a></span><span class='op'>(</span><span class='fu'><a href='design_exp.html'>design_exp</a></span><span class='op'>(</span><span class='fu'><a href='customize_sampling.html'>customize_sampling</a></span><span class='op'>(</span><span class='st'>"group"</span>,<span class='fl'>.6</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> |&gt; <span class='fu'>scale_scans</span><span class='op'>(</span><span class='op'>)</span>
+<span class='va'>sL</span> |&gt; <span class='fu'><a href='perform_exp.html'>perform_exp</a></span><span class='op'>(</span><span class='fu'><a href='design_sampling.html'>design_sampling</a></span><span class='op'>(</span><span class='st'>"group"</span>,<span class='fl'>.6</span><span class='op'>)</span><span class='op'>)</span> |&gt; <span class='fu'>scale_scans</span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; 
 #&gt; Scaled weighted adjacency matrix                               
 #&gt; a .     0.944 0.258 0.487 0.354
@@ -309,8 +312,8 @@ they have been sampled (determined via <code><a href='count_nonNA.html'>count_no
 #&gt; 
 #&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob obs.P theoretical.scanList summed.scanList sampled</div><div class='input'>
 <span class='co'>## comparing group-scan and focal sampling</span>
-<span class='va'>sL</span> |&gt; <span class='fu'><a href='perform_exp.html'>perform_exp</a></span><span class='op'>(</span><span class='fu'><a href='design_exp.html'>design_exp</a></span><span class='op'>(</span><span class='fu'><a href='customize_sampling.html'>customize_sampling</a></span><span class='op'>(</span><span class='st'>"group"</span>,<span class='fl'>.6</span><span class='op'>)</span><span class='op'>)</span>,
-                  <span class='fu'><a href='design_exp.html'>design_exp</a></span><span class='op'>(</span><span class='fu'><a href='customize_sampling.html'>customize_sampling</a></span><span class='op'>(</span><span class='st'>"focal"</span>,<span class='st'>"even"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>sL</span> |&gt; <span class='fu'><a href='perform_exp.html'>perform_exp</a></span><span class='op'>(</span><span class='fu'><a href='design_sampling.html'>design_sampling</a></span><span class='op'>(</span><span class='st'>"group"</span>,<span class='fl'>.6</span><span class='op'>)</span>,
+                  <span class='fu'><a href='design_sampling.html'>design_sampling</a></span><span class='op'>(</span><span class='st'>"focal"</span>,<span class='st'>"even"</span><span class='op'>)</span>
                   <span class='op'>)</span> |&gt; <span class='fu'>scale_scans</span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [[1]]
 #&gt; 

@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1.9000</span>
       </span>
     </div>
 
@@ -79,6 +79,9 @@
     </li>
     <li class="divider">
     <li class="dropdown-header">Performing experiments</li>
+    <li>
+      <a href="../../articles/articles/design_exp.html">General approach</a>
+    </li>
     <li>
       <a href="../../articles/articles/sampling.html">Sampling methods</a>
     </li>
@@ -539,7 +542,7 @@
 <h3 class="hasAnchor">
 <a href="#scaling-scanlist" class="anchor"></a>Scaling <code>scanList</code>
 </h3>
-<p>To compare <code>scanList</code> of different size, another “collapsing” function, <code><a href="../../reference/scale_scans.html">scale_scans()</a></code>, can be applied to <code>scanList</code> or their collapsed sums. <code><a href="../../reference/scale_scans.html">scale_scans()</a></code> divide the sum of binary edges by the number of time they were sampled (see more about sampling with <code><a href="../../reference/customize_sampling.html">customize_sampling()</a></code> and <a href="experiments.html">empirical designs</a>).</p>
+<p>To compare <code>scanList</code> of different size, another “collapsing” function, <code><a href="../../reference/scale_scans.html">scale_scans()</a></code>, can be applied to <code>scanList</code> or their collapsed sums. <code><a href="../../reference/scale_scans.html">scale_scans()</a></code> divide the sum of binary edges by the number of time they were sampled (see more about sampling with <code><a href="../../reference/design_sampling.html">design_sampling()</a></code> and <a href="experiments.html">empirical designs</a>).</p>
 <p>In the case of theoretical scanList, this means dividing the obtained weighted adjacency matrix by <code>n.scans</code>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../../reference/scale_scans.html">scale_scans</a></span><span class="op">(</span><span class="va">sL1</span><span class="op">)</span>

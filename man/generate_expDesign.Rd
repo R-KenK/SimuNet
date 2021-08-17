@@ -4,10 +4,13 @@
 \alias{generate_expDesign}
 \title{Generate \code{expDesign} objects}
 \usage{
-generate_expDesign(FUN.seq)
+generate_expDesign(FUN.seq, fun.input, input)
 }
 \arguments{
 \item{FUN.seq}{function sequence created by \code{purrr}'s \code{\link[purrr:compose]{compose()}} function}
+
+\item{fun.input}{functions of \code{scanList} objects. Can be a combination of the provided "building
+blocks" and user-defined function (cf. the example section).}
 }
 \value{
 an \code{expDesign} objects, a list consisting in the following elements:

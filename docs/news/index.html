@@ -101,7 +101,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1.9000</span>
       </span>
     </div>
 
@@ -132,6 +132,9 @@
     </li>
     <li class="divider"></li>
     <li class="dropdown-header">Performing experiments</li>
+    <li>
+      <a href="../articles/articles/design_exp.html">General approach</a>
+    </li>
     <li>
       <a href="../articles/articles/sampling.html">Sampling methods</a>
     </li>
@@ -196,6 +199,28 @@
       <small>Source: <a href='https://github.com/R-KenK/SimuNet/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="simunet-development-version" class="section level1">
+<h1 class="page-header" data-toc-text="development version">
+<a href="#simunet-development-version" class="anchor"></a>SimuNet (development version)</h1>
+<ul>
+<li>
+<code>customize_sampling()</code> renamed into <code><a href="../reference/design_sampling.html">design_sampling()</a></code>, with additional internal changes:
+<ul>
+<li>Now returns <code>expDesign</code> objects as the name suggests, and not just functions.</li>
+<li>Removes the need to nest/chain <code><a href="../reference/design_exp.html">design_exp()</a></code> and <code>customize_sampling()</code>: now a single <code><a href="../reference/design_sampling.html">design_sampling()</a></code> is enough, although <code><a href="../reference/design_exp.html">design_exp(design_sampling())</a></code> would return an equivalent <code>expDesign</code> anyway.</li>
+</ul>
+</li>
+<li>
+<code><a href="../reference/design_exp.html">design_exp()</a></code> can now take combinations of previously created expDesign objects and functions, either named or anonymous (renamed into <code>custom.FUN_X</code> for now on):
+<ul>
+<li>
+<code>NamedList()</code> function added and used in <code><a href="../reference/design_exp.html">design_exp()</a></code> to keep track of function names input.</li>
+<li>
+<code>expDesign</code> now prints the sequence of functions as a sequence of their names (more human-readable)</li>
+</ul>
+</li>
+</ul>
+</div>
     <div id="simunet-211" class="section level1">
 <h1 class="page-header" data-toc-text="2.1.1">
 <a href="#simunet-211" class="anchor"></a>SimuNet 2.1.1</h1>
@@ -309,7 +334,7 @@ This provides faster simulation and manipulations, but required an important rew
 </li>
 <li>Empirical sampling, with group-scan and focal-scan sampling, are now handled as (part of) experimental designs passed as <code>expDesign</code> objects, as such “building blocks”:
 <ul>
-<li>the function <code><a href="../reference/customize_sampling.html">customize_sampling()</a></code> can be used to define commonly defined group and focal sampling method, and can accept like previously:
+<li>the function <code>customize_sampling()</code> can be used to define commonly defined group and focal sampling method, and can accept like previously:
 <ul>
 <li>in the case of group-scan sampling:
 <ul>
@@ -326,7 +351,7 @@ This provides faster simulation and manipulations, but required an important rew
 </ul>
 </li>
 <li>
-<code><a href="../reference/customize_sampling.html">customize_sampling()</a></code> returns a function that can be used as a design “building block” within <code><a href="../reference/design_exp.html">design_exp()</a></code>
+<code>customize_sampling()</code> returns a function that can be used as a design “building block” within <code><a href="../reference/design_exp.html">design_exp()</a></code>
 </li>
 </ul>
 </li>

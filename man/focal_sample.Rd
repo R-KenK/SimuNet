@@ -48,6 +48,6 @@ Performs a focal-scan sampling over a \code{scanList} object
 Internal.
 }
 \seealso{
-\code{\link[=customize_sampling]{customize_sampling()}}, \code{\link[=draw_focalList]{draw_focalList()}}.
+\code{\link[=design_sampling]{design_sampling()}}, \code{\link[=draw_focalList]{draw_focalList()}}.
 }
 \keyword{internal}
