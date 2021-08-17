@@ -132,9 +132,9 @@ customize_sampling <- function(method = c("group","focal"),
                                all.sampled = TRUE) {
 
   method <- match.arg(method)
-  check_sampling_parameters(method = method,sampling = sampling)
+  samp.type <- determine_sampling_type(method = method,sampling = sampling)
 
-  switch(method,
+  FUN <- switch(method,
          "group" = \(scan.list) group_sample(scan.list = scan.list,
                                              sampling = sampling,
                                              all.sampled = all.sampled
@@ -144,6 +144,8 @@ customize_sampling <- function(method = c("group","focal"),
                                              all.sampled = all.sampled
          )
   )
+  attr(FUN,"FUN.names") <- paste0(method,"-scan sampling: ",samp.type)
+  FUN
 }
 
 #' Checks if the method and sampling parameter combination is adequate
@@ -151,11 +153,12 @@ customize_sampling <- function(method = c("group","focal"),
 #' @param method inputted `method` parameter, see [`customize_sampling()`][customize_sampling()]
 #' @param sampling inputted `sampling` parameter, see [`customize_sampling()`][customize_sampling()]
 #'
-#' @return nothing, but returns an error if the combination is not adequate
+#' @return character, the type of sampling. Returns an error if incompatible method/sampling
+#'   combination
 #' @export
 #'
 #' @keywords internal
-check_sampling_parameters <-
+determine_sampling_type <-
   function(method,
            sampling =  c("constant","matrix","even","random","function")) {
     switch(
@@ -171,10 +174,10 @@ check_sampling_parameters <-
               "random" =,
               "constant" =, # this is the default choice when no sampling argument is inputted
               "matrix" =,
-              "function" = {}
+              "function" = sampling
             )
           },
-          "function" =,"numeric" =,"matrix" = {}
+          "function" = "function","numeric" = "constant","matrix" = "matrix"
         ),
       "focal" =
         switch(
@@ -187,12 +190,12 @@ check_sampling_parameters <-
               "matrix" = stop('Invalid `sampling` option for method = "focal" (cf. `?customize_sampling`)'),
               "random" =,
               "even" =,
-              "function" = {}
+              "function" = sampling
             )
           },
           "matrix" =,
           "numeric" = stop('Invalid `sampling` option for method = "focal" (cf. `?customize_sampling`)'),
-          "function" = {}
+          "function" = "function"
         )
     )
   }
@@ -418,18 +421,20 @@ draw_focalList<- function(scan.list,sampling = c("even","random","function"),all
            if (is.null(sampling_fun)) {stop("Please input a `sampling` variable as a function object directly (cf. `?focal_sample`")}
            if (all.sampled) {
              if (n > n.scans) stop("n.scans is too small to sample all nodes.")
-             focal.list[sample(1:n.scans,n)] <- 1:n;n.scans <- n.scans - n
+             focal.list[sample(1:n.scans,n)] <- 1:n
+             n.scans <- n.scans - n
            }
            # applies the user-defined function, adjust the minimum probability to be non zero
            P <- sampling_fun(Adj)
            if (any(P == 0)) P <- P + min(P[P > 0])
            # replace remaining NAs for each scan with a node given their probability distribution at each scan
-           focal.list[is.na(focal.list)]<- sample(1:n,n.scans,replace = TRUE,prob = P)
+           focal.list[is.na(focal.list)] <- sample(1:n,n.scans,replace = TRUE,prob = P)
            focal.list
          },
          stop("`sampling` class not recognized.")
   )
   names(focal.list) <- node_names[focal.list] # keeps nodes names `NULL` if `Adj` didn't have nodes names
+  attr(focal.list,"sampling") <- sampling
   focal.list
 }
 
