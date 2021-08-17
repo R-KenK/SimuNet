@@ -13,7 +13,7 @@ reference:
       - '`simunet`'
       - '`design_exp`'
       - '`perform_exp`'
-      - '`customize_sampling`'
+      - '`design_sampling`'
   - title: Building Blocks
     desc: Provided experimental manipulations - combine them with your own!
     contents:

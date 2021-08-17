@@ -22,9 +22,6 @@
     <loc>https://r-kenk.github.io/SimuNet//reference/attrs.html</loc>
   </url>
   <url>
-    <loc>https://r-kenk.github.io/SimuNet//reference/check_sampling_parameters.html</loc>
-  </url>
-  <url>
     <loc>https://r-kenk.github.io/SimuNet//reference/copy_attrs_to.html</loc>
   </url>
   <url>
@@ -34,16 +31,19 @@
     <loc>https://r-kenk.github.io/SimuNet//reference/count_nonNA.html</loc>
   </url>
   <url>
-    <loc>https://r-kenk.github.io/SimuNet//reference/customize_sampling.html</loc>
+    <loc>https://r-kenk.github.io/SimuNet//reference/design_exp.html</loc>
   </url>
   <url>
-    <loc>https://r-kenk.github.io/SimuNet//reference/design_exp.html</loc>
+    <loc>https://r-kenk.github.io/SimuNet//reference/design_sampling.html</loc>
   </url>
   <url>
     <loc>https://r-kenk.github.io/SimuNet//reference/determine_Adj.subfun.html</loc>
   </url>
   <url>
     <loc>https://r-kenk.github.io/SimuNet//reference/determine_obsProb.html</loc>
+  </url>
+  <url>
+    <loc>https://r-kenk.github.io/SimuNet//reference/determine_sampling_type.html</loc>
   </url>
   <url>
     <loc>https://r-kenk.github.io/SimuNet//reference/diagonal.html</loc>
@@ -89,6 +89,9 @@
   </url>
   <url>
     <loc>https://r-kenk.github.io/SimuNet//reference/matList2scanList.html</loc>
+  </url>
+  <url>
+    <loc>https://r-kenk.github.io/SimuNet//reference/namedList.html</loc>
   </url>
   <url>
     <loc>https://r-kenk.github.io/SimuNet//reference/non.diagonal-set.html</loc>

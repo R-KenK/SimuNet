@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1.9000</span>
       </span>
     </div>
 
@@ -79,6 +79,9 @@
     </li>
     <li class="divider">
     <li class="dropdown-header">Performing experiments</li>
+    <li>
+      <a href="../../articles/articles/design_exp.html">General approach</a>
+    </li>
     <li>
       <a href="../../articles/articles/sampling.html">Sampling methods</a>
     </li>
@@ -194,7 +197,7 @@ SimuNet includes way to simulate two main sampling methods used in animal social
 <li>To do so, pass several functions in the desired order as arguments of <code><a href="../../reference/design_exp.html">design_exp()</a></code>
 </li>
 <li>
-<code><a href="../../reference/design_exp.html">design_exp()</a></code> returns an object of class <code>expDesign</code>, which main argument contain the sequence of function to apply to a <code>scanList</code>. <code><a href="../../reference/design_exp.html">design_exp()</a></code> internally relies on <code><a href="https://purrr.tidyverse.org/reference/invoke.html">purrr::invoke()</a></code>
+<code><a href="../../reference/design_exp.html">design_exp()</a></code> returns an object of class <code>expDesign</code>, which main argument contain the sequence of function to apply to a <code>scanList</code>. <code><a href="../../reference/design_exp.html">design_exp()</a></code> internally relies on <code><a href="https://purrr.tidyverse.org/reference/compose.html">purrr::compose()</a></code>
 </li>
 <li>
 <code>expDesign</code> objects can be used as arguments in <code><a href="../../reference/simunet.html">simunet()</a></code> and <code><a href="../../reference/perform_exp.html">perform_exp()</a></code>
