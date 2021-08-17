@@ -1,3 +1,5 @@
+# SimuNet (development version)
+
 # SimuNet 2.2.0
 * `customize_sampling()` renamed into `design_sampling()`, with additional internal changes:
     * Now returns `expDesign` objects as the name suggests, and not just functions.
