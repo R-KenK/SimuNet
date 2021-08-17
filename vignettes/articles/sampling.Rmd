@@ -19,10 +19,10 @@ Within experimental designs, sampling via a given method is considered similarly
 * and return an empirical `scanList`
 
 ## Designin a sampling method
-Designing a sampling method - or creating a `expDesign` object in `SimuNet` - relies on `customize_sampling()` and `design_exp()`:
+Designing a sampling method - or creating a `expDesign` object in `SimuNet` - relies on `design_sampling()` and `design_exp()`:
 
-* `customize_sampling()` tailors a sampling function of `scanList`
-* `design_exp()`, a general wrapper to create a sequence of experimental manipulations, takes the function returned by `customize_sampling()` to include the sampling as part of the manipulation sequence.
+* `design_sampling()` tailors a sampling function of `scanList`
+* `design_exp()`, a general wrapper to create a sequence of experimental manipulations, takes the function returned by `design_sampling()` to include the sampling as part of the manipulation sequence.
 
 Sampling can be only part of the overall experimental design, and for instance follow a sequence of other manipulations. See them in action in the following examples!
 
@@ -37,14 +37,14 @@ associated/interacting with whom.
     `scanList`'s attributes list `attrs`.
 ```{r group_exp1_1}
 library(SimuNet)
-customize_sampling(method = "group",sampling = "random")
+design_sampling(method = "group",sampling = "random")
 ```
 
 The returned function can be passed to `design_exp()`
 ```{r group_exp1_2}
-group.rand <- customize_sampling(method = "group",sampling = "random") |> design_exp()
+group.rand <- design_sampling(method = "group",sampling = "random")
  # or 
-group.fun <- customize_sampling(method = "group",sampling = "random")
+group.fun <- design_sampling(method = "group",sampling = "random")
 group.rand <- design_exp(group.fun)
 ```
 
@@ -73,7 +73,7 @@ sL |> perform_exp(group.rand)
 Like in the previous example, observation probabilities can be determined at random. Input
 `sampling` as the character string `"random"`
 ```{r group_rand}
-group.rand <- customize_sampling("group",sampling = "random") |> design_exp()
+group.rand <- design_sampling("group",sampling = "random") |> design_exp()
 ```
 
 #### Constant probability
@@ -81,9 +81,9 @@ All probabilities can be set to a constant probability. Input this constant as t
 argument:
 ```{r group_constant}
 group.cst <-
-  customize_sampling("group",sampling = 0.8) |> # an edge has 80% chances of being observed
+  design_sampling("group",sampling = 0.8) |> # an edge has 80% chances of being observed
   design_exp()
-
+group.cst
 sL.cst <- sL |> perform_exp(group.cst)
 sL.cst
 sL.cst |> count_nonNA()
@@ -104,7 +104,7 @@ central.bias_fun <- function(Adj) {
 central.bias_fun(Adj) # 
 
 group.bias <-
-  customize_sampling("group",sampling = central.bias_fun) |>
+  design_sampling("group",sampling = central.bias_fun) |>
   design_exp()
 
 sL.bias <- sL |> perform_exp(group.bias)
@@ -132,7 +132,7 @@ each minute).
 
 ```{r focal_exp1_1}
 ## randomly select focals
-focal.rand <- customize_sampling(method = "focal",sampling = "random") |>
+focal.rand <- design_sampling(method = "focal",sampling = "random") |>
   design_exp()
 
 sL.foc <- sL |> perform_exp(focal.rand)
@@ -148,7 +148,7 @@ Like in the previous example, focals can be selected at random. Input
 `sampling` as the character string `"random"`
 ```{r focal_rand}
 ## randomly select focals
-focal.rand <- customize_sampling(method = "focal",sampling = "random") |>
+focal.rand <- design_sampling(method = "focal",sampling = "random") |>
   design_exp()
 ```
 
@@ -157,7 +157,7 @@ Efforts can be made to draw a focal list as evenly as possible (each node is sam
 time). Input `sampling` as the character string `"even"` (the default).
 ```{r focal_even}
 ## randomly select focals
-focal.even <- customize_sampling(method = "focal",sampling = "even") |>
+focal.even <- design_sampling(method = "focal",sampling = "even") |>
   design_exp()
 
 sL.even <- sL |> perform_exp(focal.even)
@@ -177,7 +177,7 @@ trait_bias <- function(Adj) {
 trait_bias(Adj) # 
 
 group.bias <-
-  customize_sampling("group",sampling = central.bias_fun) |>
+  design_sampling("group",sampling = central.bias_fun) |>
   design_exp()
 
 sL.bias <- sL |> perform_exp(group.bias)

@@ -333,10 +333,10 @@ sLvapply <- function(sL,.f,...,USE.NAMES = TRUE) {
 #'
 #' # Designing the experiments:
 #' ## setting a constant probability of not observing edges
-#' group.scan <- design_exp(customize_sampling(method = "group",sampling = 0.8))
+#' group.scan <- design_sampling(method = "group",sampling = 0.8)
 #'
 #' ## setting an even focal sampling
-#' focal.scan <- design_exp(customize_sampling(method = "focal",sampling = "even"))
+#' focal.scan <- design_sampling(method = "focal",sampling = "even")
 #'
 #' sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L)
 #'
@@ -381,6 +381,7 @@ rbind.scanList <- function(...,deparse.level = 1) {
 # printing related functions ----
 
 ## printing methods ----
+
 #' Print method for `scanList` objects
 #' @export
 #' @noRd

@@ -44,7 +44,7 @@ sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "directed",n.scans = 12
 sL
 
 ## group-scan sampling
-sL |> perform_exp(design_exp(customize_sampling("group",.6))) |> count_nonNA()
+sL |> perform_exp(design_sampling("group",.6)) |> count_nonNA()
 }
 \seealso{
 \code{\link[=simunet]{simunet()}}, \code{\link[=design_exp]{design_exp()}}, \code{\link[=perform_exp]{perform_exp()}}], \code{\link[=count_NA]{count_NA()}}.

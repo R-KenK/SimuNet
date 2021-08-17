@@ -42,7 +42,7 @@ sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L)
 sL
 
 ## focal-scan sampling
-sL |> perform_exp(design_exp(customize_sampling("focal","even"))) |> remove_mostPeripheral()
+sL |> perform_exp(design_sampling("focal","even")) |> remove_mostPeripheral()
 }
 \seealso{
 \code{\link[=simunet]{simunet()}}, \code{\link[=design_exp]{design_exp()}}, \code{\link[=perform_exp]{perform_exp()}}.

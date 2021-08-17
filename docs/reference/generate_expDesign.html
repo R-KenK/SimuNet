@@ -102,7 +102,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1.9000</span>
       </span>
     </div>
 
@@ -133,6 +133,9 @@
     </li>
     <li class="divider"></li>
     <li class="dropdown-header">Performing experiments</li>
+    <li>
+      <a href="../articles/articles/design_exp.html">General approach</a>
+    </li>
     <li>
       <a href="../articles/articles/sampling.html">Sampling methods</a>
     </li>
@@ -202,7 +205,7 @@
     <p>Generate <code>expDesign</code> objects</p>
     </div>
 
-    <pre class="usage"><span class='fu'>generate_expDesign</span><span class='op'>(</span><span class='va'>FUN.seq</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>generate_expDesign</span><span class='op'>(</span><span class='va'>FUN.seq</span>, <span class='va'>fun.input</span>, <span class='va'>input</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -210,6 +213,11 @@
     <tr>
       <th>FUN.seq</th>
       <td><p>function sequence created by <code>purrr</code>'s <code><a href='https://purrr.tidyverse.org/reference/compose.html'>compose()</a></code> function</p></td>
+    </tr>
+    <tr>
+      <th>fun.input</th>
+      <td><p>functions of <code>scanList</code> objects. Can be a combination of the provided "building
+blocks" and user-defined function (cf. the example section).</p></td>
     </tr>
     </table>
 

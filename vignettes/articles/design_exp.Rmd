@@ -56,7 +56,7 @@ Once the user knows what sequence of manipulations defines the experimental desi
 
 * To do so, pass several functions in the desired order as arguments of `design_exp()`
 * `design_exp()` returns an object of class `expDesign`, which main argument contain the sequence of
-function to apply to a `scanList`. `design_exp()` internally relies on `purrr::invoke()`
+function to apply to a `scanList`. `design_exp()` internally relies on `purrr::compose()`
 * `expDesign` objects can be used as arguments in `simunet()` and `perform_exp()`
     * When used in the former, the simulation outputs directly an empirical `scanList`, but the
     intermediate theoretical scanList is stored in the attributes list `attrs` under the name

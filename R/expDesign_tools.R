@@ -9,7 +9,7 @@
 #' It is best practice to use a combination of:
 #'
 #' * provided "building blocks": functions included in the `SimuNet` package, such as
-#' [`customize_sampling()`][customize_sampling()], [`add_scans()`][add_scans()],
+#' [`design_sampling()`][design_sampling()], [`add_scans()`][add_scans()],
 #' [`remove_mostPeripheral()`][remove_mostPeripheral()], or [`sum_scans()`][sum_scans()]
 #' * user-defined functions: designed to take a `scanList` object as a first argument, which is is
 #' in essence a 3 dimensional array with adjacency matrices on the first 2 dimensions, and the
@@ -46,7 +46,7 @@
 #'
 #' @export
 #'
-#' @seealso [perform_exp()], [simunet()], [customize_sampling()].
+#' @seealso [perform_exp()], [simunet()], [design_sampling()].
 #'
 #' @importFrom purrr compose
 #'
@@ -64,16 +64,14 @@
 #'
 #' # Designing the experiments:
 #' ## setting a constant probability of not observing edges
-#' group.scan <- design_exp(customize_sampling(method = "group",sampling = 0.8))
+#' group.scan <- design_sampling(method = "group",sampling = 0.8)
 #'
 #' ## setting a biased focal sampling favoring central individual (node strength)
-#' focal.scan <- design_exp(
-#'   customize_sampling(
-#'     method = "focal",
-#'     sampling = function(Adj) Adj |>
-#'       igraph::graph.adjacency("upper",weighted = TRUE) |>
-#'       igraph::strength()
-#'   )
+#' focal.scan <- design_sampling(
+#'  method = "focal",
+#'  sampling = function(Adj) Adj |>
+#'   igraph::graph.adjacency("upper",weighted = TRUE) |>
+#'   igraph::strength()
 #' )
 #'
 #' ## Adding more scans, removing the most peripheral individual, before performing an even focal
@@ -81,7 +79,7 @@
 #' focal.periRemoved <- design_exp(
 #'   function(Adj) add_scans(Adj,42),     # users can use anonymous function to specify arguments
 #'   remove_mostPeripheral,               # ... or pass functions as arguments directly
-#'   customize_sampling(method = "focal",sampling = "even")    # customize_sampling: special case
+#'   design_sampling(method = "focal",sampling = "even")    # design_sampling: special case
 #'                                                             # that returns sampling functions
 #' )
 #'
@@ -104,8 +102,39 @@
 #' )
 design_exp <- function(...,.dir = c("forward", "backward")) {
   .dir <- match.arg(.dir)
-  FUN.seq <- purrr::compose(... = ...,.dir = .dir)
-  generate_expDesign(FUN.seq = FUN.seq)
+
+  dots.call <- as.list(substitute(...()))
+  dots.list <- list(...)
+
+  dots.fun <- replace_expDesign_by_funs(...)
+
+  named.list <- do.call(namedList,dots.fun)
+  # return(named.list)
+  FUN.seq <- do.call(\(...) purrr::compose(...,.dir = .dir),dots.fun)
+  generate_expDesign(FUN.seq = FUN.seq,
+                     fun.input = named.list,
+                     input = dots.call
+  )
+}
+
+#' Replace ellipsis mixing `expDesign` and functions into flat list of functions
+#' Internal
+#'
+#' @param ... ellipsis argument passed to `design_exp()`
+#'
+#' @return a flat-list of functions
+#'
+#' @noRd
+replace_expDesign_by_funs <- function(...) {
+  dots.call <- as.list(substitute(...()))
+  dots.content <- list(...)
+  is.expDesign <- dots.content |>
+    sapply(inherits,what = "expDesign")
+  if (any(is.expDesign)) {
+    dots.call[is.expDesign] <-
+      lapply(dots.content[is.expDesign],"[[","input")
+  }
+  unlist(dots.call)
 }
 
 #' Perform an experimental design on theoretical `scanList`
@@ -134,7 +163,7 @@ design_exp <- function(...,.dir = c("forward", "backward")) {
 #'   `scanList`, i.e. a `sLlist` object
 #' @export
 #'
-#' @seealso [design_exp()], [simunet()], [customize_sampling()].
+#' @seealso [design_exp()], [simunet()], [design_sampling()].
 #'
 #' @examples
 #' set.seed(42)
@@ -150,11 +179,11 @@ design_exp <- function(...,.dir = c("forward", "backward")) {
 #'
 #' # Designing the experiments:
 #' ## setting a constant probability of not observing edges
-#' group.scan <- design_exp(customize_sampling(method = "group",sampling = 0.8))
+#' group.scan <- design_sampling(method = "group",sampling = 0.8)
 #'
 #' ## setting a biased focal sampling favoring central individual (node strength)
 #' focal.scan <- design_exp(
-#'   customize_sampling(
+#'   design_sampling(
 #'     method = "focal",
 #'     sampling = function(Adj) Adj |>
 #'       igraph::graph.adjacency("upper",weighted = TRUE) |>
@@ -167,7 +196,7 @@ design_exp <- function(...,.dir = c("forward", "backward")) {
 #' focal.periRemoved <- design_exp(
 #'   function(Adj) add_scans(Adj,42),     # users can use anonymous function to specify arguments
 #'   remove_mostPeripheral,               # ... or pass functions as arguments directly
-#'   customize_sampling(method = "focal",sampling = "even")    # customize_sampling: special case
+#'   design_sampling(method = "focal",sampling = "even")    # design_sampling: special case
 #'                                                             # that returns sampling functions
 #' )
 #'
@@ -181,12 +210,19 @@ design_exp <- function(...,.dir = c("forward", "backward")) {
 #' ## performing a list of experiments
 #' perform_exp(sL,group.scan,focal.scan)
 perform_exp <- function(scan.list,exp.design = NULL,...){
-  if (!inherits(scan.list,"scanList")) {stop("scan.list inputted is not a scanList object.")}
+  if (!inherits(scan.list,"scanList")) {
+    stop("scan.list inputted is not a scanList object.")
+  }
+
   if (is.null(exp.design)) {
     return(scan.list)
-  } else if (!inherits(exp.design,"expDesign")) {stop("exp.design inputted is not a expDesign object.")}
-  if (missing(...)) generate_empiscanList(scan.list,exp.design)
-  else {
+  } else if (!inherits(exp.design,"expDesign")) {
+    stop("exp.design inputted is not a expDesign object.")
+  }
+
+  if (missing(...)) {
+    generate_empiscanList(scan.list,exp.design)
+  } else {
     expD.list <- list(exp.design,...)
     sL.list <- lapply(expD.list,\(expD) generate_empiscanList(scan.list = scan.list,exp.design = expD))
     class(sL.list) <- "sLlist"
@@ -197,18 +233,89 @@ perform_exp <- function(scan.list,exp.design = NULL,...){
 #' Generate `expDesign` objects
 #'
 #' @param FUN.seq function sequence created by `purrr`'s [`compose()`][purrr::compose()] function
+#' @param fun.input functions of `scanList` objects. Can be a combination of the provided "building
+#'   blocks" and user-defined function (cf. the example section).
 #'
 #' @return an `expDesign` objects, a list consisting in the following elements:
 #' * `FUN.seq`: function sequence created by `purrr`'s [`compose()`][purrr::compose()] function
 #' * WIP: more to come, notably to include more descriptive function names.
 #'
 #' @keywords internal
-generate_expDesign <- function(FUN.seq) {
+generate_expDesign <- function(FUN.seq,fun.input,input) {
   expD <-
     list(
-      FUN.seq = FUN.seq
+      FUN.seq = FUN.seq,
+      # FUN.names = if (!is.null(names(fun.input))) names(fun.input) else attr(fun.input,"FUN.names"),
+      FUN.names = names(fun.input),
+      rest = fun.input,
+      input = input
     )
   class(expD) <- "expDesign"
   expD
 }
 
+#' Helper to manage function names in list of functions
+#' modified from <https://stackoverflow.com/a/16951524>
+#'
+#' @param ... functions of `scanList` objects. Can be a combination of the provided "building
+#'   blocks" and user-defined function (cf. the example section).
+#'
+#' @return a named list of functions
+#' @export
+#'
+#' @importFrom stats setNames
+#'
+#' @keywords internal
+namedList <- function(...) {
+  L <- list(...)
+  snm <- sapply(substitute(list(...)),deparse)[-1]
+  if (is.null(nm <- names(L))) nm <- snm
+  if (any(nonames <- nm=="")) nm[nonames] <- snm[nonames]
+  nm <- rename_sampling(nm,...)
+  nm <- rename_customFUN(nm)
+  stats::setNames(L,nm)
+}
+
+#' Rename sampling functions' names
+#' @noRd
+rename_sampling <- function(nm,...) {
+  L <- list(...)
+  is.sampling <- sapply(L,\(fn) !is.null(attr(fn,"FUN.names")))
+  nm[is.sampling] <- sapply(L[is.sampling],\(fn) attr(fn,"FUN.names"))
+  nm
+}
+
+#' Rename custom functions' names
+#' @noRd
+rename_customFUN <- function(nm) {
+  custom.f <- substr(nm,1,9) %>% {. %in% c("function(","c(\"functi")}
+  if (any(custom.f)) {
+    unique.nm <- data.frame(
+      fun = as.character(unique(nm[custom.f])),
+      nm = paste0("custom.FUN_",1:length(unique(nm[custom.f])))
+    )
+    nm[custom.f] <- unique.nm$nm[
+      match(nm[custom.f],unique.nm$fun)
+    ]
+  }
+  nm
+}
+
+#' Print method for `expDesign` objects
+#' @export
+#' @noRd
+print.expDesign <- function(x,...) {
+  format_FUN.names(x$FUN.names)
+  cat("\nSee `$FUN.seq` for the functions source code.\n")
+}
+
+#' Format function sequence names
+#' @noRd
+format_FUN.names <- function(FUN.names) {
+  paste0(FUN.names," ->") |>
+    paste(collapse = "\n ") %>%
+    c("Theoretical scanList ->\n ------------\n ",
+      .,
+      "\n ------------\n empirical scanList\n") |>
+    cat(sep = "")
+}

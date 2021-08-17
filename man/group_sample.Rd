@@ -45,6 +45,6 @@ Performs a group-scan sampling over a \code{scanList} object
 Internal.
 }
 \seealso{
-\code{\link[=customize_sampling]{customize_sampling()}}, \code{\link[=determine_obsProb]{determine_obsProb()}}.
+\code{\link[=design_sampling]{design_sampling()}}, \code{\link[=determine_obsProb]{determine_obsProb()}}.
 }
 \keyword{internal}

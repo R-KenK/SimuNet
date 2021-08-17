@@ -48,11 +48,11 @@ sL |> sum_scans() |> scale_scans()
 
 # ... or `scanList` object directly
 ## group-scan sampling
-sL |> perform_exp(design_exp(customize_sampling("group",.6))) |> scale_scans()
+sL |> perform_exp(design_sampling("group",.6)) |> scale_scans()
 
 ## comparing group-scan and focal sampling
-sL |> perform_exp(design_exp(customize_sampling("group",.6)),
-                  design_exp(customize_sampling("focal","even"))
+sL |> perform_exp(design_sampling("group",.6),
+                  design_sampling("focal","even")
                   ) |> scale_scans()
 }
 \seealso{
