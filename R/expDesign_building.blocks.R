@@ -52,11 +52,11 @@
 #' sL |> sum_scans()
 #'
 #' ## group-scan sampling
-#' sL |> perform_exp(design_exp(customize_sampling("group",.6))) |> sum_scans()
+#' sL |> perform_exp(design_sampling("group",.6)) |> sum_scans()
 #'
 #' ## comparing group-scan and focal sampling
-#' sL |> perform_exp(design_exp(customize_sampling("group",.6)),
-#'                   design_exp(customize_sampling("focal","even"))
+#' sL |> perform_exp(design_sampling("group",.6),
+#'                   design_sampling("focal","even")
 #'                   ) |> sum_scans()
 sum_scans <- function(scan.list,...) {
   UseMethod("sum_scans")
@@ -143,11 +143,11 @@ sum_scans.empirical <- function(scan.list,which = c("auto","theoretical","raw"),
 #'
 #' # ... or `scanList` object directly
 #' ## group-scan sampling
-#' sL |> perform_exp(design_exp(customize_sampling("group",.6))) |> scale_scans()
+#' sL |> perform_exp(design_sampling("group",.6)) |> scale_scans()
 #'
 #' ## comparing group-scan and focal sampling
-#' sL |> perform_exp(design_exp(customize_sampling("group",.6)),
-#'                   design_exp(customize_sampling("focal","even"))
+#' sL |> perform_exp(design_sampling("group",.6),
+#'                   design_sampling("focal","even")
 #'                   ) |> scale_scans()
 scale_scans <- function(scan.list,...) {
   UseMethod("scale_scans")
@@ -229,7 +229,7 @@ scale_scans.sLlist <- function(scan.list,...) {
 #' sL
 #'
 #' ## group-scan sampling
-#' sL |> perform_exp(design_exp(customize_sampling("group",.6))) |> count_NA()
+#' sL |> perform_exp(design_sampling("group",.6)) |> count_NA()
 count_NA <- function(scan.list,...) {
   UseMethod("count_NA")
 }
@@ -302,7 +302,7 @@ count_NA.sLlist <- function(scan.list,...) {
 #' sL
 #'
 #' ## group-scan sampling
-#' sL |> perform_exp(design_exp(customize_sampling("group",.6))) |> count_nonNA()
+#' sL |> perform_exp(design_sampling("group",.6)) |> count_nonNA()
 count_nonNA <- function(scan.list,...) {
   UseMethod("count_nonNA")
 }
@@ -380,7 +380,7 @@ count_nonNA.sLlist <- function(scan.list,...) {
 #' sL
 #'
 #' ## focal-scan sampling
-#' sL |> perform_exp(design_exp(customize_sampling("focal","even"))) |> add_scans(50)
+#' sL |> perform_exp(design_sampling("focal","even")) |> add_scans(50)
 add_scans <- function(scan.list,...) {
   UseMethod("add_scans")
 }
@@ -461,7 +461,7 @@ add_scans.sLlist <- function(scan.list,new.scans,...) {
 #' sL
 #'
 #' ## focal-scan sampling
-#' sL |> perform_exp(design_exp(customize_sampling("focal","even"))) |> remove_mostPeripheral()
+#' sL |> perform_exp(design_sampling("focal","even")) |> remove_mostPeripheral()
 remove_mostPeripheral <- function(scan.list,...) {
   UseMethod("remove_mostPeripheral")
 }

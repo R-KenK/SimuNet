@@ -9,7 +9,7 @@
 #' It is best practice to use a combination of:
 #'
 #' * provided "building blocks": functions included in the `SimuNet` package, such as
-#' [`customize_sampling()`][customize_sampling()], [`add_scans()`][add_scans()],
+#' [`design_sampling()`][design_sampling()], [`add_scans()`][add_scans()],
 #' [`remove_mostPeripheral()`][remove_mostPeripheral()], or [`sum_scans()`][sum_scans()]
 #' * user-defined functions: designed to take a `scanList` object as a first argument, which is is
 #' in essence a 3 dimensional array with adjacency matrices on the first 2 dimensions, and the
@@ -46,7 +46,7 @@
 #'
 #' @export
 #'
-#' @seealso [perform_exp()], [simunet()], [customize_sampling()].
+#' @seealso [perform_exp()], [simunet()], [design_sampling()].
 #'
 #' @importFrom purrr compose
 #'
@@ -64,16 +64,14 @@
 #'
 #' # Designing the experiments:
 #' ## setting a constant probability of not observing edges
-#' group.scan <- design_exp(customize_sampling(method = "group",sampling = 0.8))
+#' group.scan <- design_sampling(method = "group",sampling = 0.8)
 #'
 #' ## setting a biased focal sampling favoring central individual (node strength)
-#' focal.scan <- design_exp(
-#'   customize_sampling(
-#'     method = "focal",
-#'     sampling = function(Adj) Adj |>
-#'       igraph::graph.adjacency("upper",weighted = TRUE) |>
-#'       igraph::strength()
-#'   )
+#' focal.scan <- design_sampling(
+#'  method = "focal",
+#'  sampling = function(Adj) Adj |>
+#'   igraph::graph.adjacency("upper",weighted = TRUE) |>
+#'   igraph::strength()
 #' )
 #'
 #' ## Adding more scans, removing the most peripheral individual, before performing an even focal
@@ -81,7 +79,7 @@
 #' focal.periRemoved <- design_exp(
 #'   function(Adj) add_scans(Adj,42),     # users can use anonymous function to specify arguments
 #'   remove_mostPeripheral,               # ... or pass functions as arguments directly
-#'   customize_sampling(method = "focal",sampling = "even")    # customize_sampling: special case
+#'   design_sampling(method = "focal",sampling = "even")    # design_sampling: special case
 #'                                                             # that returns sampling functions
 #' )
 #'
@@ -165,7 +163,7 @@ replace_expDesign_by_funs <- function(...) {
 #'   `scanList`, i.e. a `sLlist` object
 #' @export
 #'
-#' @seealso [design_exp()], [simunet()], [customize_sampling()].
+#' @seealso [design_exp()], [simunet()], [design_sampling()].
 #'
 #' @examples
 #' set.seed(42)
@@ -181,11 +179,11 @@ replace_expDesign_by_funs <- function(...) {
 #'
 #' # Designing the experiments:
 #' ## setting a constant probability of not observing edges
-#' group.scan <- design_exp(customize_sampling(method = "group",sampling = 0.8))
+#' group.scan <- design_sampling(method = "group",sampling = 0.8)
 #'
 #' ## setting a biased focal sampling favoring central individual (node strength)
 #' focal.scan <- design_exp(
-#'   customize_sampling(
+#'   design_sampling(
 #'     method = "focal",
 #'     sampling = function(Adj) Adj |>
 #'       igraph::graph.adjacency("upper",weighted = TRUE) |>
@@ -198,7 +196,7 @@ replace_expDesign_by_funs <- function(...) {
 #' focal.periRemoved <- design_exp(
 #'   function(Adj) add_scans(Adj,42),     # users can use anonymous function to specify arguments
 #'   remove_mostPeripheral,               # ... or pass functions as arguments directly
-#'   customize_sampling(method = "focal",sampling = "even")    # customize_sampling: special case
+#'   design_sampling(method = "focal",sampling = "even")    # design_sampling: special case
 #'                                                             # that returns sampling functions
 #' )
 #'

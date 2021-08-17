@@ -124,7 +124,7 @@
 #'
 #' ## group-scan sampling
 #' ### Designing the experiment: setting a constant probability of not observing edges
-#' group.scan <- design_exp(customize_sampling(method = "group",sampling = 0.8))
+#' group.scan <- design_sampling(method = "group",sampling = 0.8)
 #'
 #' ### simulation can be directly run through the simunet() function
 #' simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L,
@@ -136,7 +136,7 @@
 #'
 #' ## add more scans, perform even focal sampling, then remove the overall most peripheral node
 #' foc.peri_removed <- design_exp(function(x) add_scans(x,200),
-#'                                customize_sampling(method = "focal",sampling = "even"),
+#'                                design_sampling(method = "focal",sampling = "even"),
 #'                                remove_mostPeripheral
 #' )
 #' ### or the experiment can be applied to a theoretical scanList object

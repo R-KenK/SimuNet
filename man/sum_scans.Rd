@@ -60,11 +60,11 @@ sL
 sL |> sum_scans()
 
 ## group-scan sampling
-sL |> perform_exp(design_exp(customize_sampling("group",.6))) |> sum_scans()
+sL |> perform_exp(design_sampling("group",.6)) |> sum_scans()
 
 ## comparing group-scan and focal sampling
-sL |> perform_exp(design_exp(customize_sampling("group",.6)),
-                  design_exp(customize_sampling("focal","even"))
+sL |> perform_exp(design_sampling("group",.6),
+                  design_sampling("focal","even")
                   ) |> sum_scans()
 }
 \seealso{

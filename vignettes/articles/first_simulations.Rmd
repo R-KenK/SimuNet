@@ -100,7 +100,7 @@ abline(0,1,col = "red",lty = "dashed")
 ### Scaling `scanList`
 To compare `scanList` of different size, another "collapsing" function, `scale_scans()`, can be
 applied to `scanList` or their collapsed sums. `scale_scans()` divide the sum of binary edges by the
-number of time they were sampled (see more about sampling with `customize_sampling()` and [empirical
+number of time they were sampled (see more about sampling with `design_sampling()` and [empirical
 designs](experiments.html)).
 
 In the case of theoretical scanList, this means dividing the obtained weighted adjacency matrix by

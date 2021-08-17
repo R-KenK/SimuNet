@@ -51,11 +51,11 @@ Adj
 
 # Designing the experiments:
 ## setting a constant probability of not observing edges
-group.scan <- design_exp(customize_sampling(method = "group",sampling = 0.8))
+group.scan <- design_sampling(method = "group",sampling = 0.8)
 
 ## setting a biased focal sampling favoring central individual (node strength)
 focal.scan <- design_exp(
-  customize_sampling(
+  design_sampling(
     method = "focal",
     sampling = function(Adj) Adj |>
       igraph::graph.adjacency("upper",weighted = TRUE) |>
@@ -68,7 +68,7 @@ focal.scan <- design_exp(
 focal.periRemoved <- design_exp(
   function(Adj) add_scans(Adj,42),     # users can use anonymous function to specify arguments
   remove_mostPeripheral,               # ... or pass functions as arguments directly
-  customize_sampling(method = "focal",sampling = "even")    # customize_sampling: special case
+  design_sampling(method = "focal",sampling = "even")    # design_sampling: special case
                                                             # that returns sampling functions
 )
 
@@ -83,5 +83,5 @@ perform_exp(sL,focal.periRemoved) |> sum_scans()
 perform_exp(sL,group.scan,focal.scan)
 }
 \seealso{
-\code{\link[=design_exp]{design_exp()}}, \code{\link[=simunet]{simunet()}}, \code{\link[=customize_sampling]{customize_sampling()}}.
+\code{\link[=design_exp]{design_exp()}}, \code{\link[=simunet]{simunet()}}, \code{\link[=design_sampling]{design_sampling()}}.
 }

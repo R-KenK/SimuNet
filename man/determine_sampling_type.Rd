@@ -10,9 +10,9 @@ determine_sampling_type(
 )
 }
 \arguments{
-\item{method}{inputted \code{method} parameter, see \code{\link[=customize_sampling]{customize_sampling()}}}
+\item{method}{inputted \code{method} parameter, see \code{\link[=design_sampling]{design_sampling()}}}
 
-\item{sampling}{inputted \code{sampling} parameter, see \code{\link[=customize_sampling]{customize_sampling()}}}
+\item{sampling}{inputted \code{sampling} parameter, see \code{\link[=design_sampling]{design_sampling()}}}
 }
 \value{
 character, the type of sampling. Returns an error if incompatible method/sampling

@@ -4,7 +4,7 @@
 \alias{generate_expDesign}
 \title{Generate \code{expDesign} objects}
 \usage{
-generate_expDesign(FUN.seq, fun.input)
+generate_expDesign(FUN.seq, fun.input, input)
 }
 \arguments{
 \item{FUN.seq}{function sequence created by \code{purrr}'s \code{\link[purrr:compose]{compose()}} function}

@@ -80,32 +80,32 @@
 #'
 #' # Designing sampling regimes:
 #' ## setting a constant probability of not observing edges
-#' group.constant <- customize_sampling(method = "group",sampling = 0.8)
+#' group.constant <- design_sampling(method = "group",sampling = 0.8)
 #'
 #' ## setting a random probability of not observing edges
-#' group.random <- customize_sampling(method = "group",sampling = "random")
+#' group.random <- design_sampling(method = "group",sampling = "random")
 #'
 #' ## setting probability of not observing edges via user-defined functions
 #' g.fun1 <- function(Adj) Adj     # observation proportional to the network's weights,
 #'                                 # will be rescaled as probabilities internally
-#' group.fun1 <- customize_sampling(method = "group",sampling = g.fun1)
+#' group.fun1 <- design_sampling(method = "group",sampling = g.fun1)
 #'
 #' ### user-defined functions can also be passed as anonymous functions
-#' group.fun2 <- customize_sampling(method = "group",sampling = function(Adj) Adj^2)
+#' group.fun2 <- design_sampling(method = "group",sampling = function(Adj) Adj^2)
 #'
 #' ## evenly select focals
-#' focal.even <- customize_sampling(method = "focal",sampling = "even")
+#' focal.even <- design_sampling(method = "focal",sampling = "even")
 #'
 #' ## randomly select focals
-#' focal.random <- customize_sampling(method = "focal",sampling = "random")
+#' focal.random <- design_sampling(method = "focal",sampling = "random")
 #'
 #' ## setting probability of selecting focals via user-defined functions
 #' f.fun1 <- function(Adj) 1:nrow(Adj)       # linear increase of probability of being focal,
 #'                                           # akin to a linear trait
-#' focal.fun1 <- customize_sampling(method = "focal",sampling = f.fun1)
+#' focal.fun1 <- design_sampling(method = "focal",sampling = f.fun1)
 #'
 #' ### user-defined functions can also be passed as anonymous functions
-#' focal.fun2 <- customize_sampling(method = "focal",sampling = function(Adj) Adj |>
+#' focal.fun2 <- design_sampling(method = "focal",sampling = function(Adj) Adj |>
 #'                                    igraph::graph.adjacency(mode = "upper",weighted = TRUE) |>
 #'                                    igraph::eigen_centrality() |> {\(x) x$vector}()
 #' )                            # probabilities proportional to nodes' eigen-vector centralities
@@ -125,9 +125,9 @@
 #' ## but need to be passed to `design_exp()`
 #' ## (TO DO: recognize sampling regime and manage this automatically)
 #' simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L,design_exp(group.fun2))
-#' sL |> perform_exp(design_exp(focal.even))
-#' sL |> perform_exp(design_exp(customize_sampling("focal","random")))
-customize_sampling <- function(method = c("group","focal"),
+#' sL |> perform_exp(focal.even)
+#' sL |> perform_exp(design_sampling("focal","random"))
+design_sampling <- function(method = c("group","focal"),
                                sampling =  c("constant","matrix","even","random","function"),
                                all.sampled = TRUE) {
 
@@ -154,8 +154,8 @@ customize_sampling <- function(method = c("group","focal"),
 
 #' Checks if the method and sampling parameter combination is adequate
 #'
-#' @param method inputted `method` parameter, see [`customize_sampling()`][customize_sampling()]
-#' @param sampling inputted `sampling` parameter, see [`customize_sampling()`][customize_sampling()]
+#' @param method inputted `method` parameter, see [`design_sampling()`][design_sampling()]
+#' @param sampling inputted `sampling` parameter, see [`design_sampling()`][design_sampling()]
 #'
 #' @return character, the type of sampling. Returns an error if incompatible method/sampling
 #'   combination
@@ -174,7 +174,7 @@ determine_sampling_type <-
             sampling <- match.arg(sampling)
             switch(
               sampling,
-              "even" = stop('Invalid `sampling` option for method = "group" (cf. `?customize_sampling`)'),
+              "even" = stop('Invalid `sampling` option for method = "group" (cf. `?design_sampling`)'),
               "random" =,
               "constant" =, # this is the default choice when no sampling argument is inputted
               "matrix" =,
@@ -191,14 +191,14 @@ determine_sampling_type <-
             switch(
               sampling,
               "constant" =, # this is the default choice when no sampling argument is inputted
-              "matrix" = stop('Invalid `sampling` option for method = "focal" (cf. `?customize_sampling`)'),
+              "matrix" = stop('Invalid `sampling` option for method = "focal" (cf. `?design_sampling`)'),
               "random" =,
               "even" =,
               "function" = sampling
             )
           },
           "matrix" =,
-          "numeric" = stop('Invalid `sampling` option for method = "focal" (cf. `?customize_sampling`)'),
+          "numeric" = stop('Invalid `sampling` option for method = "focal" (cf. `?design_sampling`)'),
           "function" = "function"
         )
     )
@@ -231,7 +231,7 @@ determine_sampling_type <-
 #'
 #' @export
 #'
-#' @seealso [customize_sampling()], [determine_obsProb()].
+#' @seealso [design_sampling()], [determine_obsProb()].
 #'
 #' @importFrom stats rbinom
 #'
@@ -352,7 +352,7 @@ determine_obsProb <- function(scan.list,sampling = c("constant","matrix","random
 #' observed
 #'
 #' @export
-#' @seealso [customize_sampling()], [draw_focalList()].
+#' @seealso [design_sampling()], [draw_focalList()].
 #'
 #' @keywords internal
 focal_sample <- function(scan.list,sampling = c("even","random","function"),all.sampled = TRUE){

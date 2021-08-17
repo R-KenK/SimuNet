@@ -52,7 +52,7 @@ sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "directed",n.scans = 12
 sL
 
 ## focal-scan sampling
-sL |> perform_exp(design_exp(customize_sampling("focal","even"))) |> add_scans(50)
+sL |> perform_exp(design_sampling("focal","even")) |> add_scans(50)
 }
 \seealso{
 \code{\link[=simunet]{simunet()}}, \code{\link[=design_exp]{design_exp()}}, \code{\link[=perform_exp]{perform_exp()}}.
