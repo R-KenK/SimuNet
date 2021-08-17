@@ -1,3 +1,8 @@
+# SimuNet (development version)
+* NamedList() added to design_exp() to keep track of function names input
+* `expDesign` now prints the sequence of functions as a sequence of their names (more
+human-friendly)
+
 # SimuNet 2.1.1
 * `print` method is cleaner for `edgeProb` and newly introduced `edgeProbMat` classes:
     * `edgeProbMat` is the matrix itself stored in `edgeProb` object (their `$P`), with attribute
