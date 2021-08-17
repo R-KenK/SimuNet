@@ -1,7 +1,14 @@
-# SimuNet (development version)
-* NamedList() added to design_exp() to keep track of function names input
-* `expDesign` now prints the sequence of functions as a sequence of their names (more
-human-friendly)
+# SimuNet 2.2.0
+* `customize_sampling()` renamed into `design_sampling()`, with additional internal changes:
+    * Now returns `expDesign` objects as the name suggests, and not just functions.
+    * Removes the need to nest/chain `design_exp()` and `customize_sampling()`: now a single
+    `design_sampling()` is enough, although `design_exp(design_sampling())` would return an
+    equivalent `expDesign` anyway.
+* `design_exp()` can now take combinations of previously created expDesign objects and functions,
+either named or anonymous (renamed into `custom.FUN_X` for now on):
+    * `NamedList()` function added and used in `design_exp()` to keep track of function names input.
+    * `expDesign` now prints the sequence of functions as a sequence of their names (more
+    human-readable)
 
 # SimuNet 2.1.1
 * `print` method is cleaner for `edgeProb` and newly introduced `edgeProbMat` classes:
