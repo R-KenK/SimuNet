@@ -104,11 +104,39 @@
 #' )
 design_exp <- function(...,.dir = c("forward", "backward")) {
   .dir <- match.arg(.dir)
-  named.list <- namedList(...)
-  FUN.seq <- purrr::compose(... = ...,.dir = .dir)
+
+  dots.call <- as.list(substitute(...()))
+  dots.list <- list(...)
+
+  dots.fun <- replace_expDesign_by_funs(...)
+
+  named.list <- do.call(namedList,dots.fun)
+  # return(named.list)
+  FUN.seq <- do.call(\(...) purrr::compose(...,.dir = .dir),dots.fun)
   generate_expDesign(FUN.seq = FUN.seq,
-                     fun.input = named.list
+                     fun.input = named.list,
+                     input = dots.call
   )
+}
+
+#' Replace ellipsis mixing `expDesign` and functions into flat list of functions
+#' Internal
+#'
+#' @param ... ellipsis argument passed to `design_exp()`
+#'
+#' @return a flat-list of functions
+#'
+#' @noRd
+replace_expDesign_by_funs <- function(...) {
+  dots.call <- as.list(substitute(...()))
+  dots.content <- list(...)
+  is.expDesign <- dots.content |>
+    sapply(inherits,what = "expDesign")
+  if (any(is.expDesign)) {
+    dots.call[is.expDesign] <-
+      lapply(dots.content[is.expDesign],"[[","input")
+  }
+  unlist(dots.call)
 }
 
 #' Perform an experimental design on theoretical `scanList`
@@ -208,12 +236,14 @@ perform_exp <- function(scan.list,exp.design = NULL,...){
 #' * WIP: more to come, notably to include more descriptive function names.
 #'
 #' @keywords internal
-generate_expDesign <- function(FUN.seq,fun.input) {
+generate_expDesign <- function(FUN.seq,fun.input,input) {
   expD <-
     list(
       FUN.seq = FUN.seq,
+      # FUN.names = if (!is.null(names(fun.input))) names(fun.input) else attr(fun.input,"FUN.names"),
       FUN.names = names(fun.input),
-      rest = fun.input
+      rest = fun.input,
+      input = input
     )
   class(expD) <- "expDesign"
   expD
