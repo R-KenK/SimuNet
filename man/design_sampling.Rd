@@ -2,7 +2,7 @@
 % Please edit documentation in R/expDesign_sampling.R
 \name{design_sampling}
 \alias{design_sampling}
-\title{Customize a sampling regime to perform on a theoretical \code{scanList}}
+\title{Design a sampling regime to perform on a theoretical \code{scanList}}
 \usage{
 design_sampling(
   method = c("group", "focal"),
@@ -39,17 +39,17 @@ focal node at each scan
 work with group-scan sampling?)}
 }
 \value{
-a function of a theoretical \code{scan.list} simulating the empirical sampling of the
-network's edges at each scan. To be used as part of an \code{expDesign} object (see
-\code{\link[=design_exp]{design_exp()}})
+an \code{expDesign} object containing a function of a theoretical \code{scan.list} simulating the
+empirical sampling of the network's edges at each scan. To be used as part of an \code{expDesign}
+object (see \code{\link[=design_exp]{design_exp()}})
 }
 \description{
-This function returns a function tailored to be used as part of an \code{expDesign} object (see
-\code{\link[=design_exp]{design_exp()}}). It is written as a convenient wrapper for commonly used
-sampling methods: group-scan sampling and focal-scan sampling.
+This function returns an \code{expDesign} object containing a sampling function to apply to
+\code{scanList} objects (see \code{\link[=perform_exp]{perform_exp()}}). It is written as a convenient wrapper
+for commonly used sampling methods: group-scan sampling and focal-scan sampling.
 }
 \details{
-the function accepts as \code{sampling} parameter:
+\code{design_sampling()} accepts as \code{sampling} parameter:
 \itemize{
 \item character scalar: common options like random edge observation probability or even focal
 sampling
@@ -106,6 +106,7 @@ Adj
 # Designing sampling regimes:
 ## setting a constant probability of not observing edges
 group.constant <- design_sampling(method = "group",sampling = 0.8)
+group.constant
 
 ## setting a random probability of not observing edges
 group.random <- design_sampling(method = "group",sampling = "random")

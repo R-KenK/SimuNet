@@ -2,13 +2,13 @@
 
 ## Wrapper to create sampling functions ----
 
-#'  Customize a sampling regime to perform on a theoretical `scanList`
+#'  Design a sampling regime to perform on a theoretical `scanList`
 #'
-#'  This function returns a function tailored to be used as part of an `expDesign` object (see
-#'  [`design_exp()`][design_exp()]). It is written as a convenient wrapper for commonly used
-#'  sampling methods: group-scan sampling and focal-scan sampling.
+#'  This function returns an `expDesign` object containing a sampling function to apply to
+#'  `scanList` objects (see [`perform_exp()`][perform_exp()]). It is written as a convenient wrapper
+#'  for commonly used sampling methods: group-scan sampling and focal-scan sampling.
 #'
-#'  the function accepts as `sampling` parameter:
+#'  `design_sampling()` accepts as `sampling` parameter:
 #'  * character scalar: common options like random edge observation probability or even focal
 #'  sampling
 #'  * for `method = "group"`: numeric scalar (constant) or matrix representing edge observation
@@ -57,9 +57,9 @@
 #' @param all.sampled logical scalar, should all nodes be sampled at least once? (TO CHECK: does it
 #'   work with group-scan sampling?)
 #'
-#' @return a function of a theoretical `scan.list` simulating the empirical sampling of the
-#'   network's edges at each scan. To be used as part of an `expDesign` object (see
-#'   [`design_exp()`][design_exp()])
+#' @return an `expDesign` object containing a function of a theoretical `scan.list` simulating the
+#'   empirical sampling of the network's edges at each scan. To be used as part of an `expDesign`
+#'   object (see [`design_exp()`][design_exp()])
 #'
 #' @export
 #'
@@ -81,6 +81,7 @@
 #' # Designing sampling regimes:
 #' ## setting a constant probability of not observing edges
 #' group.constant <- design_sampling(method = "group",sampling = 0.8)
+#' group.constant
 #'
 #' ## setting a random probability of not observing edges
 #' group.random <- design_sampling(method = "group",sampling = "random")
