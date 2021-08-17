@@ -234,15 +234,51 @@ namedList <- function(...) {
   snm <- sapply(substitute(list(...)),deparse)[-1]
   if (is.null(nm <- names(L))) nm <- snm
   if (any(nonames <- nm=="")) nm[nonames] <- snm[nonames]
-  custom.f <- substr(nm,1,12) %>% {. == "c(\"function("}
-  nm[custom.f] <- paste0("custom.FUN_",1:length(nm[custom.f]))
+  nm <- rename_sampling(nm,...)
+  nm <- rename_customFUN(nm)
   setNames(L,nm)
+}
+
+#' Rename sampling functions' names
+#' @noRd
+rename_sampling <- function(nm,...) {
+  L <- list(...)
+  is.sampling <- sapply(L,\(fn) !is.null(attr(fn,"FUN.names")))
+  nm[is.sampling] <- sapply(L[is.sampling],\(fn) attr(fn,"FUN.names"))
+  nm
+}
+
+#' Rename custom functions' names
+#' @noRd
+rename_customFUN <- function(nm) {
+  custom.f <- substr(nm,1,9) %>% {. %in% c("function(","c(\"functi")}
+  if (any(custom.f)) {
+    unique.nm <- data.frame(
+      fun = as.character(unique(nm[custom.f])),
+      nm = paste0("custom.FUN_",1:length(unique(nm[custom.f])))
+    )
+    nm[custom.f] <- unique.nm$nm[
+      match(nm[custom.f],unique.nm$fun)
+    ]
+  }
+  nm
 }
 
 #' Print method for `expDesign` objects
 #' @export
 #' @noRd
 print.expDesign <- function(x,...) {
-  cat("Theoretical scanList",x$FUN.names,"empirical scanList",sep = " -> ")
+  format_FUN.names(x$FUN.names)
   cat("\nSee `$FUN.seq` for the functions source code.")
+}
+
+#' Format function sequence names
+#' @noRd
+format_FUN.names <- function(FUN.names) {
+  paste0(FUN.names," ->") |>
+    paste(collapse = "\n ") %>%
+    c("Theoretical scanList ->\n ------------\n ",
+      .,
+      "\n ------------\n empirical scanList\n") |>
+    cat(sep = "")
 }

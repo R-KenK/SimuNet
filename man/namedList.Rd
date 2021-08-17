@@ -3,7 +3,7 @@
 \name{namedList}
 \alias{namedList}
 \title{Helper to manage function names in list of functions
-from \url{https://stackoverflow.com/a/16951524}}
+modified from \url{https://stackoverflow.com/a/16951524}}
 \usage{
 namedList(...)
 }
@@ -16,6 +16,6 @@ a named list of functions
 }
 \description{
 Helper to manage function names in list of functions
-from \url{https://stackoverflow.com/a/16951524}
+modified from \url{https://stackoverflow.com/a/16951524}
 }
 \keyword{internal}
