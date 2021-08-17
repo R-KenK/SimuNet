@@ -212,12 +212,19 @@ replace_expDesign_by_funs <- function(...) {
 #' ## performing a list of experiments
 #' perform_exp(sL,group.scan,focal.scan)
 perform_exp <- function(scan.list,exp.design = NULL,...){
-  if (!inherits(scan.list,"scanList")) {stop("scan.list inputted is not a scanList object.")}
+  if (!inherits(scan.list,"scanList")) {
+    stop("scan.list inputted is not a scanList object.")
+  }
+
   if (is.null(exp.design)) {
     return(scan.list)
-  } else if (!inherits(exp.design,"expDesign")) {stop("exp.design inputted is not a expDesign object.")}
-  if (missing(...)) generate_empiscanList(scan.list,exp.design)
-  else {
+  } else if (!inherits(exp.design,"expDesign")) {
+    stop("exp.design inputted is not a expDesign object.")
+  }
+
+  if (missing(...)) {
+    generate_empiscanList(scan.list,exp.design)
+  } else {
     expD.list <- list(exp.design,...)
     sL.list <- lapply(expD.list,\(expD) generate_empiscanList(scan.list = scan.list,exp.design = expD))
     class(sL.list) <- "sLlist"
@@ -258,6 +265,8 @@ generate_expDesign <- function(FUN.seq,fun.input,input) {
 #' @return a named list of functions
 #' @export
 #'
+#' @importFrom stats setNames
+#'
 #' @keywords internal
 namedList <- function(...) {
   L <- list(...)
@@ -266,7 +275,7 @@ namedList <- function(...) {
   if (any(nonames <- nm=="")) nm[nonames] <- snm[nonames]
   nm <- rename_sampling(nm,...)
   nm <- rename_customFUN(nm)
-  setNames(L,nm)
+  stats::setNames(L,nm)
 }
 
 #' Rename sampling functions' names
@@ -299,7 +308,7 @@ rename_customFUN <- function(nm) {
 #' @noRd
 print.expDesign <- function(x,...) {
   format_FUN.names(x$FUN.names)
-  cat("\nSee `$FUN.seq` for the functions source code.")
+  cat("\nSee `$FUN.seq` for the functions source code.\n")
 }
 
 #' Format function sequence names
