@@ -480,7 +480,7 @@ print_sLarray <- function(sL,...) {
 #' @return integer vector, indices of scan to print
 #' @noRd
 choose_scan_to_print <- function(sL) {
-  truncated <- dim(sL)[3] > 5
+  truncated <- dim(sL)[3] > 3
   scan.ind <-
     if (truncated) c(1,2) else 1:(dim(sL)[3] - 1)
   attr(scan.ind,"truncated") <- truncated
