@@ -460,12 +460,16 @@ print.scaled <- function(x,digits = 3,...) {
 #' @return `sL` invisibly, but print a cleaner 3D array via `Matrix::printSpMatrix()`
 #' @noRd
 print_sLarray <- function(sL,...) {
-  scan.ind <- choose_scan_to_print(sL)
-  truncated <- attr(scan.ind,"truncated")
-  # prints all but the last
-  lapply(scan.ind,\(s) print_clean_scan(sL[,,s],s,...))
-  if (truncated) cat("\n... (",dim(sL)[3] - 3," more scans)\n")
-  print_clean_scan(sL[,,dim(sL)[3]],dim(sL)[3],...)
+  if (is.na(dim(sL)[3])) {
+    print_clean_scan(sL,"scan:",...)
+  } else {
+    scan.ind <- choose_scan_to_print(sL)
+    truncated <- attr(scan.ind,"truncated")
+    # prints all but the last
+    lapply(scan.ind,\(s) print_clean_scan(sL[,,s],s,...))
+    if (truncated) cat("\n... (",dim(sL)[3] - 3," more scans)\n")
+    print_clean_scan(sL[,,dim(sL)[3]],dim(sL)[3],...)
+  }
   invisible(sL)
 }
 
@@ -505,8 +509,10 @@ print_clean_scan <- function(mat,s,
                              col.names = FALSE,
                              note.dropping.colnames = FALSE,
                              ...) {
-  if (is.numeric(s)) cat("\nscan: ",s,sep = "")
-  else cat("\n",s,sep = "")
+  if (is.numeric(s))
+    cat("\nscan: ",s,sep = "")
+  else
+    cat("\n",s,sep = "")
   m <- mat
   class(m) <- NULL
   methods::as(m,"dgCMatrix") |>
