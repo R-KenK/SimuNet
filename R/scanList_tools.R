@@ -468,7 +468,7 @@ choose_scan_to_print <- function(sL) {
 
 #' Cleaner adjacency matrix print
 #'
-#' @param scan numeric matrix, a scan
+#' @param mat numeric matrix, a scan
 #' @param s integer, scan index
 #' @param ... additional arguments to be passed to
 #'   [`Matrix::printSpMatrix()`][Matrix::printSpMatrix()]
@@ -476,23 +476,25 @@ choose_scan_to_print <- function(sL) {
 #' @param col.names logical, see [`Matrix::printSpMatrix()`][Matrix::printSpMatrix()]
 #' @param note.dropping.colnames logical, see [`Matrix::printSpMatrix()`][Matrix::printSpMatrix()]
 #'
-#' @return `scan` invisibly, but print a cleaner scan via
+#' @return `mat` invisibly, but print a cleaner scan via
 #'   [`Matrix::printSpMatrix()`][Matrix::printSpMatrix()]
 #'
 #' @importFrom Matrix printSpMatrix
 #' @importFrom methods as
 #'
 #' @noRd
-print_clean_scan <- function(scan,s,
+print_clean_scan <- function(mat,s,
                              col.names = FALSE,
                              note.dropping.colnames = FALSE,
                              ...) {
   if (is.numeric(s)) cat("\nscan: ",s,sep = "")
   else cat("\n",s,sep = "")
-  methods::as(scan,"dgCMatrix") |>
+  m <- mat
+  class(m) <- NULL
+  methods::as(m,"dgCMatrix") |>
     Matrix::printSpMatrix(col.names = col.names,note.dropping.colnames = note.dropping.colnames,
                           ...)
-  invisible(scan)
+  invisible(mat)
 }
 
 #' Display and format attribute names in attrs if they exist
