@@ -263,11 +263,16 @@ copy_attrs_to <- function(from,to) {
 #' sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L)
 #' sL |> sLapply(\(scan) {scan[1,2] <- NA;scan})
 sLapply <- function(sL,FUN,...) {
-  lapply(
-    X = 1:(dim(sL)[3]),
-    FUN = function(x) FUN(sL[,,x],...)
-  )
+  sL.ori <- sL
+  sL <-
+    lapply(
+      X = 1:(dim(sL)[3]),
+      FUN = function(x) FUN(sL[,,x],...)
+    ) |> matList2array()
+  sL <- copy_attrs_to(sL.ori,sL)
+  sL
 }
+
 #' Shortcut to a `lapply` equivalent to apply a function to each 2D matrix contained in a `scanList`
 #' Written analogously to [vapply()]. Values returned by `.f` should be a similarly dimensionned
 #' matrix as the first one contained in the 3D array
@@ -295,15 +300,19 @@ sLapply <- function(sL,FUN,...) {
 #' Adj
 #'
 #' sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L)
-#' sL |> sLapply(\(scan) {scan[1,2] <- NA;scan})
+#' sL |> sLvapply(\(scan) {scan[1,2] <- NA;scan})
 sLvapply <- function(sL,.f,...,USE.NAMES = TRUE) {
-  vapply(
+  sL.ori <- sL
+  sL <-
+    vapply(
     X = 1:(dim(sL)[3]),
     FUN = function(x) .f(sL[,,x]),
     FUN.VALUE = sL[,,1],
     ... = ...,
     USE.NAMES = USE.NAMES
   )
+  sL <- copy_attrs_to(sL.ori,sL)
+  sL
 }
 
 #' Shortcut to a `lapply` equivalent to apply a function to a list of `scanList`: a `sLlist` object
@@ -378,6 +387,24 @@ rbind.scanList <- function(...,deparse.level = 1) {
   Reduce(rbind_2scanList,list(...))
 }
 
+#' Subsetting (dollard-sign) method for `scanList` objects
+#' @export
+#' @noRd
+`$.scanList` <- function(x,name) {
+  attrs(x,name)
+}
+
+#' Subsetting (single brackets) method for `scanList` objects
+#' @export
+#' @noRd
+`[.scanList` <- function(x,i,j,...) {
+  x.ori <- x
+  x <- without_attrs(x)
+  x.sub <- NextMethod()
+  x.sub <- copy_attrs_to(x.ori,x.sub)
+  x.sub
+}
+
 # printing related functions ----
 
 ## printing methods ----
@@ -442,12 +469,16 @@ print.scaled <- function(x,digits = 3,...) {
 #' @return `sL` invisibly, but print a cleaner 3D array via `Matrix::printSpMatrix()`
 #' @noRd
 print_sLarray <- function(sL,...) {
-  scan.ind <- choose_scan_to_print(sL)
-  truncated <- attr(scan.ind,"truncated")
-  # prints all but the last
-  lapply(scan.ind,\(s) print_clean_scan(sL[,,s],s,...))
-  if (truncated) cat("\n... (",dim(sL)[3] - 3," more scans)\n")
-  print_clean_scan(sL[,,dim(sL)[3]],dim(sL)[3],...)
+  if (is.na(dim(sL)[3])) {
+    print_clean_scan(sL,"scan:",...)
+  } else {
+    scan.ind <- choose_scan_to_print(sL)
+    truncated <- attr(scan.ind,"truncated")
+    # prints all but the last
+    lapply(scan.ind,\(s) print_clean_scan(sL[,,s],s,...))
+    if (truncated) cat("\n... (",dim(sL)[3] - 3," more scans)\n")
+    print_clean_scan(sL[,,dim(sL)[3]],dim(sL)[3],...)
+  }
   invisible(sL)
 }
 
@@ -458,9 +489,9 @@ print_sLarray <- function(sL,...) {
 #' @return integer vector, indices of scan to print
 #' @noRd
 choose_scan_to_print <- function(sL) {
-  truncated <- dim(sL)[3] > 5
+  truncated <- dim(sL)[3] > 3
   scan.ind <-
-    if (truncated) c(1,2) else scan.ind <- 1:(dim(sL)[3] - 1)
+    if (truncated) c(1,2) else 1:(dim(sL)[3] - 1)
   attr(scan.ind,"truncated") <- truncated
   attr(scan.ind,"last.scan") <- dim(sL)[3]
   scan.ind
@@ -468,7 +499,7 @@ choose_scan_to_print <- function(sL) {
 
 #' Cleaner adjacency matrix print
 #'
-#' @param scan numeric matrix, a scan
+#' @param mat numeric matrix, a scan
 #' @param s integer, scan index
 #' @param ... additional arguments to be passed to
 #'   [`Matrix::printSpMatrix()`][Matrix::printSpMatrix()]
@@ -476,23 +507,27 @@ choose_scan_to_print <- function(sL) {
 #' @param col.names logical, see [`Matrix::printSpMatrix()`][Matrix::printSpMatrix()]
 #' @param note.dropping.colnames logical, see [`Matrix::printSpMatrix()`][Matrix::printSpMatrix()]
 #'
-#' @return `scan` invisibly, but print a cleaner scan via
+#' @return `mat` invisibly, but print a cleaner scan via
 #'   [`Matrix::printSpMatrix()`][Matrix::printSpMatrix()]
 #'
 #' @importFrom Matrix printSpMatrix
 #' @importFrom methods as
 #'
 #' @noRd
-print_clean_scan <- function(scan,s,
+print_clean_scan <- function(mat,s,
                              col.names = FALSE,
                              note.dropping.colnames = FALSE,
                              ...) {
-  if (is.numeric(s)) cat("\nscan: ",s,sep = "")
-  else cat("\n",s,sep = "")
-  methods::as(scan,"dgCMatrix") |>
+  if (is.numeric(s))
+    cat("\nscan: ",s,sep = "")
+  else
+    cat("\n",s,sep = "")
+  m <- mat
+  class(m) <- NULL
+  methods::as(m,"dgCMatrix") |>
     Matrix::printSpMatrix(col.names = col.names,note.dropping.colnames = note.dropping.colnames,
                           ...)
-  invisible(scan)
+  invisible(mat)
 }
 
 #' Display and format attribute names in attrs if they exist

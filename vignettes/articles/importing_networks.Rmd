@@ -9,7 +9,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-Before starting with network simulations, `SimuNet` needs networks (e.g. from real-life) to
+Before starting with network simulations, `SimuNet` needs a network (e.g. from real-life) to
 "inspire" its internal simulation probabilities. The approach is described in the article on the
 [underlying Bayesian framework](bayesian_framework.html), and is described "code-wise" in the
 `draw_edgeProb()`'s doc.
@@ -23,31 +23,35 @@ observed associating or interacting
 
 A user willing to run simulations with SimuNet will import an `Adj` matrix and `samp.effort`.
 
+```{r overview_bayesian}
+# TODO: illustrate the two required data input, with a mention on Adj's mode
+```
+
 Care regarding the `mode` of `Adj`  - in the `igraph` sense (see `igraph::graph.adjacency()`) - is
-also required. In short, `igraph` defines the `mode`s:
+also required. In short, `igraph`'s `mode` can be:
 
 * `"directed"` for directed networks (asymmetrical matrices) where $Adj[i,j] = 1$ does not have the
 same meaning as $Adj[j,i] = 1$
 * `"undirected"` for undirected networks (symmetrical matrices) where $Adj[i,j] = 1$ has the same
 meaning as $Adj[j,i] = 1$.    
 `igraph` actually includes multiple approaches to build undirected networks when an asymmetrical
-matrix is inputted:
+matrix is inputted, with `mode` set to:
 
     * `"max"`, which takes the $max(Adj[i,j],Adj[j,i])$ for both edges. This is actually the `mode`
     used when `mode = "undirected"`
-    * `"min"`, which takes the $max(Adj[i,j],Adj[j,i])$ for both edges
+    * `"min"`, which takes the $min(Adj[i,j],Adj[j,i])$ for both edges
     * `"plus"`, which takes $Adj[i,j] + Adj[j,i]$ for both edges
     * `"upper"`, for upper-triangular matrices
     * `"lower"`, for lower-triangular matrices
 
 For unambiguous undirected networks, we recommend using triangular matrices (`mode = "upper"` or
-`mode = "upper"`).
+`mode = "lower"`).
 
 ### Creating or importing `Adj` and `samp.effort`
 Any methods leading to such a square integer matrix - triangular or not - is suitable as `Adj`. For
 `samp.effort`, simply assign an integer to a variable.
 
-#### randomly generate an `Adj` matrix and `samp.effort`:  
+#### Randomly generate an `Adj` matrix and `samp.effort`:  
 ```{r random_init}
 library(SimuNet)
 set.seed(42)
@@ -66,7 +70,7 @@ Adj          # note that the suitable `mode` here would be "directed"
 samp.effort
 ```
 
-#### import them manually
+#### Import them manually
 from real-life observations:  
 ```{r manual_init}
 # input data manually... 
@@ -101,7 +105,11 @@ Adj           # note that here, the suitable `mode` is driven by `type`
 samp.effort
 ```
 
-That's it! With `Adj`, `samp.effort` and knowing the suitable `mode`, you can start using
+Note that here, `type` can be either `"both"`, `"upper"`, `"lower"`, and refers to the matrix
+triangles to consider (usually either `"upper"` or `"lower"` in the case of undirected networks, and
+`"both"` in the case of directed ones)
+
+**That's it!** With `Adj`, `samp.effort` and knowing the suitable `mode`, you can start using
 `simunet()` to [generate social network simulations](first_simulations.html)!
 
 Hereafter, we only showcase general network considerations about converting, importing and plotting
@@ -136,7 +144,7 @@ plot(G,
 )
 ```
 
-The conversion can be achieve the other-way around:
+The conversion can be achieve the other-way around, via `igraph::get.adjacency()`:
 ```{r network_to_Adj}
 G.Adj <- igraph::get.adjacency(G,type = "lower",attr = "weight")
 G.Adj

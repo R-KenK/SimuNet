@@ -11,7 +11,8 @@ array2matList(array.3D)
 throughout the different scans (3rd dimension)}
 }
 \value{
-a list of matrices where each element is the 2D matrix for each scan index (3rd dimension of \code{array.3D})
+a list of matrices where each element is the 2D matrix for each scan index (3rd dimension
+of \code{array.3D})
 }
 \description{
 Convenience function to allow the use of functions designed to affect list of matrices instead of

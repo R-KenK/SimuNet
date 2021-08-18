@@ -7,8 +7,8 @@
 matList2array(mat.list)
 }
 \arguments{
-\item{mat.list}{a 3 dimensional array representing adjacency matrices (first 2 dimensions)
-throughout the different scans (3rd dimension)}
+\item{mat.list}{a list of matrices where each element is the 2D matrix for each scan index (3rd
+dimension of \code{array.3D})}
 }
 \value{
 a 3 dimensional array representing adjacency matrices (first 2 dimensions) throughout the
