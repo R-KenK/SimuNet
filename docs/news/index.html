@@ -101,7 +101,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0.9000</span>
       </span>
     </div>
 
@@ -202,6 +202,25 @@
     <div id="simunet-development-version" class="section level1">
 <h1 class="page-header" data-toc-text="development version">
 <a href="#simunet-development-version" class="anchor"></a>SimuNet (development version)</h1>
+<ul>
+<li>
+<code><a href="https://rdrr.io/r/base/Extract.html">$</a></code> methods added for <code>scanList</code> to retrieve attributes in <code>attrs</code>:
+<ul>
+<li>Users can now use <code>sL$name</code>, e.g. <code>sL$edge.Prob</code> as a shortcut for <code><a href="../reference/attrs.html">attrs(sL,"edge.Prob")</a></code>.</li>
+</ul>
+</li>
+<li>
+<code><a href="https://rdrr.io/r/base/Extract.html">[</a></code> methods added for <code>scanList</code> to subset scans:
+<ul>
+<li>
+<code>sL[,,vec]</code> is now also a scanList with <code>attrs</code> copied from <code>sL</code>.</li>
+</ul>
+</li>
+</ul>
+</div>
+    <div id="simunet-220" class="section level1">
+<h1 class="page-header" data-toc-text="2.2.0">
+<a href="#simunet-220" class="anchor"></a>SimuNet 2.2.0</h1>
 <ul>
 <li>
 <code>customize_sampling()</code> renamed into <code><a href="../reference/design_sampling.html">design_sampling()</a></code>, with additional internal changes:

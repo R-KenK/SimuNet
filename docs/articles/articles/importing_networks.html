@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0.9000</span>
       </span>
     </div>
 
@@ -151,7 +151,7 @@
 
     
     
-<p>Before starting with network simulations, <code>SimuNet</code> needs networks (e.g. from real-life) to “inspire” its internal simulation probabilities. The approach is described in the article on the <a href="bayesian_framework.html">underlying Bayesian framework</a>, and is described “code-wise” in the <code><a href="../../reference/draw_edgeProb.html">draw_edgeProb()</a></code>’s doc.</p>
+<p>Before starting with network simulations, <code>SimuNet</code> needs a network (e.g. from real-life) to “inspire” its internal simulation probabilities. The approach is described in the article on the <a href="bayesian_framework.html">underlying Bayesian framework</a>, and is described “code-wise” in the <code><a href="../../reference/draw_edgeProb.html">draw_edgeProb()</a></code>’s doc.</p>
 <div id="data-import" class="section level2">
 <h2 class="hasAnchor">
 <a href="#data-import" class="anchor"></a>Data import</h2>
@@ -162,17 +162,19 @@
 </li>
 </ul>
 <p>A user willing to run simulations with SimuNet will import an <code>Adj</code> matrix and <code>samp.effort</code>.</p>
-<p>Care regarding the <code>mode</code> of <code>Adj</code> - in the <code>igraph</code> sense (see <code><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">igraph::graph.adjacency()</a></code>) - is also required. In short, <code>igraph</code> defines the <code>mode</code>s:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># TODO: illustrate the two required data input, with a mention on Adj's mode</span></code></pre></div>
+<p>Care regarding the <code>mode</code> of <code>Adj</code> - in the <code>igraph</code> sense (see <code><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">igraph::graph.adjacency()</a></code>) - is also required. In short, <code>igraph</code>’s <code>mode</code> can be:</p>
 <ul>
 <li><p><code>"directed"</code> for directed networks (asymmetrical matrices) where <span class="math inline">\(Adj[i,j] = 1\)</span> does not have the same meaning as <span class="math inline">\(Adj[j,i] = 1\)</span></p></li>
 <li>
-<p><code>"undirected"</code> for undirected networks (symmetrical matrices) where <span class="math inline">\(Adj[i,j] = 1\)</span> has the same meaning as <span class="math inline">\(Adj[j,i] = 1\)</span>.<br><code>igraph</code> actually includes multiple approaches to build undirected networks when an asymmetrical matrix is inputted:</p>
+<p><code>"undirected"</code> for undirected networks (symmetrical matrices) where <span class="math inline">\(Adj[i,j] = 1\)</span> has the same meaning as <span class="math inline">\(Adj[j,i] = 1\)</span>.<br><code>igraph</code> actually includes multiple approaches to build undirected networks when an asymmetrical matrix is inputted, with <code>mode</code> set to:</p>
 <ul>
 <li>
 <code>"max"</code>, which takes the <span class="math inline">\(max(Adj[i,j],Adj[j,i])\)</span> for both edges. This is actually the <code>mode</code> used when <code>mode = "undirected"</code>
 </li>
 <li>
-<code>"min"</code>, which takes the <span class="math inline">\(max(Adj[i,j],Adj[j,i])\)</span> for both edges</li>
+<code>"min"</code>, which takes the <span class="math inline">\(min(Adj[i,j],Adj[j,i])\)</span> for both edges</li>
 <li>
 <code>"plus"</code>, which takes <span class="math inline">\(Adj[i,j] + Adj[j,i]\)</span> for both edges</li>
 <li>
@@ -182,7 +184,7 @@
 </ul>
 </li>
 </ul>
-<p>For unambiguous undirected networks, we recommend using triangular matrices (<code>mode = "upper"</code> or <code>mode = "upper"</code>).</p>
+<p>For unambiguous undirected networks, we recommend using triangular matrices (<code>mode = "upper"</code> or <code>mode = "lower"</code>).</p>
 <div id="creating-or-importing-adj-and-samp-effort" class="section level3">
 <h3 class="hasAnchor">
 <a href="#creating-or-importing-adj-and-samp-effort" class="anchor"></a>Creating or importing <code>Adj</code> and <code>samp.effort</code>
@@ -190,8 +192,8 @@
 <p>Any methods leading to such a square integer matrix - triangular or not - is suitable as <code>Adj</code>. For <code>samp.effort</code>, simply assign an integer to a variable.</p>
 <div id="randomly-generate-an-adj-matrix-and-samp-effort" class="section level4">
 <h4 class="hasAnchor">
-<a href="#randomly-generate-an-adj-matrix-and-samp-effort" class="anchor"></a>randomly generate an <code>Adj</code> matrix and <code>samp.effort</code>:</h4>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<a href="#randomly-generate-an-adj-matrix-and-samp-effort" class="anchor"></a>Randomly generate an <code>Adj</code> matrix and <code>samp.effort</code>:</h4>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/R-KenK/SimuNet">SimuNet</a></span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span>
 
@@ -217,9 +219,9 @@
 </div>
 <div id="import-them-manually" class="section level4">
 <h4 class="hasAnchor">
-<a href="#import-them-manually" class="anchor"></a>import them manually</h4>
+<a href="#import-them-manually" class="anchor"></a>Import them manually</h4>
 <p>from real-life observations:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># input data manually... </span>
 <span class="va">Adj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span> <span class="fl">0</span>,<span class="fl">12</span>,<span class="fl">34</span>,<span class="fl">56</span>,<span class="fl">78</span>,
                  <span class="fl">0</span>, <span class="fl">0</span>,<span class="fl">23</span>,<span class="fl">45</span>,<span class="fl">67</span>,
@@ -248,7 +250,7 @@
 <a href="#import-them-from-the-animal-social-network-repository" class="anchor"></a>Import them from the <a href="https://bansallab.github.io/asnr/">Animal Social Network Repository</a>
 </h4>
 <p>A helper function, <code><a href="../../reference/import_from_asnr.html">import_from_asnr()</a></code>, can be used to interact with the <a href="https://bansallab.github.io/asnr/">ASNR</a></p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">Adj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/import_from_asnr.html">import_from_asnr</a></span><span class="op">(</span><span class="st">"Mammalia"</span>,
                         <span class="st">"kangaroo_proximity_weighted"</span>,
                         output <span class="op">=</span> <span class="st">"adjacency"</span>,type <span class="op">=</span> <span class="st">"lower"</span><span class="op">)</span>
@@ -276,7 +278,8 @@
 <span class="co">#&gt; 17  0  0  0  0  0 0 0 0 1  0  0  0  0  0  0  0  0</span>
 <span class="va">samp.effort</span>
 <span class="co">#&gt; [1] 241</span></code></pre></div>
-<p>That’s it! With <code>Adj</code>, <code>samp.effort</code> and knowing the suitable <code>mode</code>, you can start using <code><a href="../../reference/simunet.html">simunet()</a></code> to <a href="first_simulations.html">generate social network simulations</a>!</p>
+<p>Note that here, <code>type</code> can be either <code>"both"</code>, <code>"upper"</code>, <code>"lower"</code>, and refers to the matrix triangles to consider (usually either <code>"upper"</code> or <code>"lower"</code> in the case of undirected networks, and <code>"both"</code> in the case of directed ones)</p>
+<p><strong>That’s it!</strong> With <code>Adj</code>, <code>samp.effort</code> and knowing the suitable <code>mode</code>, you can start using <code><a href="../../reference/simunet.html">simunet()</a></code> to <a href="first_simulations.html">generate social network simulations</a>!</p>
 <p>Hereafter, we only showcase general network considerations about converting, importing and plotting networks.</p>
 </div>
 </div>
@@ -287,7 +290,7 @@
 <p>Our last example represented a social network of a group of kangaroo, the weights of which representing how many times each pair of kangaroos was observed in association, after 241 observations, or <code>"scans"</code>.</p>
 <p>The user can reconstruct an <a href="https://igraph.org/r/">igraph</a> network (or graph) object from <code><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">igraph::graph.adjacency()</a></code>, but <code>SimuNet</code>’s <code><a href="../../reference/import_from_asnr.html">import_from_asnr()</a></code> can also output igraph object directly by specifying the <code>output</code> (among <code>"graph"</code> and <code>"adjacency"</code>, with support for partial matching)</p>
 <p>From there, it is easy to plot a visualization of the network:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># from Adj...</span>
 <span class="va">G</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">graph.adjacency</a></span><span class="op">(</span><span class="va">Adj</span>,mode <span class="op">=</span> <span class="st">"lower"</span>,weighted <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co"># ... or directly imported</span>
@@ -304,8 +307,8 @@
        <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">G.E</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">G.E</span><span class="op">)</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
 <p><img src="importing_networks_files/figure-html/plotting_original_Adj-1.png" width="700"></p>
-<p>The conversion can be achieve the other-way around:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<p>The conversion can be achieve the other-way around, via <code><a href="https://rdrr.io/pkg/igraph/man/as_adjacency_matrix.html">igraph::get.adjacency()</a></code>:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">G.Adj</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/as_adjacency_matrix.html">get.adjacency</a></span><span class="op">(</span><span class="va">G</span>,type <span class="op">=</span> <span class="st">"lower"</span>,attr <span class="op">=</span> <span class="st">"weight"</span><span class="op">)</span>
 <span class="va">G.Adj</span>
 <span class="co">#&gt; 17 x 17 sparse Matrix of class "dgCMatrix"</span>

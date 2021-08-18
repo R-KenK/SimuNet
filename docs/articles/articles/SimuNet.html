@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0.9000</span>
       </span>
     </div>
 
@@ -155,6 +155,8 @@
 <h2 class="hasAnchor">
 <a href="#mathemtatical-framework" class="anchor"></a>Mathemtatical framework</h2>
 <p>A network is particular mathematical object consisting in a set of nodes connected with edges. If the nodes’ indices are used as the row and columns of a matrix, edges’ presences or weights can be represented by numbers populating this thus-called <strong>adjacency matrix</strong>.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># TODO: illustrate a binary network/matrix</span></code></pre></div>
 <p><code>SimuNet</code> internally represents networks as adjacency matrices, shortened in variable names as <code>Adj</code>. Various methods and functions can be used to convert such matrices into R objects more dedicated to representing network objects, e.g. the <a href="https://igraph.org/r/"><code>igraph</code></a> package relying on <code><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">igraph::graph_from_adjacency_matrix()</a></code> (or the shorter <code><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">igraph::graph.adjacency()</a></code>) to convert matrices into igraph network objects.</p>
 <p>A binary network - where an edge between two node is either present or not - is represented as a binary adjacency matrix filled with 0s and 1s.</p>
 <p>A weighted network has edges that can be absent, or have different numerical values. These can represent:</p>
@@ -163,6 +165,8 @@
 <strong>distances</strong>, in geographical networks for instance</li>
 <li>or quantify <strong>proximity</strong> between nodes, in the case of social networks (the focus of <code>SimuNet</code>)</li>
 </ul>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># TODO: illustrate a weighted network/matrix</span></code></pre></div>
 </div>
 <div id="simunets-approach" class="section level2">
 <h2 class="hasAnchor">
@@ -183,9 +187,15 @@
 <a href="#overview" class="anchor"></a>Overview</h3>
 <p><code>SimuNet</code> simulated networks are stored as a specific S3 class: as <code>scanList</code> objects.</p>
 <p>From a given <code>Adj</code> and <code>samp.effort</code> input, <code>SimuNet</code>’s main and eponymous function <code><a href="../../reference/simunet.html">simunet()</a></code> will generate different <code>scanList</code> based on edge presence probabilities drawn from a similar Beta distribution (see <code><a href="../../reference/draw_edgeProb.html">draw_edgeProb()</a></code>).</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># TODO: illustrate the overall probability framework</span></code></pre></div>
 <p><code>scanList</code> objects are mainly 3-dimensional arrays arranged as a sequence of 2-dimensional binary adjacency matrices, representing the “scans”; the 3rd dimension represent the sequence, i.e. the scan indices.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># TODO: scheme of scanLists</span></code></pre></div>
 <p><code>scanList</code> objects also have single attribute named <code>attrs</code>. <code>attrs</code> is a list that contains many characteristics or intermediate steps that can be relevant and are therefore tracked.</p>
 <p><code>scanList</code> <em>binary</em> 3D arrays can be “collapsed” into <em>weighted</em> adjacency matrices, by summing the array along the 3rd dimension. This can be achieved via <code><a href="../../reference/sum_scans.html">sum_scans()</a></code></p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># TODO: illustrate collapsing binary sequences into weighted adjacency</span></code></pre></div>
 </div>
 <div id="two-types-of-simulations" class="section level3">
 <h3 class="hasAnchor">
@@ -202,6 +212,8 @@
 </ul>
 </li>
 </ul>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># TODO: illustrate the difference between theoretical scanList vs empirical scanList</span></code></pre></div>
 <p>You can find out more in these articles about <a href="first_simulations.html">theoretical simulations</a> and <a href="experiments.html">empirical designs</a>.</p>
 </div>
 </div>
