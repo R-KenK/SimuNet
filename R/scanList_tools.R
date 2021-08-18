@@ -378,6 +378,24 @@ rbind.scanList <- function(...,deparse.level = 1) {
   Reduce(rbind_2scanList,list(...))
 }
 
+#' Subsetting (dollard-sign) method for `scanList` objects
+#' @export
+#' @noRd
+`$.scanList` <- function(x,name) {
+  attrs(x,name)
+}
+
+#' Subsetting (single brackets) method for `scanList` objects
+#' @export
+#' @noRd
+`[.scanList` <- function(x,i,j,...) {
+  x.ori <- x
+  x <- without_attrs(x)
+  x.sub <- NextMethod()
+  x.sub <- copy_attrs_to(x.ori,x.sub)
+  x.sub
+}
+
 # printing related functions ----
 
 ## printing methods ----
