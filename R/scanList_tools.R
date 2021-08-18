@@ -460,7 +460,7 @@ print_sLarray <- function(sL,...) {
 choose_scan_to_print <- function(sL) {
   truncated <- dim(sL)[3] > 5
   scan.ind <-
-    if (truncated) c(1,2) else scan.ind <- 1:(dim(sL)[3] - 1)
+    if (truncated) c(1,2) else 1:(dim(sL)[3] - 1)
   attr(scan.ind,"truncated") <- truncated
   attr(scan.ind,"last.scan") <- dim(sL)[3]
   scan.ind
