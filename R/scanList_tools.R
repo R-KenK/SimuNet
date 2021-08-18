@@ -263,11 +263,16 @@ copy_attrs_to <- function(from,to) {
 #' sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L)
 #' sL |> sLapply(\(scan) {scan[1,2] <- NA;scan})
 sLapply <- function(sL,FUN,...) {
-  lapply(
-    X = 1:(dim(sL)[3]),
-    FUN = function(x) FUN(sL[,,x],...)
-  )
+  sL.ori <- sL
+  sL <-
+    lapply(
+      X = 1:(dim(sL)[3]),
+      FUN = function(x) FUN(sL[,,x],...)
+    ) |> matList2array()
+  sL <- copy_attrs_to(sL.ori,sL)
+  sL
 }
+
 #' Shortcut to a `lapply` equivalent to apply a function to each 2D matrix contained in a `scanList`
 #' Written analogously to [vapply()]. Values returned by `.f` should be a similarly dimensionned
 #' matrix as the first one contained in the 3D array
@@ -295,15 +300,19 @@ sLapply <- function(sL,FUN,...) {
 #' Adj
 #'
 #' sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L)
-#' sL |> sLapply(\(scan) {scan[1,2] <- NA;scan})
+#' sL |> sLvapply(\(scan) {scan[1,2] <- NA;scan})
 sLvapply <- function(sL,.f,...,USE.NAMES = TRUE) {
-  vapply(
+  sL.ori <- sL
+  sL <-
+    vapply(
     X = 1:(dim(sL)[3]),
     FUN = function(x) .f(sL[,,x]),
     FUN.VALUE = sL[,,1],
     ... = ...,
     USE.NAMES = USE.NAMES
   )
+  sL <- copy_attrs_to(sL.ori,sL)
+  sL
 }
 
 #' Shortcut to a `lapply` equivalent to apply a function to a list of `scanList`: a `sLlist` object

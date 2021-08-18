@@ -39,5 +39,5 @@ Adj[lower.tri(Adj,diag = TRUE)] <- 0L
 Adj
 
 sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L)
-sL |> sLapply(\(scan) {scan[1,2] <- NA;scan})
+sL |> sLvapply(\(scan) {scan[1,2] <- NA;scan})
 }
