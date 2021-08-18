@@ -104,7 +104,7 @@ of the attributes list attrs" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0.9000</span>
       </span>
     </div>
 
@@ -249,85 +249,115 @@ handles attributes list <code>attrs</code></p>
 #&gt; e 0   0  0  0  0</div><div class='input'><span class='va'>mL</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simunet.html'>simunet</a></span><span class='op'>(</span><span class='va'>Adj</span>,<span class='va'>samp.effort</span>,<span class='st'>"upper"</span>,<span class='fl'>10</span><span class='op'>)</span> |&gt; <span class='fu'>scanList2matList</span><span class='op'>(</span><span class='op'>)</span>
 <span class='va'>mL</span>
 </div><div class='output co'>#&gt; [[1]]
-#&gt;   a b c d e
-#&gt; a 0 1 1 0 1
-#&gt; b 0 0 0 0 0
-#&gt; c 0 0 0 0 1
-#&gt; d 0 0 0 0 0
-#&gt; e 0 0 0 0 0
 #&gt; 
+#&gt; scan:           
+#&gt; a . 1 1 . 1
+#&gt; b . . . . .
+#&gt; c . . . . 1
+#&gt; d . . . . .
+#&gt; e . . . . .
+#&gt; 
+#&gt; 
+#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob
 #&gt; [[2]]
-#&gt;   a b c d e
-#&gt; a 0 1 0 0 0
-#&gt; b 0 0 0 0 1
-#&gt; c 0 0 0 0 1
-#&gt; d 0 0 0 0 0
-#&gt; e 0 0 0 0 0
 #&gt; 
+#&gt; scan:           
+#&gt; a . 1 . . .
+#&gt; b . . . . 1
+#&gt; c . . . . 1
+#&gt; d . . . . .
+#&gt; e . . . . .
+#&gt; 
+#&gt; 
+#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob
 #&gt; [[3]]
-#&gt;   a b c d e
-#&gt; a 0 1 0 0 0
-#&gt; b 0 0 0 0 1
-#&gt; c 0 0 0 0 1
-#&gt; d 0 0 0 0 0
-#&gt; e 0 0 0 0 0
 #&gt; 
+#&gt; scan:           
+#&gt; a . 1 . . .
+#&gt; b . . . . 1
+#&gt; c . . . . 1
+#&gt; d . . . . .
+#&gt; e . . . . .
+#&gt; 
+#&gt; 
+#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob
 #&gt; [[4]]
-#&gt;   a b c d e
-#&gt; a 0 1 1 0 1
-#&gt; b 0 0 0 0 1
-#&gt; c 0 0 0 0 0
-#&gt; d 0 0 0 0 0
-#&gt; e 0 0 0 0 0
 #&gt; 
+#&gt; scan:           
+#&gt; a . 1 1 . 1
+#&gt; b . . . . 1
+#&gt; c . . . . .
+#&gt; d . . . . .
+#&gt; e . . . . .
+#&gt; 
+#&gt; 
+#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob
 #&gt; [[5]]
-#&gt;   a b c d e
-#&gt; a 0 1 0 0 1
-#&gt; b 0 0 0 1 0
-#&gt; c 0 0 0 0 1
-#&gt; d 0 0 0 0 0
-#&gt; e 0 0 0 0 0
 #&gt; 
+#&gt; scan:           
+#&gt; a . 1 . . 1
+#&gt; b . . . 1 .
+#&gt; c . . . . 1
+#&gt; d . . . . .
+#&gt; e . . . . .
+#&gt; 
+#&gt; 
+#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob
 #&gt; [[6]]
-#&gt;   a b c d e
-#&gt; a 0 1 1 0 1
-#&gt; b 0 0 1 0 1
-#&gt; c 0 0 0 0 1
-#&gt; d 0 0 0 0 1
-#&gt; e 0 0 0 0 0
 #&gt; 
+#&gt; scan:           
+#&gt; a . 1 1 . 1
+#&gt; b . . 1 . 1
+#&gt; c . . . . 1
+#&gt; d . . . . 1
+#&gt; e . . . . .
+#&gt; 
+#&gt; 
+#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob
 #&gt; [[7]]
-#&gt;   a b c d e
-#&gt; a 0 1 0 1 0
-#&gt; b 0 0 0 1 1
-#&gt; c 0 0 0 0 1
-#&gt; d 0 0 0 0 1
-#&gt; e 0 0 0 0 0
 #&gt; 
+#&gt; scan:           
+#&gt; a . 1 . 1 .
+#&gt; b . . . 1 1
+#&gt; c . . . . 1
+#&gt; d . . . . 1
+#&gt; e . . . . .
+#&gt; 
+#&gt; 
+#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob
 #&gt; [[8]]
-#&gt;   a b c d e
-#&gt; a 0 1 1 0 0
-#&gt; b 0 0 0 0 1
-#&gt; c 0 0 0 0 1
-#&gt; d 0 0 0 0 0
-#&gt; e 0 0 0 0 0
 #&gt; 
+#&gt; scan:           
+#&gt; a . 1 1 . .
+#&gt; b . . . . 1
+#&gt; c . . . . 1
+#&gt; d . . . . .
+#&gt; e . . . . .
+#&gt; 
+#&gt; 
+#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob
 #&gt; [[9]]
-#&gt;   a b c d e
-#&gt; a 0 1 0 0 1
-#&gt; b 0 0 0 0 1
-#&gt; c 0 0 0 0 1
-#&gt; d 0 0 0 0 0
-#&gt; e 0 0 0 0 0
 #&gt; 
+#&gt; scan:           
+#&gt; a . 1 . . 1
+#&gt; b . . . . 1
+#&gt; c . . . . 1
+#&gt; d . . . . .
+#&gt; e . . . . .
+#&gt; 
+#&gt; 
+#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob
 #&gt; [[10]]
-#&gt;   a b c d e
-#&gt; a 0 1 0 1 1
-#&gt; b 0 0 0 0 0
-#&gt; c 0 0 0 0 1
-#&gt; d 0 0 0 0 0
-#&gt; e 0 0 0 0 0
 #&gt; 
+#&gt; scan:           
+#&gt; a . 1 . 1 1
+#&gt; b . . . . .
+#&gt; c . . . . 1
+#&gt; d . . . . .
+#&gt; e . . . . .
+#&gt; 
+#&gt; 
+#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob
 #&gt; attr(,"class")
 #&gt; [1] "theoretical" "matList"    
 #&gt; 

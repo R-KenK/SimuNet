@@ -1,3 +1,9 @@
+# SimuNet 2.2.1
+* `$` methods added for `scanList` to retrieve attributes in `attrs`:
+    * Users can now use `sL$name`, e.g. `sL$edge.Prob` as a shortcut for `attrs(sL,"edge.Prob")`.
+* `[` methods added for `scanList` to subset scans:
+    * `sL[,,vec]` is now also a scanList with `attrs` copied from `sL`.
+
 # SimuNet 2.2.0
 * `customize_sampling()` renamed into `design_sampling()`, with additional internal changes:
     * Now returns `expDesign` objects as the name suggests, and not just functions.

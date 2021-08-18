@@ -83,7 +83,8 @@ matList2scanList <- function(mat.list) {
 #' @param array.3D a 3 dimensional array representing adjacency matrices (first 2 dimensions)
 #'   throughout the different scans (3rd dimension)
 #'
-#' @return a list of matrices where each element is the 2D matrix for each scan index (3rd dimension of `array.3D`)
+#' @return a list of matrices where each element is the 2D matrix for each scan index (3rd dimension
+#'   of `array.3D`)
 #' @export
 #'
 #' @keywords internal
@@ -95,8 +96,8 @@ array2matList <- function(array.3D) {
 #'
 #' Convenience function to back-transform a list of matrices into a 3D array
 #'
-#' @param mat.list a 3 dimensional array representing adjacency matrices (first 2 dimensions)
-#'   throughout the different scans (3rd dimension)
+#' @param mat.list a list of matrices where each element is the 2D matrix for each scan index (3rd
+#'   dimension of `array.3D`)
 #'
 #' @return a 3 dimensional array representing adjacency matrices (first 2 dimensions) throughout the
 #'   different scans (3rd dimension)

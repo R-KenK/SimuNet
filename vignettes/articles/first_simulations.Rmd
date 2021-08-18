@@ -9,7 +9,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-Let's first retrieve the kangaroo social network we [imported previously](importing_networks.html):
+Let's first retrieve the kangaroo social network we [previously imported](importing_networks.html):
 ```{r setup}
 library(SimuNet)
 
@@ -17,9 +17,9 @@ Adj <- import_from_asnr("Mammalia",
                         "kangaroo_proximity_weighted",
                         output = "adjacency",type = "upper")
 samp.effort <- 241L # number of observations reported by the authors
-# data retrieved from (Grant, 1973)
-# DOI: 10.1016/S0003-3472(73)80004-1
-Adj           # note that here, the suitable `mode` is driven by `type`
+                    # data retrieved from (Grant, 1973)
+                    # DOI: 10.1016/S0003-3472(73)80004-1
+Adj                 # note that here, the suitable `mode` is driven by `type`
 samp.effort
 ```
 
@@ -42,7 +42,19 @@ sL1 <- simunet(
                              # to obtain Adj.
 sL1
 ```
-We obtain a 17 x 17 x 10 array of 10 binary adjacency matrices, the 10 scans.
+We obtain a 17 x 17 x 10 array of 10 binary adjacency matrices, the 10 _scans_. Zeros are
+represented as dots `.` to lower the visual load.
+
+Printed output automatically masks scans and only shows three of them, but all of them can be accessed via R's array subsetting syntax
+
+```{r access_first_sim}
+# Use the following syntax x[a,b,c] where a,b, and c are vectors of indices to explore the three
+# dimensions of the scanList's array. Leave a and b empty to select all rows and columns of each
+# scan
+
+# For instance, to select scans 3 and 4:
+sL1[,,3:4]
+```
 
 ## Running more simulations
 Simulating more `scanList`s from the same `Adj` and `samp.effort` will lead not only to different
@@ -56,8 +68,11 @@ identical(sL1,sL2)
 
 but also internally a different edge presence probability matrix. 
 
-These matrices are stored in `scanList` their attribute list `attrs`, as the `edge.Prob` attribute,
-and can be accessed via `attrs()` in a similar fashion than base `attr()`.
+These matrices are stored in a `scanList`'s attribute list `attrs`, as its `edge.Prob` attribute,
+and can be accessed:
+
+* via `attrs()` in a similar fashion than base `attr()`,
+* or via the dollar-sign subsetting function `sL$edge.Prob`
 ```{r edge.Probs}
 attrs(sL1,"edge.Prob")
 sL2 |> attrs("edge.Prob") # most of `SimuNet`'s functions have been written to allow for piping
