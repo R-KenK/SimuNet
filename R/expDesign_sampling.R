@@ -306,9 +306,9 @@ determine_obsProb <- function(scan.list,sampling = c("constant","matrix","random
            "character" = {
              sampling <- match.arg(sampling)
              switch(sampling,
-                    "constant" = stop("Please input a `sampling` variable as a numeric constant/scalar directly (cf. `?group_sample`"),
-                    "matrix" = stop("Please input a `sampling` variable as a numeric matrix directly (cf. `?group_sample`"),
-                    "function" = stop("Please input a `sampling` variable as a function object directly (cf. `?group_sample`"),
+                    "constant" = stop("Please input a `sampling` variable as a numeric constant/scalar directly (cf. `?group_sample`)"),
+                    "matrix" = stop("Please input a `sampling` variable as a numeric matrix directly (cf. `?group_sample`)"),
+                    "function" = stop("Please input a `sampling` variable as a function object directly (cf. `?group_sample`)"),
                     "random" = {
                       obs.P <- Adj
                       obs.P[sf(obs.P)] <- runif(length(obs.P[sf(obs.P)]))
