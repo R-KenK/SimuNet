@@ -486,6 +486,75 @@ remove_mostPeripheral.scanList <- function(scan.list,...) {
 #' @export
 #' @noRd
 remove_mostPeripheral.sLlist <- function(scan.list,...) {
- sLlapply(remove_mostPeripheral,scan.list)
+  sLlapply(remove_mostPeripheral,scan.list)
+}
+
+## remove central individual ----
+
+#' Remove from all scans the (overall) most central individual
+#' Individual centrality based on eigen vectors. Mostly given as an example of experimental
+#' manipulations that could be performed on `scanList` as `expDesign`, even as user-defined
+#' functions
+#'
+#' Written as a S3 method to be applied to `scanList` or `sLlist` (list of `scanList`) objects.
+#'
+#' @param scan.list a `scanList` or `sLlist` object. See objects returned by
+#'   [`simunet()`][simunet()]
+#' @param ... additional arguments to be passed. At the moment `scale_scans()` does not use
+#'
+#' At the moment `remove_mostCentral()` does not use additional argument, arguments passed will be
+#' ignored.
+#'
+#' @return a `scanList`, or list of such, in which the most central node has been removed. See
+#'   also [`simunet()`][simunet()].
+#'
+#' @seealso [simunet()], [design_exp()], [perform_exp()].
+#'
+#' @export
+#'
+#' @examples
+#' set.seed(42)
+#' n <- 5L
+#' samp.effort <- 241L
+#'
+#' # Adjacency matrix import
+#' ## random directed adjacency matrix
+#' Adj <- sample(1:samp.effort,n * n) |>
+#'   matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
+#' Adj[lower.tri(Adj,diag = FALSE)] <- 0L
+#' Adj
+#'
+#' # social network simulations
+#' ## theoretical scans
+#' sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L)
+#' sL
+#'
+#' ## focal-scan sampling
+#' sL |> perform_exp(design_sampling("focal","even")) |> remove_mostCentral()
+remove_mostCentral <- function(scan.list,...) {
+  UseMethod("remove_mostCentral")
+}
+
+#' remove_mostCentral method for `scanList` objects
+#' @export
+#' @noRd
+remove_mostCentral.scanList <- function(scan.list,...) {
+  mode <- attrs(scan.list,"mode")
+  directed <- switch(mode,"directed" = TRUE,FALSE)
+  scan.list |>
+    sum_scans() |>
+    igraph::graph.adjacency(weighted = TRUE) |>
+    igraph::eigen_centrality(directed = directed) %>%
+    .$vector |>
+    which.max() %>%
+    {scan.list[-c(.),-c(.),]} |>
+    copy_attrs_to(from = scan.list)
+}
+
+#' remove_mostCentral method for `sLlist` objects
+#' @export
+#' @noRd
+remove_mostCentral.sLlist <- function(scan.list,...) {
+  sLlapply(remove_mostCentral,scan.list)
 }
 
