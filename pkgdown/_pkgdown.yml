@@ -20,6 +20,7 @@ reference:
       - '`add_scans`'
       - '`count_NA`'
       - '`count_nonNA`'
+      - '`remove_mostCentral`'
       - '`remove_mostPeripheral`'
       - '`scale_scans`'
       - '`sum_scans`'

@@ -26,18 +26,17 @@ library(SimuNet)
 But `SimuNet` has been conceptualized to embed a way to _also_ simulate empirical phenomenon. These
 can include:
 
-* [**empirical sampling**](sampling.html): an observer relies on a method that can lead to data diverging from their
-theoretical counterparts, due to random error, missing data, etc.    
-SimuNet includes way to simulate
-two main sampling methods used in animal social network analysis:
+* [**empirical sampling**](sampling.html): an observer relies on a method that can lead to data
+diverging from their theoretical counterparts, due to random error, missing data, etc. SimuNet
+includes way to simulate two main sampling methods used in animal social network analysis:
     * group-scan sampling, and
     * focal(-scan) sampling
-* [**experimental manipulations**](experiments.html): these can represent abstract or artificial modifications applied
-to the theoretical network in order to see the impact of such manipulations. For instance, how is
-the resulting network impacted when the most peripheral node is removed (see
+* [**experimental manipulations**](experiments.html): these can represent abstract or artificial
+modifications applied to the theoretical network in order to see the impact of such manipulations.
+For instance, how is the resulting network impacted when the most peripheral node is removed (see
 `remove_mostPeripheral()`)?
 
-The general approach is based on the concept of experimental designs, that consist in performing
+The general approach is based on the concept of experimental designs, that consists in performing
 multiple "elementary" manipulations:
 
 * Such manipulations to be done on a theoretical `scanList` can be combined, chained, and tweaked at
@@ -57,23 +56,31 @@ Once the user knows what sequence of manipulations defines the experimental desi
 * To do so, pass several functions in the desired order as arguments of `design_exp()`
 * `design_exp()` returns an object of class `expDesign`, which main argument contain the sequence of
 function to apply to a `scanList`. `design_exp()` internally relies on `purrr::compose()`
-* `expDesign` objects can be used as arguments in `simunet()` and `perform_exp()`
-    * When used in the former, the simulation outputs directly an empirical `scanList`, but the
-    intermediate theoretical scanList is stored in the attributes list `attrs` under the name
-    `theoretical.scanList`.
-    * The latter takes a theoretical `scanList` as an argument as well, and perform the inputted
-    `expDesign` to it. The returned `scanList` similarly stores the original in `attrs`
-* Users can also input several `expDesign` objects in one call of either `simunet()` and
+* You can also add manipulations to an existing `expDesign` object by passing it along other
+functions in `design_exp()`. `design_exp()` accepts any combinations of functions and expDesign
+objects!
+
+### Running experiments
+`expDesign` objects can be used as arguments in `simunet()` and `perform_exp()`
+
+* When used in the former, the simulation outputs directly an empirical `scanList`, but the
+intermediate theoretical `scanList` is stored in the attributes list `attrs` under the name
+`theoretical.scanList`.
+* The latter takes a theoretical `scanList` as an argument as well, and perform the inputted
+`expDesign` to it. The returned `scanList` similarly stores the original in `attrs`
+
+Users can also input several `expDesign` objects in one call of either `simunet()` and
 `perform_exp()` to run several experimental design on a given theoretical `scanList`, allowing for
 easier comparison:
-    * returned object is then a list of `scanList`s, aptly named `sLlist` objects.
-    * provided building blocks are written to seamlessly be applied to a `scanList` or `sLlist`, but
-    user-defined functions could benefit from using `lapply()` (e.g. `lapply(scanList,my_fun)`)
+* returned object is then a list of `scanList`s, aptly named `sLlist` objects.
+* provided building blocks are written to seamlessly be applied to a `scanList` or `sLlist`, but
+user-defined functions could benefit from using `lapply()` (e.g. `lapply(scanList,my_fun)`)
 
 ```{r expDesign}
 # TODO: insert a schematic
 ```
 
+### Thinking in experimental designs
 Experimental design's philosophy can see inspiration from:
 
 * the data manipulation philosophy used in tidy packages like
