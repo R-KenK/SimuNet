@@ -80,7 +80,7 @@ generate_scanList <- function(edge.Prob,n.scans){
 generate_empiscanList <- function(scan.list,exp.design) {
   empiscanList <- exp.design$FUN.seq(scan.list)
   attrs(empiscanList,"scanList.type") <- "empirical"
-  attrs(empiscanList,"theoretical.scanList") <- without_attrs(scan.list)
+  attrs(empiscanList,"theoretical.scanList") <- scan.list
   class(empiscanList)<- c("empirical","scanList")
   empiscanList
 }
