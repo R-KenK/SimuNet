@@ -537,10 +537,28 @@ print_clean_scan <- function(mat,s,
 #'
 #' @noRd
 format_attributes <- function(x,...) {
-  if (!is.null(get_attrs(x))) cat("\n\nHidden attributes:",names(get_attrs(x)))
+  if (!is.null(get_attrs(x))) {
+    attrs.names <-
+      get_attrs(x) |>
+      names() |>
+      split_returnCarriage_attributes()
+    cat("\n\nHidden attributes:\n",attrs.names,"\n",sep = "")
+  }
   if (inherits(x,"edgeProbMat")) {
     bet <- attr(x,"Beta priors")
     cat("\n","alpha.prior =",bet[1],"-","beta.prior =",bet[2])
   }
   invisible(x)
+}
+
+#' Split character vectors in chunks with at max n.attrs elements
+#' separate them with " - ", add a return carriage and makes it into a printable character scalar
+#'
+#' @param attrs.names character vector, names of a `scanList`'s `attrs`
+#'
+#' @noRd
+split_returnCarriage_attributes <- function(attrs.names,n.attrs = 6) {
+  split(attrs.names, ceiling(seq_along(attrs.names) / n.attrs)) |>
+    lapply(paste,collapse = " - ") %>%
+    {do.call(paste,list(.,collapse = "\n"))}
 }
