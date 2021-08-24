@@ -241,7 +241,7 @@ copy_attrs_to <- function(from,to) {
 #' matrix as the first one contained in the 3D array
 #'
 #' @param sL a `scanList` object (see [`simunet()`][simunet()])
-#' @param FUN a function,to apply a function to each 2D matrix contained in `sL`
+#' @param FUN a function, to apply to each 2D matrix contained in `sL`
 #' @param ... extra argument to be passed, notably named arguments used by `.f` (see [lapply()])
 #'
 #' @return a 3D array onto which the function has been applied to each scan
@@ -278,7 +278,7 @@ sLapply <- function(sL,FUN,...) {
 #' matrix as the first one contained in the 3D array
 #'
 #' @param sL a `scanList` object (see [`simunet()`][simunet()])
-#' @param .f a function,to apply a function to each 2D matrix contained in `sL`
+#' @param .f a function, to apply to each 2D matrix contained in `sL`
 #' @param ... extra argument to be passed, notably named arguments used by `.f` (see [lapply()])
 #' @param USE.NAMES logical; if `TRUE` and if `X` is character, use `X` as names for the result
 #'   unless it had names already (see [vapply()])
