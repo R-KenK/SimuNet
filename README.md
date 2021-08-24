@@ -5,6 +5,9 @@
 
 <!-- badges: start -->
 
+[![Project Status: WIP – Initial development is in progress, but there
+has not yet been a stable, usable release suitable for the
+public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 [![R-CMD-check](https://github.com/R-KenK/SimuNet/workflows/R-CMD-check/badge.svg)](https://github.com/R-KenK/SimuNet/actions)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/SimuNet)](https://CRAN.R-project.org/package=SimuNet)
