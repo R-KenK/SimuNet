@@ -13,6 +13,7 @@ knitr::opts_chunk$set(
 Let's first generate a theoretical simulation:
 ```{r setup}
 library(SimuNet)
+library(magrittr)
 set.seed(42)
 n <- 5L
 samp.effort <- 100L
@@ -27,7 +28,7 @@ sL
 
 ## Designin an experiment
 Experimental designs - `expDesign` objects in `SimuNet` - are successions of manipulations that are
-applied to a `scanList` - a 3-dimensional array.
+applied to a `scanList`, i.e. a 3-dimensional array.
 
 To design an experiment, simply input functions as successive arguments of `design_exp()`:
 
@@ -45,13 +46,24 @@ my_fun2 <- function(scan.list) {
 design_exp(my_fun1,remove_mostCentral,my_fun2)
 ```
 
-You can store `design_exp()`'s output and apply it to scanList via `perform_exp()`.
+You can store `design_exp()`'s output and apply it to `scanList` via `perform_exp()`.
 
 An `expDesign` can be expanded by inputting it in `design_exp()` with other functions or
-`expDesign`. Since `design_sampling()` also returns `expDesign` objects, this is how one can include
-a sampling method within an experimental design:
+`expDesign`.
 
 ```{r eD_syntax2}
+eD1 <- design_exp(my_fun1,remove_mostCentral)
+
+design_exp(eD1,my_fun2)    # this is similar to...
+
+# ... this:
+design_exp(my_fun1,remove_mostCentral,my_fun2)
+```
+
+Since `design_sampling()` also returns `expDesign` objects, this is how one can include
+a sampling method within an experimental design:
+
+```{r eD_syntax3}
 design_exp(my_fun1,design_sampling("group",0.9))
 
 foc.even <- design_sampling("focal","even")
@@ -59,7 +71,7 @@ foc.even
 design_exp(my_fun2,foc.even,my_fun1)
 ```
 
-`design_exp()` uses `purrr`'s `purrr:compose()` to encapsulate the sequence of manipulations into a
+`design_exp()` uses `purrr`'s `purrr::compose()` to encapsulate the sequence of manipulations into a
 single function stored as `FUN.seq` in the `expDesign` object, to be applied to the `scanList`.
 
 Manipulation "building blocks" are included in `SimuNet` to be used in experimental designs, but
@@ -89,7 +101,9 @@ We can see that it:
 4. remove it from all scans
 5. returns the resulting modified `scanList`, with the copied `attrs`
 
-Let's include it in its own experimental design, and apply it to `sL`
+Imagine what manipulation you too can design and use in `SimuNet`!
+
+Let's include `remove_mostCentral()` in its own experimental design, and apply it to `sL`
 ```{r remove_mostP2}
 removeC <- design_exp(remove_mostCentral)
 removeC
@@ -115,15 +129,13 @@ as expected, e had the highest eigen-vector centrality value.
 Let see for instance how this impacted the network's clustering coefficient:
 ```{r remove_mostP4}
 sL |> 
-  sum_scans() |>
-  without_attrs() %>%     # TODO: conversion helper to isolate the array/matrix
+  sum_scans() %>%
   {class(.) <- NULL;.} %>%
   {. + t(.)} |>           # DirectedClustering requires symmetrical matrices for undirected networks
   DirectedClustering::ClustBCG(type = "undirected")
 
 Cremoved |> 
-  sum_scans() |>
-  without_attrs() %>% 
+  sum_scans() %>% 
   {class(.) <- NULL;.} %>%
   {. + t(.)} |> 
   DirectedClustering::ClustBCG(type = "undirected")
@@ -131,7 +143,7 @@ Cremoved |>
 
 ### An more complexe example
 What would have happened if, in addition to having the most central individual removed, we also
-missed 20% of the edges' value?
+missed 20% of the edges' value when doing group-scans?
 
 Let's design this second experiment:
 ```{r remove_mostP5}
@@ -164,10 +176,9 @@ Replicating theoretical simulations allows to assess the clustering coefficient 
 get_undirectedCC <- function(scanList) {
   CC <- 
     scanList |> 
-    sum_scans() |>
-    without_attrs() %>%
-    {class(.) <- NULL;.} %>%
-    {. + t(.)} |>
+    sum_scans() %>%
+    {class(.) <- NULL;.} %>%  # modify the sumeed scanList into a class-less matrix
+    {. + t(.)} |>             # symmetrize the triangular matrix by adding its transposed matrix
     DirectedClustering::ClustBCG(type = "undirected")
   CC$GlobalCC
 }
@@ -196,7 +207,7 @@ CC.empi <- data.frame(type = factor(c("theoretical","empirical"),
                                     levels = c("theoretical","empirical")
                       ),
                       rep = rep(1:100,each = 2) |> as.factor(),
-                      CC = replicate(100,simplify = FALSE, # TODO: more elegant code
+                      CC = replicate(100,simplify = FALSE, # TODO: come up with more elegant code
                                      {
                                        sL <- simunet(Adj,samp.effort,"upper",100,removeC2)
                                        CC.theo <- sL$theoretical.scanList |> get_undirectedCC()
@@ -216,7 +227,74 @@ CC.empi |>
   guides(fill = "none",colour = "none")+
   scale_x_discrete(labels = c("Original","Most central node removed\n+\n20% edges missed"))+
   labs(x = "",y = "Mean Clustering Coefficient")+
-  theme_minimal(15)
+  theme_minimal(15)+
+  theme(plot.background = element_rect(fill = 'white', colour = NA))
 ```
 
+As seen above, combining `SimuNet`'s experimental design approach in combination with R's
+`replicate()` (or `lapply()`/`sapply()` to allow handling of the replication index) allows for
+varied and customized collection of simulated data!
 
+## Helper functions
+`SimuNet` includes some helper functions to convert objects to fit your needs.
+
+These helper functions include:
+
+* `scanList2matList()`: convert a `scanList` 3D array into an R list of 2D matrices
+* `matList2scanList()`: does the opposite as `scanList2matList()`
+* In combination with already existing functions - e.g. `igraph::graph.adjacency()` - you can use
+flexibly many network manipulations in your experimental design!
+
+### Examples
+#### Using matrix lists:
+Let's implement manipulations to apply on a list of matrices:
+```{r matList}
+# This function mask a random node from a matrix
+mask_randomNode <- function(Adj) {
+  to.mask <- sample(1:nrow(Adj),1)
+  Adj[c(to.mask),] <- NA
+  Adj[,c(to.mask)] <- NA
+  Adj
+}
+
+# a scanList can be transformed to a list of matrices, and lapply can be used to apply
+# mask_randomNode to each. matList2scanList back transforms it:
+mask_inEachScan <- function(sL) {
+  mL <- scanList2matList(sL)
+  mL |> 
+    lapply(mask_randomNode) |> 
+    copy_attrs_to(from = mL) |>     # keeps track of sL's attributes
+    matList2scanList()
+}
+
+rand.mask <- design_exp(mask_inEachScan)
+rand.mask
+sL |> perform_exp(rand.mask)
+```
+
+#### Using igraph networks
+Let's see with another example relying on igraph networks:
+```{r igraph}
+# This function mask a random node from a matrix
+rewire_each <- function(sL) {
+  mode <- sL$mode
+  sLapply(   # wrapper for lapply over scanLists' 3rd dimension. See ?sLapply
+    sL,
+    function(scan) {
+      scan |>
+        igraph::graph.adjacency(mode = mode,weighted = TRUE) |>     # transform to igraph network
+        igraph::rewire(igraph::each_edge(p = .2, loops = FALSE)) |> # rewire networks
+        igraph::get.adjacency(type = "upper",sparse = FALSE)        # transform back to matrix
+    }
+  )
+}
+
+rand.rewire <- design_exp(rewire_each)
+rand.rewire
+rewired <- sL |> perform_exp(rand.rewire)
+sL[,,3:4]
+rewired[,,3:4]
+```
+
+## TODO: Implement and showcase network plotting
+Coming soon!
