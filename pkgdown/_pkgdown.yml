@@ -72,10 +72,10 @@ navbar:
       href: articles/articles/experiments.html
     - text: -------
     - text: "SimuNet in details"
-    - text: SimuNet's Bayesian framework
-      href: articles/articles/bayesian_framework.html
     - text: Network Uncertainty
       href: articles/articles/uncertainty.html
+    - text: SimuNet's Bayesian framework
+      href: articles/articles/bayesian_framework.html
    reference:
     text: "Documentation"
     href: reference/index.html
