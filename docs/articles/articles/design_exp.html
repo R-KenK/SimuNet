@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.1.9000</span>
       </span>
     </div>
 
@@ -91,10 +91,10 @@
     <li class="divider">
     <li class="dropdown-header">SimuNet in details</li>
     <li>
-      <a href="../../articles/articles/bayesian_framework.html">SimuNet's Bayesian framework</a>
+      <a href="../../articles/articles/uncertainty.html">Network Uncertainty</a>
     </li>
     <li>
-      <a href="../../articles/articles/uncertainty.html">Network Uncertainty</a>
+      <a href="../../articles/articles/bayesian_framework.html">SimuNet's Bayesian framework</a>
     </li>
   </ul>
 </li>
@@ -169,8 +169,7 @@
 <p>But <code>SimuNet</code> has been conceptualized to embed a way to <em>also</em> simulate empirical phenomenon. These can include:</p>
 <ul>
 <li>
-<a href="sampling.html"><strong>empirical sampling</strong></a>: an observer relies on a method that can lead to data diverging from their theoretical counterparts, due to random error, missing data, etc.<br>
-SimuNet includes way to simulate two main sampling methods used in animal social network analysis:
+<a href="sampling.html"><strong>empirical sampling</strong></a>: an observer relies on a method that can lead to data diverging from their theoretical counterparts, due to random error, missing data, etc. SimuNet includes way to simulate two main sampling methods used in animal social network analysis:
 <ul>
 <li>group-scan sampling, and</li>
 <li>focal(-scan) sampling</li>
@@ -179,7 +178,7 @@ SimuNet includes way to simulate two main sampling methods used in animal social
 <li>
 <a href="experiments.html"><strong>experimental manipulations</strong></a>: these can represent abstract or artificial modifications applied to the theoretical network in order to see the impact of such manipulations. For instance, how is the resulting network impacted when the most peripheral node is removed (see <code><a href="../../reference/remove_mostPeripheral.html">remove_mostPeripheral()</a></code>)?</li>
 </ul>
-<p>The general approach is based on the concept of experimental designs, that consist in performing multiple “elementary” manipulations:</p>
+<p>The general approach is based on the concept of experimental designs, that consists in performing multiple “elementary” manipulations:</p>
 <ul>
 <li>Such manipulations to be done on a theoretical <code>scanList</code> can be combined, chained, and tweaked at will.</li>
 <li>
@@ -199,23 +198,25 @@ SimuNet includes way to simulate two main sampling methods used in animal social
 <li>
 <code><a href="../../reference/design_exp.html">design_exp()</a></code> returns an object of class <code>expDesign</code>, which main argument contain the sequence of function to apply to a <code>scanList</code>. <code><a href="../../reference/design_exp.html">design_exp()</a></code> internally relies on <code><a href="https://purrr.tidyverse.org/reference/compose.html">purrr::compose()</a></code>
 </li>
-<li>
-<code>expDesign</code> objects can be used as arguments in <code><a href="../../reference/simunet.html">simunet()</a></code> and <code><a href="../../reference/perform_exp.html">perform_exp()</a></code>
+<li>You can also add manipulations to an existing <code>expDesign</code> object by passing it along other functions in <code><a href="../../reference/design_exp.html">design_exp()</a></code>. <code><a href="../../reference/design_exp.html">design_exp()</a></code> accepts any combinations of functions and expDesign objects!</li>
+</ul>
+</div>
+<div id="running-experiments" class="section level3">
+<h3 class="hasAnchor">
+<a href="#running-experiments" class="anchor"></a>Running experiments</h3>
+<p><code>expDesign</code> objects can be used as arguments in <code><a href="../../reference/simunet.html">simunet()</a></code> and <code><a href="../../reference/perform_exp.html">perform_exp()</a></code></p>
 <ul>
-<li>When used in the former, the simulation outputs directly an empirical <code>scanList</code>, but the intermediate theoretical scanList is stored in the attributes list <code>attrs</code> under the name <code>theoretical.scanList</code>.</li>
+<li>When used in the former, the simulation outputs directly an empirical <code>scanList</code>, but the intermediate theoretical <code>scanList</code> is stored in the attributes list <code>attrs</code> under the name <code>theoretical.scanList</code>.</li>
 <li>The latter takes a theoretical <code>scanList</code> as an argument as well, and perform the inputted <code>expDesign</code> to it. The returned <code>scanList</code> similarly stores the original in <code>attrs</code>
 </li>
 </ul>
-</li>
-<li>Users can also input several <code>expDesign</code> objects in one call of either <code><a href="../../reference/simunet.html">simunet()</a></code> and <code><a href="../../reference/perform_exp.html">perform_exp()</a></code> to run several experimental design on a given theoretical <code>scanList</code>, allowing for easier comparison:
-<ul>
-<li>returned object is then a list of <code>scanList</code>s, aptly named <code>sLlist</code> objects.</li>
-<li>provided building blocks are written to seamlessly be applied to a <code>scanList</code> or <code>sLlist</code>, but user-defined functions could benefit from using <code><a href="https://rdrr.io/r/base/lapply.html">lapply()</a></code> (e.g. <code><a href="https://rdrr.io/r/base/lapply.html">lapply(scanList,my_fun)</a></code>)</li>
-</ul>
-</li>
-</ul>
+<p>Users can also input several <code>expDesign</code> objects in one call of either <code><a href="../../reference/simunet.html">simunet()</a></code> and <code><a href="../../reference/perform_exp.html">perform_exp()</a></code> to run several experimental design on a given theoretical <code>scanList</code>, allowing for easier comparison: * returned object is then a list of <code>scanList</code>s, aptly named <code>sLlist</code> objects. * provided building blocks are written to seamlessly be applied to a <code>scanList</code> or <code>sLlist</code>, but user-defined functions could benefit from using <code><a href="https://rdrr.io/r/base/lapply.html">lapply()</a></code> (e.g. <code><a href="https://rdrr.io/r/base/lapply.html">lapply(scanList,my_fun)</a></code>)</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># TODO: insert a schematic</span></code></pre></div>
+</div>
+<div id="thinking-in-experimental-designs" class="section level3">
+<h3 class="hasAnchor">
+<a href="#thinking-in-experimental-designs" class="anchor"></a>Thinking in experimental designs</h3>
 <p>Experimental design’s philosophy can see inspiration from:</p>
 <ul>
 <li>the data manipulation philosophy used in tidy packages like <a href="https://dplyr.tidyverse.org/"><code>dplyr</code></a> (manipulations and building blocks can even be piped!),</li>

@@ -76,6 +76,8 @@ and can be accessed:
 ```{r edge.Probs}
 attrs(sL1,"edge.Prob")
 sL2 |> attrs("edge.Prob") # most of `SimuNet`'s functions have been written to allow for piping
+
+sL1$edge.Prob
 ```
 
 ## Collapsing the binary adjacency matrix sequence into a weighted adjacency matrix

@@ -102,7 +102,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.1.9000</span>
       </span>
     </div>
 
@@ -145,10 +145,10 @@
     <li class="divider"></li>
     <li class="dropdown-header">SimuNet in details</li>
     <li>
-      <a href="../articles/articles/bayesian_framework.html">SimuNet's Bayesian framework</a>
+      <a href="../articles/articles/uncertainty.html">Network Uncertainty</a>
     </li>
     <li>
-      <a href="../articles/articles/uncertainty.html">Network Uncertainty</a>
+      <a href="../articles/articles/bayesian_framework.html">SimuNet's Bayesian framework</a>
     </li>
   </ul>
 </li>
@@ -317,7 +317,9 @@ from classes <code>empirical</code> or <code>theoretical</code>, and further fro
 #&gt; e . . . .  .
 #&gt; 
 #&gt; 
-#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob obs.P theoretical.scanList</div><div class='input'><span class='fu'>perform_exp</span><span class='op'>(</span><span class='va'>sL</span>,<span class='va'>focal.periRemoved</span><span class='op'>)</span> |&gt; <span class='fu'><a href='sum_scans.html'>sum_scans</a></span><span class='op'>(</span><span class='op'>)</span>
+#&gt; Hidden attributes:
+#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode
+#&gt; Adj.subfun - edge.Prob - obs.P - theoretical.scanList</div><div class='input'><span class='fu'>perform_exp</span><span class='op'>(</span><span class='va'>sL</span>,<span class='va'>focal.periRemoved</span><span class='op'>)</span> |&gt; <span class='fu'><a href='sum_scans.html'>sum_scans</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; 
 #&gt; Weighted adjacency matrix            
 #&gt; a . 65 20 36
@@ -326,7 +328,9 @@ from classes <code>empirical</code> or <code>theoretical</code>, and further fro
 #&gt; e .  .  .  .
 #&gt; 
 #&gt; 
-#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob focalList theoretical.scanList summed.scanList sampled</div><div class='input'>
+#&gt; Hidden attributes:
+#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode
+#&gt; Adj.subfun - edge.Prob - focalList - theoretical.scanList - summed.scanList - sampled</div><div class='input'>
 <span class='co'>## performing a list of experiments</span>
 <span class='fu'>perform_exp</span><span class='op'>(</span><span class='va'>sL</span>,<span class='va'>group.scan</span>,<span class='va'>focal.scan</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [[1]]
@@ -355,7 +359,10 @@ from classes <code>empirical</code> or <code>theoretical</code>, and further fro
 #&gt; e .  .  .  . .
 #&gt; 
 #&gt; 
-#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob obs.P theoretical.scanList
+#&gt; Hidden attributes:
+#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode
+#&gt; Adj.subfun - edge.Prob - obs.P - theoretical.scanList
+#&gt; 
 #&gt; [[2]]
 #&gt; 
 #&gt; scan: 1              
@@ -382,7 +389,10 @@ from classes <code>empirical</code> or <code>theoretical</code>, and further fro
 #&gt; e . .  .  .  .
 #&gt; 
 #&gt; 
-#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob focalList theoretical.scanList
+#&gt; Hidden attributes:
+#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode
+#&gt; Adj.subfun - edge.Prob - focalList - theoretical.scanList
+#&gt; 
 #&gt; attr(,"class")
 #&gt; [1] "sLlist"</div></pre>
   </div>

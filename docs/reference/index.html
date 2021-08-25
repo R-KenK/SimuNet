@@ -101,7 +101,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.1.9000</span>
       </span>
     </div>
 
@@ -144,10 +144,10 @@
     <li class="divider"></li>
     <li class="dropdown-header">SimuNet in details</li>
     <li>
-      <a href="../articles/articles/bayesian_framework.html">SimuNet's Bayesian framework</a>
+      <a href="../articles/articles/uncertainty.html">Network Uncertainty</a>
     </li>
     <li>
-      <a href="../articles/articles/uncertainty.html">Network Uncertainty</a>
+      <a href="../articles/articles/bayesian_framework.html">SimuNet's Bayesian framework</a>
     </li>
   </ul>
 </li>
@@ -281,6 +281,15 @@ counts how many time this was the case in the inputted <code>scan.list</code> fo
 For empirical <code>scanList</code>, an edge that is observed during a scan is <em>not</em> <code>NA</code> (it will be either
 0 or 1). This function counts how many time this was the case in the inputted <code>scan.list</code> for
 each edge.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="remove_mostCentral.html">remove_mostCentral()</a></code> </p>
+        </td>
+        <td><p>Remove from all scans the (overall) most central individual
+Individual centrality based on eigen vectors. Mostly given as an example of experimental
+manipulations that could be performed on <code>scanList</code> as <code>expDesign</code>, even as user-defined
+functions</p></td>
       </tr><tr>
         
         <td>

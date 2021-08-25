@@ -80,7 +80,7 @@ generate_scanList <- function(edge.Prob,n.scans){
 generate_empiscanList <- function(scan.list,exp.design) {
   empiscanList <- exp.design$FUN.seq(scan.list)
   attrs(empiscanList,"scanList.type") <- "empirical"
-  attrs(empiscanList,"theoretical.scanList") <- without_attrs(scan.list)
+  attrs(empiscanList,"theoretical.scanList") <- scan.list
   class(empiscanList)<- c("empirical","scanList")
   empiscanList
 }
@@ -241,7 +241,7 @@ copy_attrs_to <- function(from,to) {
 #' matrix as the first one contained in the 3D array
 #'
 #' @param sL a `scanList` object (see [`simunet()`][simunet()])
-#' @param FUN a function,to apply a function to each 2D matrix contained in `sL`
+#' @param FUN a function, to apply to each 2D matrix contained in `sL`
 #' @param ... extra argument to be passed, notably named arguments used by `.f` (see [lapply()])
 #'
 #' @return a 3D array onto which the function has been applied to each scan
@@ -278,7 +278,7 @@ sLapply <- function(sL,FUN,...) {
 #' matrix as the first one contained in the 3D array
 #'
 #' @param sL a `scanList` object (see [`simunet()`][simunet()])
-#' @param .f a function,to apply a function to each 2D matrix contained in `sL`
+#' @param .f a function, to apply to each 2D matrix contained in `sL`
 #' @param ... extra argument to be passed, notably named arguments used by `.f` (see [lapply()])
 #' @param USE.NAMES logical; if `TRUE` and if `X` is character, use `X` as names for the result
 #'   unless it had names already (see [vapply()])
@@ -537,10 +537,28 @@ print_clean_scan <- function(mat,s,
 #'
 #' @noRd
 format_attributes <- function(x,...) {
-  if (!is.null(get_attrs(x))) cat("\n\nHidden attributes:",names(get_attrs(x)))
+  if (!is.null(get_attrs(x))) {
+    attrs.names <-
+      get_attrs(x) |>
+      names() |>
+      split_returnCarriage_attributes()
+    cat("\n\nHidden attributes:\n",attrs.names,"\n",sep = "")
+  }
   if (inherits(x,"edgeProbMat")) {
     bet <- attr(x,"Beta priors")
     cat("\n","alpha.prior =",bet[1],"-","beta.prior =",bet[2])
   }
   invisible(x)
+}
+
+#' Split character vectors in chunks with at max n.attrs elements
+#' separate them with " - ", add a return carriage and makes it into a printable character scalar
+#'
+#' @param attrs.names character vector, names of a `scanList`'s `attrs`
+#'
+#' @noRd
+split_returnCarriage_attributes <- function(attrs.names,n.attrs = 6) {
+  split(attrs.names, ceiling(seq_along(attrs.names) / n.attrs)) |>
+    lapply(paste,collapse = " - ") %>%
+    {do.call(paste,list(.,collapse = "\n"))}
 }
