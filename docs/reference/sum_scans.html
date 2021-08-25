@@ -105,7 +105,7 @@ Written as a S3 method to be applied to scanList or sLlist (list of scanList) ob
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.1.9000</span>
       </span>
     </div>
 
@@ -148,10 +148,10 @@ Written as a S3 method to be applied to scanList or sLlist (list of scanList) ob
     <li class="divider"></li>
     <li class="dropdown-header">SimuNet in details</li>
     <li>
-      <a href="../articles/articles/bayesian_framework.html">SimuNet's Bayesian framework</a>
+      <a href="../articles/articles/uncertainty.html">Network Uncertainty</a>
     </li>
     <li>
-      <a href="../articles/articles/uncertainty.html">Network Uncertainty</a>
+      <a href="../articles/articles/bayesian_framework.html">SimuNet's Bayesian framework</a>
     </li>
   </ul>
 </li>
@@ -296,7 +296,9 @@ not <code>NA</code>). Determined via <code><a href='count_nonNA.html'>count_nonN
 #&gt; e . 1 1 . .
 #&gt; 
 #&gt; 
-#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob</div><div class='input'><span class='va'>sL</span> |&gt; <span class='fu'>sum_scans</span><span class='op'>(</span><span class='op'>)</span>
+#&gt; Hidden attributes:
+#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode
+#&gt; Adj.subfun - edge.Prob</div><div class='input'><span class='va'>sL</span> |&gt; <span class='fu'>sum_scans</span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; 
 #&gt; Weighted adjacency matrix                   
 #&gt; a   . 115 36 63  48
@@ -306,7 +308,9 @@ not <code>NA</code>). Determined via <code><a href='count_nonNA.html'>count_nonN
 #&gt; e  29  60 47 54   .
 #&gt; 
 #&gt; 
-#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob summed.scanList sampled</div><div class='input'>
+#&gt; Hidden attributes:
+#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode
+#&gt; Adj.subfun - edge.Prob - summed.scanList - sampled</div><div class='input'>
 <span class='co'>## group-scan sampling</span>
 <span class='va'>sL</span> |&gt; <span class='fu'><a href='perform_exp.html'>perform_exp</a></span><span class='op'>(</span><span class='fu'><a href='design_sampling.html'>design_sampling</a></span><span class='op'>(</span><span class='st'>"group"</span>,<span class='fl'>.6</span><span class='op'>)</span><span class='op'>)</span> |&gt; <span class='fu'>sum_scans</span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; 
@@ -318,7 +322,9 @@ not <code>NA</code>). Determined via <code><a href='count_nonNA.html'>count_nonN
 #&gt; e 15 34 29 35  .
 #&gt; 
 #&gt; 
-#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob obs.P theoretical.scanList summed.scanList sampled</div><div class='input'>
+#&gt; Hidden attributes:
+#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode
+#&gt; Adj.subfun - edge.Prob - obs.P - theoretical.scanList - summed.scanList - sampled</div><div class='input'>
 <span class='co'>## comparing group-scan and focal sampling</span>
 <span class='va'>sL</span> |&gt; <span class='fu'><a href='perform_exp.html'>perform_exp</a></span><span class='op'>(</span><span class='fu'><a href='design_sampling.html'>design_sampling</a></span><span class='op'>(</span><span class='st'>"group"</span>,<span class='fl'>.6</span><span class='op'>)</span>,
                   <span class='fu'><a href='design_sampling.html'>design_sampling</a></span><span class='op'>(</span><span class='st'>"focal"</span>,<span class='st'>"even"</span><span class='op'>)</span>
@@ -333,7 +339,10 @@ not <code>NA</code>). Determined via <code><a href='count_nonNA.html'>count_nonN
 #&gt; e 17 34 30 34  .
 #&gt; 
 #&gt; 
-#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob obs.P theoretical.scanList summed.scanList sampled
+#&gt; Hidden attributes:
+#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode
+#&gt; Adj.subfun - edge.Prob - obs.P - theoretical.scanList - summed.scanList - sampled
+#&gt; 
 #&gt; [[2]]
 #&gt; 
 #&gt; Weighted adjacency matrix                
@@ -344,7 +353,10 @@ not <code>NA</code>). Determined via <code><a href='count_nonNA.html'>count_nonN
 #&gt; e  9 28 16 21  .
 #&gt; 
 #&gt; 
-#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob focalList theoretical.scanList summed.scanList sampled
+#&gt; Hidden attributes:
+#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode
+#&gt; Adj.subfun - edge.Prob - focalList - theoretical.scanList - summed.scanList - sampled
+#&gt; 
 #&gt; attr(,"class")
 #&gt; [1] "sLlist"</div></pre>
   </div>

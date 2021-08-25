@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.1.9000</span>
       </span>
     </div>
 
@@ -91,10 +91,10 @@
     <li class="divider">
     <li class="dropdown-header">SimuNet in details</li>
     <li>
-      <a href="../../articles/articles/bayesian_framework.html">SimuNet's Bayesian framework</a>
+      <a href="../../articles/articles/uncertainty.html">Network Uncertainty</a>
     </li>
     <li>
-      <a href="../../articles/articles/uncertainty.html">Network Uncertainty</a>
+      <a href="../../articles/articles/bayesian_framework.html">SimuNet's Bayesian framework</a>
     </li>
   </ul>
 </li>
@@ -260,7 +260,9 @@
 <span class="co">#&gt; 17 . . . . . . . . . . . . . . . . .</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob</span></code></pre></div>
+<span class="co">#&gt; Hidden attributes:</span>
+<span class="co">#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode</span>
+<span class="co">#&gt; Adj.subfun - edge.Prob</span></code></pre></div>
 <p>We obtain a 17 x 17 x 10 array of 10 binary adjacency matrices, the 10 <em>scans</em>. Zeros are represented as dots <code>.</code> to lower the visual load.</p>
 <p>Printed output automatically masks scans and only shows three of them, but all of them can be accessed via R’s array subsetting syntax</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -310,7 +312,9 @@
 <span class="co">#&gt; 17 . . . . . . . . . . . . . . . . .</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob</span></code></pre></div>
+<span class="co">#&gt; Hidden attributes:</span>
+<span class="co">#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode</span>
+<span class="co">#&gt; Adj.subfun - edge.Prob</span></code></pre></div>
 </div>
 <div id="running-more-simulations" class="section level2">
 <h2 class="hasAnchor">
@@ -380,7 +384,9 @@
 <span class="co">#&gt; 17 . . . . . . . . . . . . . . . . .</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob</span>
+<span class="co">#&gt; Hidden attributes:</span>
+<span class="co">#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode</span>
+<span class="co">#&gt; Adj.subfun - edge.Prob</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/identical.html">identical</a></span><span class="op">(</span><span class="va">sL1</span>,<span class="va">sL2</span><span class="op">)</span>
 <span class="co">#&gt; [1] FALSE</span></code></pre></div>
@@ -471,6 +477,47 @@
 <span class="co">#&gt; 16 .     .     .     .    </span>
 <span class="co">#&gt; 17 .     .     .     .    </span>
 <span class="co">#&gt; </span>
+<span class="co">#&gt;  alpha.prior = 0.5 - beta.prior = 0.5</span>
+
+<span class="va">sL1</span><span class="op">$</span><span class="va">edge.Prob</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Edge presence probability matrix                                                                            </span>
+<span class="co">#&gt; 1  . 0.078 0.049 0.200 0.222 0.016 0.029 0.001 0.004 0.012 0.032 0.029 0.005</span>
+<span class="co">#&gt; 2  . .     0.050 0.078 0.148 0.012 0.035 0.010 0.033 0.008 0.052 0.022 0.004</span>
+<span class="co">#&gt; 3  . .     .     0.067 0.042 0.013 0.021 0.003 0.028 0.024 0.055 .     0.001</span>
+<span class="co">#&gt; 4  . .     .     .     0.231 0.041 0.101 0.014 .     0.008 0.028 0.007 0.011</span>
+<span class="co">#&gt; 5  . .     .     .     .     0.024 0.064 0.021 0.015 0.015 0.031 0.006 0.009</span>
+<span class="co">#&gt; 6  . .     .     .     .     .     0.016 0.003 0.012 0.018 0.011 0.022 0.006</span>
+<span class="co">#&gt; 7  . .     .     .     .     .     .     0.011 0.007 0.001 0.025 0.008 0.012</span>
+<span class="co">#&gt; 8  . .     .     .     .     .     .     .     0.015 0.003 0.012 0.003 0.004</span>
+<span class="co">#&gt; 9  . .     .     .     .     .     .     .     .     0.036 0.030 0.012 0.004</span>
+<span class="co">#&gt; 10 . .     .     .     .     .     .     .     .     .     0.040 0.015 .    </span>
+<span class="co">#&gt; 11 . .     .     .     .     .     .     .     .     .     .     0.010 0.007</span>
+<span class="co">#&gt; 12 . .     .     .     .     .     .     .     .     .     .     .     0.002</span>
+<span class="co">#&gt; 13 . .     .     .     .     .     .     .     .     .     .     .     .    </span>
+<span class="co">#&gt; 14 . .     .     .     .     .     .     .     .     .     .     .     .    </span>
+<span class="co">#&gt; 15 . .     .     .     .     .     .     .     .     .     .     .     .    </span>
+<span class="co">#&gt; 16 . .     .     .     .     .     .     .     .     .     .     .     .    </span>
+<span class="co">#&gt; 17 . .     .     .     .     .     .     .     .     .     .     .     .    </span>
+<span class="co">#&gt;                           </span>
+<span class="co">#&gt; 1  0.022 0.016 0.002 .    </span>
+<span class="co">#&gt; 2  0.024 0.013 0.003 0.002</span>
+<span class="co">#&gt; 3  0.001 0.005 0.007 .    </span>
+<span class="co">#&gt; 4  0.011 0.020 0.002 0.004</span>
+<span class="co">#&gt; 5  0.013 0.007 0.004 .    </span>
+<span class="co">#&gt; 6  0.008 0.019 0.010 .    </span>
+<span class="co">#&gt; 7  0.016 0.011 0.008 0.003</span>
+<span class="co">#&gt; 8  0.002 0.001 .     .    </span>
+<span class="co">#&gt; 9  0.001 0.016 0.002 0.006</span>
+<span class="co">#&gt; 10 0.010 0.002 0.005 0.001</span>
+<span class="co">#&gt; 11 0.007 0.041 0.009 0.001</span>
+<span class="co">#&gt; 12 0.011 0.003 0.002 0.005</span>
+<span class="co">#&gt; 13 0.001 0.033 0.004 .    </span>
+<span class="co">#&gt; 14 .     0.004 0.001 0.001</span>
+<span class="co">#&gt; 15 .     .     .     0.006</span>
+<span class="co">#&gt; 16 .     .     .     0.001</span>
+<span class="co">#&gt; 17 .     .     .     .    </span>
+<span class="co">#&gt; </span>
 <span class="co">#&gt;  alpha.prior = 0.5 - beta.prior = 0.5</span></code></pre></div>
 </div>
 <div id="collapsing-the-binary-adjacency-matrix-sequence-into-a-weighted-adjacency-matrix" class="section level2">
@@ -504,7 +551,9 @@
 <span class="co">#&gt; 17 . . . . . . . . . . . . . . . . .</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob summed.scanList sampled</span>
+<span class="co">#&gt; Hidden attributes:</span>
+<span class="co">#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode</span>
+<span class="co">#&gt; Adj.subfun - edge.Prob - summed.scanList - sampled</span>
 <span class="va">sL2</span> |&gt; <span class="fu"><a href="../../reference/sum_scans.html">sum_scans</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Weighted adjacency matrix                                    </span>
@@ -527,7 +576,9 @@
 <span class="co">#&gt; 17 . . . . . . . . . . . . . . . . .</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob summed.scanList sampled</span></code></pre></div>
+<span class="co">#&gt; Hidden attributes:</span>
+<span class="co">#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode</span>
+<span class="co">#&gt; Adj.subfun - edge.Prob - summed.scanList - sampled</span></code></pre></div>
 <p>For future comparison purpose, let us define a function calculating the correlation between the edges of two triangular matrices:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">upper_cor</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">X</span>,<span class="va">Y</span><span class="op">)</span> <span class="op">{</span>
@@ -579,7 +630,9 @@
 <span class="co">#&gt; 17 .  .  .  .  .  .  . . . .  . . . .  . . .</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob summed.scanList sampled</span>
+<span class="co">#&gt; Hidden attributes:</span>
+<span class="co">#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode</span>
+<span class="co">#&gt; Adj.subfun - edge.Prob - summed.scanList - sampled</span>
 
 <span class="fu">upper_cor</span><span class="op">(</span><span class="va">Adj</span>,<span class="va">sL3.Adj</span><span class="op">)</span>
 <span class="co">#&gt; [1] 0.9187637</span>
@@ -621,7 +674,9 @@
 <span class="co">#&gt; 17 . . .   .   .   . .   . .   .   .   .   .   .   .   .   .</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob summed.scanList sampled</span>
+<span class="co">#&gt; Hidden attributes:</span>
+<span class="co">#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode</span>
+<span class="co">#&gt; Adj.subfun - edge.Prob - summed.scanList - sampled</span>
 <span class="va">sL2</span> |&gt; <span class="fu"><a href="../../reference/scale_scans.html">scale_scans</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Scaled weighted adjacency matrix                                                        </span>
@@ -644,7 +699,9 @@
 <span class="co">#&gt; 17 . . .   .   .   .   .   . .   . .   . .   .   .   . .</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob summed.scanList sampled</span>
+<span class="co">#&gt; Hidden attributes:</span>
+<span class="co">#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode</span>
+<span class="co">#&gt; Adj.subfun - edge.Prob - summed.scanList - sampled</span>
 <span class="fu"><a href="../../reference/scale_scans.html">scale_scans</a></span><span class="op">(</span><span class="va">sL3.Adj</span><span class="op">)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Scaled weighted adjacency matrix                                                                            </span>
@@ -685,7 +742,9 @@
 <span class="co">#&gt; 17 .     .     .     .    </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob summed.scanList sampled</span></code></pre></div>
+<span class="co">#&gt; Hidden attributes:</span>
+<span class="co">#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode</span>
+<span class="co">#&gt; Adj.subfun - edge.Prob - summed.scanList - sampled</span></code></pre></div>
 <p>One can look at how the correlation with a scaled <code>Adj</code> evolve with increasing <code>n.scans</code></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">scaled.list</span> <span class="op">&lt;-</span> 
