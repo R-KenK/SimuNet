@@ -1,3 +1,5 @@
+# SimuNet (development version)
+
 # SimuNet 2.2.1
 * `$` methods added for `scanList` to retrieve attributes in `attrs`:
     * Users can now use `sL$name`, e.g. `sL$edge.Prob` as a shortcut for `attrs(sL,"edge.Prob")`.

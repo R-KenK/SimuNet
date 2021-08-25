@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.1.9000</span>
       </span>
     </div>
 
@@ -91,10 +91,10 @@
     <li class="divider">
     <li class="dropdown-header">SimuNet in details</li>
     <li>
-      <a href="../../articles/articles/bayesian_framework.html">SimuNet's Bayesian framework</a>
+      <a href="../../articles/articles/uncertainty.html">Network Uncertainty</a>
     </li>
     <li>
-      <a href="../../articles/articles/uncertainty.html">Network Uncertainty</a>
+      <a href="../../articles/articles/bayesian_framework.html">SimuNet's Bayesian framework</a>
     </li>
   </ul>
 </li>
@@ -151,13 +151,658 @@
 
     
     
+<p>Let’s first generate a theoretical simulation:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/R-KenK/SimuNet">SimuNet</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/R-KenK/SimuNet">SimuNet</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org">magrittr</a></span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span>
+<span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">5L</span>
+<span class="va">samp.effort</span> <span class="op">&lt;-</span> <span class="fl">100L</span>
+<span class="va">Adj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">samp.effort</span>,<span class="va">n</span> <span class="op">*</span> <span class="va">n</span><span class="op">)</span> |&gt;
+  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="va">n</span>,dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span>,<span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>
+<span class="va">Adj</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/lower.tri.html">lower.tri</a></span><span class="op">(</span><span class="va">Adj</span>,diag <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0L</span>
+<span class="va">Adj</span>
+<span class="co">#&gt;   a   b  c  d  e</span>
+<span class="co">#&gt; a 0 100 37 27 58</span>
+<span class="co">#&gt; b 0   0 20 36 42</span>
+<span class="co">#&gt; c 0   0  0  5 93</span>
+<span class="co">#&gt; d 0   0  0  0 30</span>
+<span class="co">#&gt; e 0   0  0  0  0</span>
+
+<span class="va">sL</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simunet.html">simunet</a></span><span class="op">(</span><span class="va">Adj</span>,<span class="va">samp.effort</span>,<span class="st">"upper"</span>,<span class="fl">10</span><span class="op">)</span>
+<span class="va">sL</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 1           </span>
+<span class="co">#&gt; a . 1 1 . 1</span>
+<span class="co">#&gt; b . . . . .</span>
+<span class="co">#&gt; c . . . . 1</span>
+<span class="co">#&gt; d . . . . .</span>
+<span class="co">#&gt; e . . . . .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 2           </span>
+<span class="co">#&gt; a . 1 . . .</span>
+<span class="co">#&gt; b . . . . 1</span>
+<span class="co">#&gt; c . . . . 1</span>
+<span class="co">#&gt; d . . . . .</span>
+<span class="co">#&gt; e . . . . .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ... ( 7  more scans)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 10           </span>
+<span class="co">#&gt; a . 1 . 1 1</span>
+<span class="co">#&gt; b . . . . .</span>
+<span class="co">#&gt; c . . . . 1</span>
+<span class="co">#&gt; d . . . . .</span>
+<span class="co">#&gt; e . . . . .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes:</span>
+<span class="co">#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode</span>
+<span class="co">#&gt; Adj.subfun - edge.Prob</span></code></pre></div>
+<div id="designin-an-experiment" class="section level2">
+<h2 class="hasAnchor">
+<a href="#designin-an-experiment" class="anchor"></a>Designin an experiment</h2>
+<p>Experimental designs - <code>expDesign</code> objects in <code>SimuNet</code> - are successions of manipulations that are applied to a <code>scanList</code>, i.e. a 3-dimensional array.</p>
+<p>To design an experiment, simply input functions as successive arguments of <code><a href="../../reference/design_exp.html">design_exp()</a></code>:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">my_fun1</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">scan.list</span><span class="op">)</span> <span class="op">{</span>
+  <span class="co"># do things on scan.list</span>
+  <span class="va">scan.list</span>
+<span class="op">}</span>
+
+<span class="va">my_fun2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">scan.list</span><span class="op">)</span> <span class="op">{</span>
+  <span class="co"># do other things on scan.list</span>
+  <span class="va">scan.list</span>
+<span class="op">}</span>
+
+<span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="va">my_fun1</span>,<span class="va">remove_mostCentral</span>,<span class="va">my_fun2</span><span class="op">)</span>
+<span class="co">#&gt; Theoretical scanList -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  my_fun1 -&gt;</span>
+<span class="co">#&gt;  remove_mostCentral -&gt;</span>
+<span class="co">#&gt;  my_fun2 -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  empirical scanList</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; See `$FUN.seq` for the functions source code.</span></code></pre></div>
+<p>You can store <code><a href="../../reference/design_exp.html">design_exp()</a></code>’s output and apply it to <code>scanList</code> via <code><a href="../../reference/perform_exp.html">perform_exp()</a></code>.</p>
+<p>An <code>expDesign</code> can be expanded by inputting it in <code><a href="../../reference/design_exp.html">design_exp()</a></code> with other functions or <code>expDesign</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">eD1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="va">my_fun1</span>,<span class="va">remove_mostCentral</span><span class="op">)</span>
+
+<span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="va">eD1</span>,<span class="va">my_fun2</span><span class="op">)</span>    <span class="co"># this is similar to...</span>
+<span class="co">#&gt; Theoretical scanList -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  my_fun1 -&gt;</span>
+<span class="co">#&gt;  remove_mostCentral -&gt;</span>
+<span class="co">#&gt;  my_fun2 -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  empirical scanList</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; See `$FUN.seq` for the functions source code.</span>
+
+<span class="co"># ... this:</span>
+<span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="va">my_fun1</span>,<span class="va">remove_mostCentral</span>,<span class="va">my_fun2</span><span class="op">)</span>
+<span class="co">#&gt; Theoretical scanList -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  my_fun1 -&gt;</span>
+<span class="co">#&gt;  remove_mostCentral -&gt;</span>
+<span class="co">#&gt;  my_fun2 -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  empirical scanList</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; See `$FUN.seq` for the functions source code.</span></code></pre></div>
+<p>Since <code><a href="../../reference/design_sampling.html">design_sampling()</a></code> also returns <code>expDesign</code> objects, this is how one can include a sampling method within an experimental design:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="va">my_fun1</span>,<span class="fu"><a href="../../reference/design_sampling.html">design_sampling</a></span><span class="op">(</span><span class="st">"group"</span>,<span class="fl">0.9</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; Theoretical scanList -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  my_fun1 -&gt;</span>
+<span class="co">#&gt;  group-scan sampling: constant -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  empirical scanList</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; See `$FUN.seq` for the functions source code.</span>
+
+<span class="va">foc.even</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/design_sampling.html">design_sampling</a></span><span class="op">(</span><span class="st">"focal"</span>,<span class="st">"even"</span><span class="op">)</span>
+<span class="va">foc.even</span>
+<span class="co">#&gt; Theoretical scanList -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  focal-scan sampling: even -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  empirical scanList</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; See `$FUN.seq` for the functions source code.</span>
+<span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="va">my_fun2</span>,<span class="va">foc.even</span>,<span class="va">my_fun1</span><span class="op">)</span>
+<span class="co">#&gt; Theoretical scanList -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  my_fun2 -&gt;</span>
+<span class="co">#&gt;  focal-scan sampling: even -&gt;</span>
+<span class="co">#&gt;  my_fun1 -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  empirical scanList</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; See `$FUN.seq` for the functions source code.</span></code></pre></div>
+<p><code><a href="../../reference/design_exp.html">design_exp()</a></code> uses <code>purrr</code>’s <code><a href="https://purrr.tidyverse.org/reference/compose.html">purrr::compose()</a></code> to encapsulate the sequence of manipulations into a single function stored as <code>FUN.seq</code> in the <code>expDesign</code> object, to be applied to the <code>scanList</code>.</p>
+<p>Manipulation “building blocks” are included in <code>SimuNet</code> to be used in experimental designs, but users should feel free to create their own functions to use in a sequence.</p>
+<p>WIP: <code>SimuNet</code> is planned to later include a feature to automatically carry the <code>scanList</code>’s attribute along the sequence manipulations, whether they include user-defined functions or not. In the meantime, <code><a href="../../reference/copy_attrs_to.html">copy_attrs_to(from,to)</a></code> allows for instance to copy attrs from an original scanList to its modified version.</p>
+<div id="an-example-of-experimental-design" class="section level3">
+<h3 class="hasAnchor">
+<a href="#an-example-of-experimental-design" class="anchor"></a>An example of experimental design</h3>
+<p>Let’s try out a concrete example: say you want to assess how would the adjacency matrix be affected if the overall most central node had not been there (but nothing else would have changed).</p>
+<p><code><a href="../../reference/remove_mostCentral.html">remove_mostCentral()</a></code> does just that, and can be included alone or in combination in an <code>expDesign</code>. Let’s look at its code:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/getS3method.html">getS3method</a></span><span class="op">(</span><span class="st">"remove_mostCentral"</span>,<span class="st">"scanList"</span><span class="op">)</span> <span class="co"># for convenience reasons, SimuNet's building blocks</span>
+<span class="co">#&gt; function (scan.list, ...) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     mode &lt;- attrs(scan.list, "mode")</span>
+<span class="co">#&gt;     directed &lt;- switch(mode, directed = TRUE, FALSE)</span>
+<span class="co">#&gt;     copy_attrs_to(which.max(igraph::eigen_centrality(igraph::graph.adjacency(sum_scans(scan.list), </span>
+<span class="co">#&gt;         weighted = TRUE), directed = directed) %&gt;% .$vector) %&gt;% </span>
+<span class="co">#&gt;         {</span>
+<span class="co">#&gt;             scan.list[-c(.), -c(.), ]</span>
+<span class="co">#&gt;         }, from = scan.list)</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000001b0c3558&gt;</span>
+<span class="co">#&gt; &lt;environment: namespace:SimuNet&gt;</span>
+                                                <span class="co"># are written as S3 methods, but this isn't required</span></code></pre></div>
+<p>We can see that it:</p>
+<ol style="list-style-type: decimal">
+<li>sums the <code>scanList</code> into a weighted adjacency matrix</li>
+<li>calculate node eigen-vector centrality</li>
+<li>determine the maximum</li>
+<li>remove it from all scans</li>
+<li>returns the resulting modified <code>scanList</code>, with the copied <code>attrs</code>
+</li>
+</ol>
+<p>Imagine what manipulation you too can design and use in <code>SimuNet</code>!</p>
+<p>Let’s include <code><a href="../../reference/remove_mostCentral.html">remove_mostCentral()</a></code> in its own experimental design, and apply it to <code>sL</code></p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">removeC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="va">remove_mostCentral</span><span class="op">)</span>
+<span class="va">removeC</span>
+<span class="co">#&gt; Theoretical scanList -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  remove_mostCentral -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  empirical scanList</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; See `$FUN.seq` for the functions source code.</span>
+
+<span class="va">Cremoved</span> <span class="op">&lt;-</span> <span class="va">sL</span> |&gt; <span class="fu"><a href="../../reference/perform_exp.html">perform_exp</a></span><span class="op">(</span><span class="va">removeC</span><span class="op">)</span>
+<span class="va">Cremoved</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 1         </span>
+<span class="co">#&gt; a . 1 1 .</span>
+<span class="co">#&gt; b . . . .</span>
+<span class="co">#&gt; c . . . .</span>
+<span class="co">#&gt; d . . . .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 2         </span>
+<span class="co">#&gt; a . 1 . .</span>
+<span class="co">#&gt; b . . . .</span>
+<span class="co">#&gt; c . . . .</span>
+<span class="co">#&gt; d . . . .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ... ( 7  more scans)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 10         </span>
+<span class="co">#&gt; a . 1 . 1</span>
+<span class="co">#&gt; b . . . .</span>
+<span class="co">#&gt; c . . . .</span>
+<span class="co">#&gt; d . . . .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes:</span>
+<span class="co">#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode</span>
+<span class="co">#&gt; Adj.subfun - edge.Prob - theoretical.scanList</span>
+<span class="va">Cremoved</span> |&gt; <span class="fu"><a href="../../reference/sum_scans.html">sum_scans</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Weighted adjacency matrix          </span>
+<span class="co">#&gt; a . 10 4 2</span>
+<span class="co">#&gt; b .  . 1 2</span>
+<span class="co">#&gt; c .  . . .</span>
+<span class="co">#&gt; d .  . . .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes:</span>
+<span class="co">#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode</span>
+<span class="co">#&gt; Adj.subfun - edge.Prob - theoretical.scanList - summed.scanList - sampled</span></code></pre></div>
+<p>We can see that node e was removed from all scans.</p>
+<p>Let’s have a look at the original nodes’ centrality:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">sL</span> |&gt; 
+  <span class="fu"><a href="../../reference/sum_scans.html">sum_scans</a></span><span class="op">(</span><span class="op">)</span> |&gt;
+  <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">graph.adjacency</a></span><span class="op">(</span>weighted <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> |&gt;
+  <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/eigen_centrality.html">eigen_centrality</a></span><span class="op">(</span>directed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="va">.</span><span class="op">$</span><span class="va">vector</span>
+<span class="co">#&gt;         a         b         c         d         e </span>
+<span class="co">#&gt; 0.9693835 0.9305218 0.7135468 0.2997117 1.0000000</span></code></pre></div>
+<p>as expected, e had the highest eigen-vector centrality value.</p>
+<p>Let see for instance how this impacted the network’s clustering coefficient:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">sL</span> |&gt; 
+  <span class="fu"><a href="../../reference/sum_scans.html">sum_scans</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/class.html">class</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">NULL</span>;<span class="va">.</span><span class="op">}</span> <span class="op">%&gt;%</span>
+  <span class="op">{</span><span class="va">.</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">}</span> |&gt;           <span class="co"># DirectedClustering requires symmetrical matrices for undirected networks</span>
+  <span class="fu">DirectedClustering</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/DirectedClustering/man/ClustBCG.html">ClustBCG</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"undirected"</span><span class="op">)</span>
+<span class="co">#&gt; $LocalCC</span>
+<span class="co">#&gt;         a         b         c         d         e </span>
+<span class="co">#&gt; 0.9090909 0.9500000 1.0000000 1.0000000 0.8472222 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $GlobalCC</span>
+<span class="co">#&gt; [1] 0.9412626</span>
+
+<span class="va">Cremoved</span> |&gt; 
+  <span class="fu"><a href="../../reference/sum_scans.html">sum_scans</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/class.html">class</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">NULL</span>;<span class="va">.</span><span class="op">}</span> <span class="op">%&gt;%</span>
+  <span class="op">{</span><span class="va">.</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">}</span> |&gt; 
+  <span class="fu">DirectedClustering</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/DirectedClustering/man/ClustBCG.html">ClustBCG</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"undirected"</span><span class="op">)</span>
+<span class="co">#&gt; $LocalCC</span>
+<span class="co">#&gt;         a         b         c         d </span>
+<span class="co">#&gt; 0.8125000 0.8846154 1.0000000 1.0000000 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $GlobalCC</span>
+<span class="co">#&gt; [1] 0.9242788</span></code></pre></div>
+</div>
+<div id="an-more-complexe-example" class="section level3">
+<h3 class="hasAnchor">
+<a href="#an-more-complexe-example" class="anchor"></a>An more complexe example</h3>
+<p>What would have happened if, in addition to having the most central individual removed, we also missed 20% of the edges’ value when doing group-scans?</p>
+<p>Let’s design this second experiment:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">removeC2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="va">remove_mostCentral</span>,<span class="fu"><a href="../../reference/design_sampling.html">design_sampling</a></span><span class="op">(</span><span class="st">"group"</span>,<span class="fl">0.8</span><span class="op">)</span><span class="op">)</span>
+<span class="va">removeC2</span>
+<span class="co">#&gt; Theoretical scanList -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  remove_mostCentral -&gt;</span>
+<span class="co">#&gt;  group-scan sampling: constant -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  empirical scanList</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; See `$FUN.seq` for the functions source code.</span>
+
+<span class="va">Cremoved2</span> <span class="op">&lt;-</span> <span class="va">sL</span> |&gt; <span class="fu"><a href="../../reference/perform_exp.html">perform_exp</a></span><span class="op">(</span><span class="va">removeC2</span><span class="op">)</span>
+<span class="va">Cremoved2</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 1          </span>
+<span class="co">#&gt; a . 1 1  .</span>
+<span class="co">#&gt; b . . . NA</span>
+<span class="co">#&gt; c . . .  .</span>
+<span class="co">#&gt; d . . .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 2         </span>
+<span class="co">#&gt; a . 1 . .</span>
+<span class="co">#&gt; b . . . .</span>
+<span class="co">#&gt; c . . . .</span>
+<span class="co">#&gt; d . . . .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ... ( 7  more scans)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 10          </span>
+<span class="co">#&gt; a . 1 NA 1</span>
+<span class="co">#&gt; b . .  . .</span>
+<span class="co">#&gt; c . .  . .</span>
+<span class="co">#&gt; d . .  . .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes:</span>
+<span class="co">#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode</span>
+<span class="co">#&gt; Adj.subfun - edge.Prob - obs.P - theoretical.scanList</span>
+<span class="va">Cremoved2</span> |&gt; <span class="fu"><a href="../../reference/sum_scans.html">sum_scans</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Weighted adjacency matrix         </span>
+<span class="co">#&gt; a . 8 3 2</span>
+<span class="co">#&gt; b . . 1 2</span>
+<span class="co">#&gt; c . . . .</span>
+<span class="co">#&gt; d . . . .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes:</span>
+<span class="co">#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode</span>
+<span class="co">#&gt; Adj.subfun - edge.Prob - obs.P - theoretical.scanList - summed.scanList - sampled</span></code></pre></div>
+</div>
+</div>
+<div id="generate-data-from-simulations-and-experiments" class="section level2">
+<h2 class="hasAnchor">
+<a href="#generate-data-from-simulations-and-experiments" class="anchor"></a>Generate data from simulations and experiments</h2>
+<p>Let’s push further the previous example: we will replicate the design on a larger network containing more nodes:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span>
+<span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">10L</span>
+<span class="va">samp.effort</span> <span class="op">&lt;-</span> <span class="fl">300L</span>
+<span class="va">Adj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">samp.effort</span>,<span class="va">n</span> <span class="op">*</span> <span class="va">n</span><span class="op">)</span> |&gt;
+  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="va">n</span>,dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span>,<span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>
+<span class="va">Adj</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/lower.tri.html">lower.tri</a></span><span class="op">(</span><span class="va">Adj</span>,diag <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0L</span>
+<span class="va">Adj</span>
+<span class="co">#&gt;   a   b   c   d   e   f   g   h   i   j</span>
+<span class="co">#&gt; a 0 165 158 262 297 101 113 100  60 112</span>
+<span class="co">#&gt; b 0   0 136 130 277 220 278  42  29  72</span>
+<span class="co">#&gt; c 0   0   0   3 157 248 246 239  81 219</span>
+<span class="co">#&gt; d 0   0   0   0  76 238 289  91 108 254</span>
+<span class="co">#&gt; e 0   0   0   0   0  69 104  13 201 166</span>
+<span class="co">#&gt; f 0   0   0   0   0   0 183 181 121   1</span>
+<span class="co">#&gt; g 0   0   0   0   0   0   0  54  85 141</span>
+<span class="co">#&gt; h 0   0   0   0   0   0   0   0 126 133</span>
+<span class="co">#&gt; i 0   0   0   0   0   0   0   0   0 216</span>
+<span class="co">#&gt; j 0   0   0   0   0   0   0   0   0   0</span>
+
+<span class="va">sL</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simunet.html">simunet</a></span><span class="op">(</span><span class="va">Adj</span>,<span class="va">samp.effort</span>,<span class="st">"upper"</span>,<span class="fl">100</span><span class="op">)</span>
+<span class="va">sL</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 1                     </span>
+<span class="co">#&gt; a . 1 . 1 1 . 1 1 . .</span>
+<span class="co">#&gt; b . . . . 1 1 1 . . .</span>
+<span class="co">#&gt; c . . . . 1 1 1 . . 1</span>
+<span class="co">#&gt; d . . . . . 1 1 . . 1</span>
+<span class="co">#&gt; e . . . . . . . . 1 1</span>
+<span class="co">#&gt; f . . . . . . . . . .</span>
+<span class="co">#&gt; g . . . . . . . . . 1</span>
+<span class="co">#&gt; h . . . . . . . . 1 1</span>
+<span class="co">#&gt; i . . . . . . . . . 1</span>
+<span class="co">#&gt; j . . . . . . . . . .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 2                     </span>
+<span class="co">#&gt; a . 1 1 1 1 . . . . 1</span>
+<span class="co">#&gt; b . . . 1 1 . 1 1 . 1</span>
+<span class="co">#&gt; c . . . . 1 . 1 1 . 1</span>
+<span class="co">#&gt; d . . . . . 1 . . . 1</span>
+<span class="co">#&gt; e . . . . . . . . . 1</span>
+<span class="co">#&gt; f . . . . . . 1 . . .</span>
+<span class="co">#&gt; g . . . . . . . . 1 .</span>
+<span class="co">#&gt; h . . . . . . . . 1 .</span>
+<span class="co">#&gt; i . . . . . . . . . 1</span>
+<span class="co">#&gt; j . . . . . . . . . .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ... ( 97  more scans)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 100                     </span>
+<span class="co">#&gt; a . . 1 1 1 . . 1 1 .</span>
+<span class="co">#&gt; b . . . . 1 1 1 . 1 .</span>
+<span class="co">#&gt; c . . . . 1 1 1 1 . .</span>
+<span class="co">#&gt; d . . . . . 1 1 . . 1</span>
+<span class="co">#&gt; e . . . . . . . . 1 1</span>
+<span class="co">#&gt; f . . . . . . . 1 1 .</span>
+<span class="co">#&gt; g . . . . . . . . . .</span>
+<span class="co">#&gt; h . . . . . . . . . 1</span>
+<span class="co">#&gt; i . . . . . . . . . .</span>
+<span class="co">#&gt; j . . . . . . . . . .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes:</span>
+<span class="co">#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode</span>
+<span class="co">#&gt; Adj.subfun - edge.Prob</span></code></pre></div>
+<p>Replicating theoretical simulations allows to assess the clustering coefficient distribution:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">get_undirectedCC</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">scanList</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">CC</span> <span class="op">&lt;-</span> 
+    <span class="va">scanList</span> |&gt; 
+    <span class="fu"><a href="../../reference/sum_scans.html">sum_scans</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/class.html">class</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">NULL</span>;<span class="va">.</span><span class="op">}</span> <span class="op">%&gt;%</span>  <span class="co"># modify the sumeed scanList into a class-less matrix</span>
+    <span class="op">{</span><span class="va">.</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">}</span> |&gt;             <span class="co"># symmetrize the triangular matrix by adding its transposed matrix</span>
+    <span class="fu">DirectedClustering</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/DirectedClustering/man/ClustBCG.html">ClustBCG</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"undirected"</span><span class="op">)</span>
+  <span class="va">CC</span><span class="op">$</span><span class="va">GlobalCC</span>
+<span class="op">}</span>
+
+<span class="co"># calculate the clustering coefficient from a single simulation</span>
+<span class="fu"><a href="../../reference/simunet.html">simunet</a></span><span class="op">(</span><span class="va">Adj</span>,<span class="va">samp.effort</span>,<span class="st">"upper"</span>,<span class="fl">100</span><span class="op">)</span> |&gt; <span class="fu">get_undirectedCC</span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; [1] 0.9715875</span>
+
+<span class="co"># Replicating the operation</span>
+<span class="va">CC.theo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"theoretical"</span>,
+                      CC <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">replicate</a></span><span class="op">(</span><span class="fl">100</span>,
+                                     <span class="fu"><a href="../../reference/simunet.html">simunet</a></span><span class="op">(</span><span class="va">Adj</span>,<span class="va">samp.effort</span>,<span class="st">"upper"</span>,<span class="fl">100</span><span class="op">)</span> |&gt;
+                                       <span class="fu">get_undirectedCC</span><span class="op">(</span><span class="op">)</span>
+                      <span class="op">)</span>
+<span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">CC.theo</span><span class="op">)</span>
+<span class="co">#&gt;      type                 CC        </span>
+<span class="co">#&gt;  Length:100         Min.   :0.9419  </span>
+<span class="co">#&gt;  Class :character   1st Qu.:0.9712  </span>
+<span class="co">#&gt;  Mode  :character   Median :0.9739  </span>
+<span class="co">#&gt;                     Mean   :0.9705  </span>
+<span class="co">#&gt;                     3rd Qu.:0.9747  </span>
+<span class="co">#&gt;                     Max.   :1.0000</span></code></pre></div>
+<p>Let’s do the same when the most central node is removed, and 20% of the edges are missed:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># calculate the clustering coefficient from a single simulation</span>
+<span class="fu"><a href="../../reference/simunet.html">simunet</a></span><span class="op">(</span><span class="va">Adj</span>,<span class="va">samp.effort</span>,<span class="st">"upper"</span>,<span class="fl">100</span>,<span class="va">removeC2</span><span class="op">)</span> |&gt; <span class="fu">get_undirectedCC</span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; [1] 0.934314</span>
+
+<span class="co"># Replicating the operation</span>
+<span class="va">CC.empi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"theoretical"</span>,<span class="st">"empirical"</span><span class="op">)</span>,
+                                    levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"theoretical"</span>,<span class="st">"empirical"</span><span class="op">)</span>
+                      <span class="op">)</span>,
+                      rep <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span>,each <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> |&gt; <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="op">)</span>,
+                      CC <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">replicate</a></span><span class="op">(</span><span class="fl">100</span>,simplify <span class="op">=</span> <span class="cn">FALSE</span>, <span class="co"># TODO: come up with more elegant code</span>
+                                     <span class="op">{</span>
+                                       <span class="va">sL</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simunet.html">simunet</a></span><span class="op">(</span><span class="va">Adj</span>,<span class="va">samp.effort</span>,<span class="st">"upper"</span>,<span class="fl">100</span>,<span class="va">removeC2</span><span class="op">)</span>
+                                       <span class="va">CC.theo</span> <span class="op">&lt;-</span> <span class="va">sL</span><span class="op">$</span><span class="va">theoretical.scanList</span> |&gt; <span class="fu">get_undirectedCC</span><span class="op">(</span><span class="op">)</span>
+                                       <span class="va">CC.empi</span> <span class="op">&lt;-</span> <span class="va">sL</span> |&gt; <span class="fu">get_undirectedCC</span><span class="op">(</span><span class="op">)</span>
+                                       <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">CC.theo</span>,<span class="va">CC.empi</span><span class="op">)</span> 
+                                     <span class="op">}</span>
+                      <span class="op">)</span> |&gt; <span class="fu"><a href="https://rdrr.io/r/base/do.call.html">do.call</a></span><span class="op">(</span>what <span class="op">=</span> <span class="va">c</span><span class="op">)</span>
+<span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">CC.empi</span><span class="op">)</span>
+<span class="co">#&gt;           type          rep            CC        </span>
+<span class="co">#&gt;  theoretical:100   1      :  2   Min.   :0.8907  </span>
+<span class="co">#&gt;  empirical  :100   2      :  2   1st Qu.:0.9435  </span>
+<span class="co">#&gt;                    3      :  2   Median :0.9683  </span>
+<span class="co">#&gt;                    4      :  2   Mean   :0.9637  </span>
+<span class="co">#&gt;                    5      :  2   3rd Qu.:0.9742  </span>
+<span class="co">#&gt;                    6      :  2   Max.   :1.0000  </span>
+<span class="co">#&gt;                    (Other):188</span>
+
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
+<span class="va">CC.empi</span> |&gt;
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">type</span>,<span class="va">CC</span>,colour <span class="op">=</span> <span class="va">type</span>,fill <span class="op">=</span> <span class="va">type</span><span class="op">)</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_boxplot.html">geom_boxplot</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">.5</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>group <span class="op">=</span> <span class="va">rep</span><span class="op">)</span>,alpha <span class="op">=</span> <span class="fl">0.05</span>,colour <span class="op">=</span> <span class="st">"grey50"</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.02</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"none"</span>,colour <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_discrete.html">scale_x_discrete</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Original"</span>,<span class="st">"Most central node removed\n+\n20% edges missed"</span><span class="op">)</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">""</span>,y <span class="op">=</span> <span class="st">"Mean Clustering Coefficient"</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="fl">15</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">'white'</span>, colour <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p><img src="experiments_files/figure-html/CC2-1.png" width="700"></p>
+<p>As seen above, combining <code>SimuNet</code>’s experimental design approach in combination with R’s <code><a href="https://rdrr.io/r/base/lapply.html">replicate()</a></code> (or <code><a href="https://rdrr.io/r/base/lapply.html">lapply()</a></code>/<code><a href="https://rdrr.io/r/base/lapply.html">sapply()</a></code> to allow handling of the replication index) allows for varied and customized collection of simulated data!</p>
+</div>
+<div id="helper-functions" class="section level2">
+<h2 class="hasAnchor">
+<a href="#helper-functions" class="anchor"></a>Helper functions</h2>
+<p><code>SimuNet</code> includes some helper functions to convert objects to fit your needs.</p>
+<p>These helper functions include:</p>
+<ul>
+<li>
+<code><a href="../../reference/scanList2matList.html">scanList2matList()</a></code>: convert a <code>scanList</code> 3D array into an R list of 2D matrices</li>
+<li>
+<code><a href="../../reference/matList2scanList.html">matList2scanList()</a></code>: does the opposite as <code><a href="../../reference/scanList2matList.html">scanList2matList()</a></code>
+</li>
+<li>In combination with already existing functions - e.g. <code><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">igraph::graph.adjacency()</a></code> - you can use flexibly many network manipulations in your experimental design!</li>
+</ul>
+<div id="examples" class="section level3">
+<h3 class="hasAnchor">
+<a href="#examples" class="anchor"></a>Examples</h3>
+<div id="using-matrix-lists" class="section level4">
+<h4 class="hasAnchor">
+<a href="#using-matrix-lists" class="anchor"></a>Using matrix lists:</h4>
+<p>Let’s implement manipulations to apply on a list of matrices:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># This function mask a random node from a matrix</span>
+<span class="va">mask_randomNode</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">Adj</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">to.mask</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">Adj</span><span class="op">)</span>,<span class="fl">1</span><span class="op">)</span>
+  <span class="va">Adj</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">to.mask</span><span class="op">)</span>,<span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span>
+  <span class="va">Adj</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">to.mask</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span>
+  <span class="va">Adj</span>
+<span class="op">}</span>
+
+<span class="co"># a scanList can be transformed to a list of matrices, and lapply can be used to apply</span>
+<span class="co"># mask_randomNode to each. matList2scanList back transforms it:</span>
+<span class="va">mask_inEachScan</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">sL</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">mL</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/scanList2matList.html">scanList2matList</a></span><span class="op">(</span><span class="va">sL</span><span class="op">)</span>
+  <span class="va">mL</span> |&gt; 
+    <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span><span class="op">(</span><span class="va">mask_randomNode</span><span class="op">)</span> |&gt; 
+    <span class="fu"><a href="../../reference/copy_attrs_to.html">copy_attrs_to</a></span><span class="op">(</span>from <span class="op">=</span> <span class="va">mL</span><span class="op">)</span> |&gt;     <span class="co"># keeps track of sL's attributes</span>
+    <span class="fu"><a href="../../reference/matList2scanList.html">matList2scanList</a></span><span class="op">(</span><span class="op">)</span>
+<span class="op">}</span>
+
+<span class="va">rand.mask</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="va">mask_inEachScan</span><span class="op">)</span>
+<span class="va">rand.mask</span>
+<span class="co">#&gt; Theoretical scanList -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  mask_inEachScan -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  empirical scanList</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; See `$FUN.seq` for the functions source code.</span>
+<span class="va">sL</span> |&gt; <span class="fu"><a href="../../reference/perform_exp.html">perform_exp</a></span><span class="op">(</span><span class="va">rand.mask</span><span class="op">)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 1                               </span>
+<span class="co">#&gt; a  .  1  . NA  1  .  1  1  .  .</span>
+<span class="co">#&gt; b  .  .  . NA  1  1  1  .  .  .</span>
+<span class="co">#&gt; c  .  .  . NA  1  1  1  .  .  1</span>
+<span class="co">#&gt; d NA NA NA NA NA NA NA NA NA NA</span>
+<span class="co">#&gt; e  .  .  . NA  .  .  .  .  1  1</span>
+<span class="co">#&gt; f  .  .  . NA  .  .  .  .  .  .</span>
+<span class="co">#&gt; g  .  .  . NA  .  .  .  .  .  1</span>
+<span class="co">#&gt; h  .  .  . NA  .  .  .  .  1  1</span>
+<span class="co">#&gt; i  .  .  . NA  .  .  .  .  .  1</span>
+<span class="co">#&gt; j  .  .  . NA  .  .  .  .  .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 2                               </span>
+<span class="co">#&gt; a  .  1  1  1  1 NA  .  .  .  1</span>
+<span class="co">#&gt; b  .  .  .  1  1 NA  1  1  .  1</span>
+<span class="co">#&gt; c  .  .  .  .  1 NA  1  1  .  1</span>
+<span class="co">#&gt; d  .  .  .  .  . NA  .  .  .  1</span>
+<span class="co">#&gt; e  .  .  .  .  . NA  .  .  .  1</span>
+<span class="co">#&gt; f NA NA NA NA NA NA NA NA NA NA</span>
+<span class="co">#&gt; g  .  .  .  .  . NA  .  .  1  .</span>
+<span class="co">#&gt; h  .  .  .  .  . NA  .  .  1  .</span>
+<span class="co">#&gt; i  .  .  .  .  . NA  .  .  .  1</span>
+<span class="co">#&gt; j  .  .  .  .  . NA  .  .  .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ... ( 97  more scans)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 100                               </span>
+<span class="co">#&gt; a  .  .  1  1  1 NA  .  1  1  .</span>
+<span class="co">#&gt; b  .  .  .  .  1 NA  1  .  1  .</span>
+<span class="co">#&gt; c  .  .  .  .  1 NA  1  1  .  .</span>
+<span class="co">#&gt; d  .  .  .  .  . NA  1  .  .  1</span>
+<span class="co">#&gt; e  .  .  .  .  . NA  .  .  1  1</span>
+<span class="co">#&gt; f NA NA NA NA NA NA NA NA NA NA</span>
+<span class="co">#&gt; g  .  .  .  .  . NA  .  .  .  .</span>
+<span class="co">#&gt; h  .  .  .  .  . NA  .  .  .  1</span>
+<span class="co">#&gt; i  .  .  .  .  . NA  .  .  .  .</span>
+<span class="co">#&gt; j  .  .  .  .  . NA  .  .  .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes:</span>
+<span class="co">#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode</span>
+<span class="co">#&gt; Adj.subfun - edge.Prob - theoretical.scanList</span></code></pre></div>
+</div>
+<div id="using-igraph-networks" class="section level4">
+<h4 class="hasAnchor">
+<a href="#using-igraph-networks" class="anchor"></a>Using igraph networks</h4>
+<p>Let’s see with another example relying on igraph networks:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># This function mask a random node from a matrix</span>
+<span class="va">rewire_each</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">sL</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">mode</span> <span class="op">&lt;-</span> <span class="va">sL</span><span class="op">$</span><span class="va">mode</span>
+  <span class="fu"><a href="../../reference/sLapply.html">sLapply</a></span><span class="op">(</span>   <span class="co"># wrapper for lapply over scanLists' 3rd dimension. See ?sLapply</span>
+    <span class="va">sL</span>,
+    <span class="kw">function</span><span class="op">(</span><span class="va">scan</span><span class="op">)</span> <span class="op">{</span>
+      <span class="va">scan</span> |&gt;
+        <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">graph.adjacency</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="va">mode</span>,weighted <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> |&gt;     <span class="co"># transform to igraph network</span>
+        <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/rewire.html">rewire</a></span><span class="op">(</span><span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/each_edge.html">each_edge</a></span><span class="op">(</span>p <span class="op">=</span> <span class="fl">.2</span>, loops <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span> |&gt; <span class="co"># rewire networks</span>
+        <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/as_adjacency_matrix.html">get.adjacency</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"upper"</span>,sparse <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>        <span class="co"># transform back to matrix</span>
+    <span class="op">}</span>
+  <span class="op">)</span>
+<span class="op">}</span>
+
+<span class="va">rand.rewire</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/design_exp.html">design_exp</a></span><span class="op">(</span><span class="va">rewire_each</span><span class="op">)</span>
+<span class="va">rand.rewire</span>
+<span class="co">#&gt; Theoretical scanList -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  rewire_each -&gt;</span>
+<span class="co">#&gt;  ------------</span>
+<span class="co">#&gt;  empirical scanList</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; See `$FUN.seq` for the functions source code.</span>
+<span class="va">rewired</span> <span class="op">&lt;-</span> <span class="va">sL</span> |&gt; <span class="fu"><a href="../../reference/perform_exp.html">perform_exp</a></span><span class="op">(</span><span class="va">rand.rewire</span><span class="op">)</span>
+<span class="va">sL</span><span class="op">[</span>,,<span class="fl">3</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 1                     </span>
+<span class="co">#&gt; a . . 1 1 1 1 . . . 1</span>
+<span class="co">#&gt; b . . . 1 1 . 1 . 1 1</span>
+<span class="co">#&gt; c . . . . . 1 1 1 . 1</span>
+<span class="co">#&gt; d . . . . . 1 1 . . 1</span>
+<span class="co">#&gt; e . . . . . . 1 1 1 1</span>
+<span class="co">#&gt; f . . . . . . 1 . . .</span>
+<span class="co">#&gt; g . . . . . . . . 1 .</span>
+<span class="co">#&gt; h . . . . . . . . . .</span>
+<span class="co">#&gt; i . . . . . . . . . 1</span>
+<span class="co">#&gt; j . . . . . . . . . .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 2                     </span>
+<span class="co">#&gt; a . 1 . 1 1 . . 1 . .</span>
+<span class="co">#&gt; b . . 1 1 1 . 1 . . .</span>
+<span class="co">#&gt; c . . . . . 1 1 . . 1</span>
+<span class="co">#&gt; d . . . . . . 1 . . .</span>
+<span class="co">#&gt; e . . . . . 1 . . 1 .</span>
+<span class="co">#&gt; f . . . . . . 1 1 . .</span>
+<span class="co">#&gt; g . . . . . . . . 1 .</span>
+<span class="co">#&gt; h . . . . . . . . . .</span>
+<span class="co">#&gt; i . . . . . . . . . 1</span>
+<span class="co">#&gt; j . . . . . . . . . .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes:</span>
+<span class="co">#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode</span>
+<span class="co">#&gt; Adj.subfun - edge.Prob</span>
+<span class="va">rewired</span><span class="op">[</span>,,<span class="fl">3</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 1                     </span>
+<span class="co">#&gt; a . . 1 1 1 1 . . . 1</span>
+<span class="co">#&gt; b . . . 1 1 . 1 . 1 1</span>
+<span class="co">#&gt; c . . . 1 . 1 1 1 . 1</span>
+<span class="co">#&gt; d . . . . 1 . 1 1 . .</span>
+<span class="co">#&gt; e . . . . . 1 . 1 1 .</span>
+<span class="co">#&gt; f . . . . . . 1 . . .</span>
+<span class="co">#&gt; g . . . . . . . . . .</span>
+<span class="co">#&gt; h . . . . . . . . 1 .</span>
+<span class="co">#&gt; i . . . . . . . . . 1</span>
+<span class="co">#&gt; j . . . . . . . . . .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; scan: 2                     </span>
+<span class="co">#&gt; a . . . 1 . . . 1 . 1</span>
+<span class="co">#&gt; b . . 1 . 1 . 1 1 . .</span>
+<span class="co">#&gt; c . . . . . 1 1 . . 1</span>
+<span class="co">#&gt; d . . . . . . 1 1 . .</span>
+<span class="co">#&gt; e . . . . . . . . 1 1</span>
+<span class="co">#&gt; f . . . . . . . 1 1 .</span>
+<span class="co">#&gt; g . . . . . . . . 1 .</span>
+<span class="co">#&gt; h . . . . . . . . . .</span>
+<span class="co">#&gt; i . . . . . . . . . 1</span>
+<span class="co">#&gt; j . . . . . . . . . .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes:</span>
+<span class="co">#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode</span>
+<span class="co">#&gt; Adj.subfun - edge.Prob - theoretical.scanList</span></code></pre></div>
+</div>
+</div>
+</div>
+<div id="todo-implement-and-showcase-network-plotting" class="section level2">
+<h2 class="hasAnchor">
+<a href="#todo-implement-and-showcase-network-plotting" class="anchor"></a>TODO: Implement and showcase network plotting</h2>
+<p>Coming soon!</p>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 

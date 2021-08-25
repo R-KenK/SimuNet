@@ -18,7 +18,7 @@
       "<link id=\"css\" rel=\"stylesheet\" href=\"https://bootswatch.com/3/flatly/bootstrap.css\" onload=\"document.documentElement.style.display = ''\">"
     );
   }
-</script><title>uncertainty • SimuNet</title>
+</script><title>Assessing network uncertainty with `SimuNet` • SimuNet</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- Flatly Theme - Light  --><link id="css-light" rel="stylesheet" href="https://bootswatch.com/3/flatly/bootstrap.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)">
 <!-- Darkly Theme - Dark --><link id="css-dark" rel="stylesheet" href="https://bootswatch.com/3/darkly/bootstrap.css" media="(prefers-color-scheme: dark)">
 <!-- preferably CSS --><link rel="stylesheet" href="../../preferably.css">
@@ -28,7 +28,7 @@
 <script src="../../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../../pkgdown.css" rel="stylesheet">
-<script src="../../pkgdown.js"></script><meta property="og:title" content="uncertainty">
+<script src="../../pkgdown.js"></script><meta property="og:title" content="Assessing network uncertainty with `SimuNet`">
 <meta property="og:description" content="SimuNet">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.1.9000</span>
       </span>
     </div>
 
@@ -91,10 +91,10 @@
     <li class="divider">
     <li class="dropdown-header">SimuNet in details</li>
     <li>
-      <a href="../../articles/articles/bayesian_framework.html">SimuNet's Bayesian framework</a>
+      <a href="../../articles/articles/uncertainty.html">Network Uncertainty</a>
     </li>
     <li>
-      <a href="../../articles/articles/uncertainty.html">Network Uncertainty</a>
+      <a href="../../articles/articles/bayesian_framework.html">SimuNet's Bayesian framework</a>
     </li>
   </ul>
 </li>
@@ -141,7 +141,8 @@
       </header><script src="uncertainty_files/header-attrs-2.9/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>uncertainty</h1>
+      <h1 data-toc-skip>Assessing network uncertainty with <code>SimuNet</code>
+</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/R-KenK/SimuNet/blob/master/vignettes/articles/uncertainty.Rmd"><code>vignettes/articles/uncertainty.Rmd</code></a></small>
@@ -151,14 +152,325 @@
 
     
     
+<div id="a-bayesian-approach-to-weighted-networks" class="section level2">
+<h2 class="hasAnchor">
+<a href="#a-bayesian-approach-to-weighted-networks" class="anchor"></a>A Bayesian approach to weighted networks</h2>
+<p><code>SimuNet</code>’s simulation process can be assimilated to a network constructed via Bayesian inference over the network’s edges. Through repeated Bayesian-inferred simulations, one can assess a network uncertainty by determining the <strong>distributions of simulated network metrics</strong>.</p>
+<div id="simulated-edge-weight-distribution" class="section level3">
+<h3 class="hasAnchor">
+<a href="#simulated-edge-weight-distribution" class="anchor"></a>Simulated edge weight distribution</h3>
+<p>By replicating many simulations, one can assess a distribution of edges’ weights:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/R-KenK/SimuNet">SimuNet</a></span><span class="op">)</span></code></pre></div>
-<p>under construction</p>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/R-KenK/SimuNet">SimuNet</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/hadley/reshape">reshape2</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Attaching package: 'dplyr'</span>
+<span class="co">#&gt; The following objects are masked from 'package:stats':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     filter, lag</span>
+<span class="co">#&gt; The following objects are masked from 'package:base':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     intersect, setdiff, setequal, union</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/">cowplot</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/twolodzko/extraDistr">extraDistr</a></span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span>
+<span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">5L</span>
+<span class="va">samp.effort</span> <span class="op">&lt;-</span> <span class="fl">100L</span>
+<span class="va">Adj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">samp.effort</span>,<span class="va">n</span> <span class="op">*</span> <span class="va">n</span><span class="op">)</span> |&gt;
+  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="va">n</span>,dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span>,<span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>
+<span class="va">Adj</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/lower.tri.html">lower.tri</a></span><span class="op">(</span><span class="va">Adj</span>,diag <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0L</span>
+<span class="va">Adj</span>
+<span class="co">#&gt;   a   b  c  d  e</span>
+<span class="co">#&gt; a 0 100 37 27 58</span>
+<span class="co">#&gt; b 0   0 20 36 42</span>
+<span class="co">#&gt; c 0   0  0  5 93</span>
+<span class="co">#&gt; d 0   0  0  0 30</span>
+<span class="co">#&gt; e 0   0  0  0  0</span>
+
+<span class="co"># Running a single simulation</span>
+<span class="va">sL</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simunet.html">simunet</a></span><span class="op">(</span><span class="va">Adj</span>,<span class="va">samp.effort</span>,<span class="st">"upper"</span>,<span class="fl">100</span><span class="op">)</span>
+<span class="va">sL</span> |&gt; <span class="fu"><a href="../../reference/sum_scans.html">sum_scans</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Weighted adjacency matrix               </span>
+<span class="co">#&gt; a . 99 38 30 64</span>
+<span class="co">#&gt; b .  . 20 36 39</span>
+<span class="co">#&gt; c .  .  .  5 92</span>
+<span class="co">#&gt; d .  .  .  . 22</span>
+<span class="co">#&gt; e .  .  .  .  .</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Hidden attributes:</span>
+<span class="co">#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode</span>
+<span class="co">#&gt; Adj.subfun - edge.Prob - summed.scanList - sampled</span>
+
+<span class="co"># Replicating many simulations</span>
+<span class="va">sL.list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">replicate</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>,<span class="fu"><a href="../../reference/simunet.html">simunet</a></span><span class="op">(</span><span class="va">Adj</span>,<span class="va">samp.effort</span>,<span class="st">"upper"</span>,<span class="fl">100</span><span class="op">)</span> |&gt; <span class="fu"><a href="../../reference/sum_scans.html">sum_scans</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">edge.weights</span> <span class="op">&lt;-</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/reshape2/man/melt.html">melt</a></span><span class="op">(</span><span class="va">sL.list</span>,varnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"i"</span>,<span class="st">"j"</span>,<span class="st">"rep"</span><span class="op">)</span>,value.name <span class="op">=</span> <span class="st">"weight"</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">j</span><span class="op">)</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>ij <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">i</span>,<span class="st">"-"</span>,<span class="va">j</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">edge.weights</span><span class="op">)</span>
+<span class="co">#&gt;    i j rep weight  ij</span>
+<span class="co">#&gt; 6  a b   1    100 a-b</span>
+<span class="co">#&gt; 11 a c   1     21 a-c</span>
+<span class="co">#&gt; 12 b c   1     27 b-c</span>
+<span class="co">#&gt; 16 a d   1     33 a-d</span>
+<span class="co">#&gt; 17 b d   1     35 b-d</span>
+<span class="co">#&gt; 18 c d   1      2 c-d</span></code></pre></div>
+<p>These are for instance the distributions of three edge weights with small, medium and large weights:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">edge.weights</span> <span class="op">&lt;-</span> 
+  <span class="va">Adj</span> |&gt; 
+  <span class="fu"><a href="https://rdrr.io/pkg/reshape2/man/melt.html">melt</a></span><span class="op">(</span>varnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"i"</span>,<span class="st">"j"</span><span class="op">)</span>,value.name <span class="op">=</span> <span class="st">"original.weight"</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://rdrr.io/r/base/merge.html">merge</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">edge.weights</span>,by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"i"</span>,<span class="st">"j"</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">edge.weights</span> |&gt; 
+  <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="op">(</span><span class="va">i</span> <span class="op">==</span> <span class="st">"c"</span> <span class="op">&amp;</span> <span class="va">j</span> <span class="op">==</span> <span class="st">"e"</span><span class="op">)</span> <span class="op">|</span> <span class="op">(</span><span class="va">i</span> <span class="op">==</span> <span class="st">"a"</span> <span class="op">&amp;</span> <span class="va">j</span> <span class="op">==</span> <span class="st">"e"</span><span class="op">)</span> <span class="op">|</span> <span class="op">(</span><span class="va">i</span> <span class="op">==</span> <span class="st">"c"</span> <span class="op">&amp;</span> <span class="va">j</span> <span class="op">==</span> <span class="st">"d"</span><span class="op">)</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">weight</span>,colour <span class="op">=</span> <span class="va">ij</span>,fill <span class="op">=</span> <span class="va">ij</span><span class="op">)</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span><span class="op">(</span><span class="va">ij</span> <span class="op">~</span> <span class="va">.</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">1</span>,lty <span class="op">=</span> <span class="st">"dashed"</span>,
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>
+      y <span class="op">=</span> <span class="fu">extraDistr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/extraDistr/man/BetaBinom.html">dbbinom</a></span><span class="op">(</span>
+        <span class="va">weight</span>,
+        size <span class="op">=</span> <span class="va">samp.effort</span>,
+        alpha <span class="op">=</span> <span class="va">original.weight</span> <span class="op">+</span> <span class="fl">0.5</span>,
+        beta <span class="op">=</span> <span class="va">samp.effort</span> <span class="op">-</span> <span class="va">original.weight</span> <span class="op">+</span> <span class="fl">0.5</span>
+      <span class="op">)</span>
+    <span class="op">)</span>
+  <span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"grey70"</span>,
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>
+      x <span class="op">=</span> <span class="fl">50</span>,y <span class="op">=</span> <span class="fl">0.12</span>,
+      label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"Beta-Binomial(\u03B1 = "</span>,<span class="va">samp.effort</span> <span class="op">-</span> <span class="va">original.weight</span> <span class="op">+</span> <span class="fl">0.5</span>,<span class="st">", \u03B2 = "</span>,
+                     <span class="va">original.weight</span> <span class="op">+</span> <span class="fl">0.5</span>,<span class="st">", n = "</span>,<span class="va">samp.effort</span>,<span class="st">")"</span><span class="op">)</span>
+    <span class="op">)</span>
+  <span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_ribbon</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>ymax <span class="op">=</span> <span class="fu">extraDistr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/extraDistr/man/BetaBinom.html">dbbinom</a></span><span class="op">(</span><span class="va">weight</span>,size <span class="op">=</span> <span class="va">samp.effort</span>,
+                                              alpha <span class="op">=</span> <span class="va">original.weight</span> <span class="op">+</span> <span class="fl">0.5</span>,
+                                              beta <span class="op">=</span> <span class="va">samp.effort</span> <span class="op">-</span> <span class="va">original.weight</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>,
+              ymin <span class="op">=</span> <span class="fl">0</span>,alpha <span class="op">=</span> <span class="fl">0.2</span>,colour <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html">geom_histogram</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">stat</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span>,alpha <span class="op">=</span> <span class="fl">.1</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">original.weight</span>, y <span class="op">=</span> <span class="fl">0.01</span>, colour <span class="op">=</span> <span class="va">ij</span><span class="op">)</span>,
+             shape <span class="op">=</span> <span class="fl">23</span>,stroke <span class="op">=</span> <span class="fl">1.3</span>,fill <span class="op">=</span> <span class="st">"white"</span>,size <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Edge weight value\n(after 100 scans)"</span>,y <span class="op">=</span> <span class="st">"Frequency"</span>,colour <span class="op">=</span> <span class="st">"edge"</span>,fill <span class="op">=</span> <span class="st">"edge"</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html">theme_half_open</a></span><span class="op">(</span><span class="fl">15</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">'white'</span>, colour <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span></code></pre></div>
+<p><img src="uncertainty_files/figure-html/3_edges-1.png" width="700"></p>
+<p>with:</p>
+<ul>
+<li>the <strong>diamond-shaped dots</strong> representing the original observed edge weights (in <code>Adj</code>),</li>
+<li>the <strong>dashed curves</strong> being the <em>theoretical</em> Beta-binomial distributions obtained from each edge weight in <code>Adj</code> (see <a href="bayesian_framework.html">SimuNet’s Bayesian framework</a>)</li>
+</ul>
+<div id="sampling-effort-on-edge-weight-variance" class="section level4">
+<h4 class="hasAnchor">
+<a href="#sampling-effort-on-edge-weight-variance" class="anchor"></a>Sampling effort on edge weight variance</h4>
+<p>See how the distribution is more narrow/wide as the sampling effort varies in these examples:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">Adj.10</span> <span class="op">&lt;-</span> <span class="va">Adj.100</span> <span class="op">&lt;-</span> <span class="va">Adj.1000</span> <span class="op">&lt;-</span> <span class="va">Adj.5000</span> <span class="op">&lt;-</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span><span class="fl">0L</span>,nrow <span class="op">=</span> <span class="va">n</span>,ncol <span class="op">=</span> <span class="va">n</span>,dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span>,<span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">Adj.10</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/lower.tri.html">upper.tri</a></span><span class="op">(</span><span class="va">Adj.10</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">10</span>,length.out <span class="op">=</span> <span class="op">(</span><span class="va">n</span><span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="va">n</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span> |&gt; <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">Adj.10</span>
+<span class="co">#&gt;   a b c d  e</span>
+<span class="co">#&gt; a 0 1 2 4  7</span>
+<span class="co">#&gt; b 0 0 3 5  8</span>
+<span class="co">#&gt; c 0 0 0 6  9</span>
+<span class="co">#&gt; d 0 0 0 0 10</span>
+<span class="co">#&gt; e 0 0 0 0  0</span>
+
+<span class="va">Adj.100</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/lower.tri.html">upper.tri</a></span><span class="op">(</span><span class="va">Adj.100</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">100</span>,length.out <span class="op">=</span> <span class="op">(</span><span class="va">n</span><span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="va">n</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span> |&gt; <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">Adj.100</span>
+<span class="co">#&gt;   a b  c  d   e</span>
+<span class="co">#&gt; a 0 1 12 34  67</span>
+<span class="co">#&gt; b 0 0 23 45  78</span>
+<span class="co">#&gt; c 0 0  0 56  89</span>
+<span class="co">#&gt; d 0 0  0  0 100</span>
+<span class="co">#&gt; e 0 0  0  0   0</span>
+
+<span class="va">Adj.1000</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/lower.tri.html">upper.tri</a></span><span class="op">(</span><span class="va">Adj.1000</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1000</span>,length.out <span class="op">=</span> <span class="op">(</span><span class="va">n</span><span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="va">n</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span> |&gt; <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">Adj.1000</span>
+<span class="co">#&gt;   a b   c   d    e</span>
+<span class="co">#&gt; a 0 1 112 334  667</span>
+<span class="co">#&gt; b 0 0 223 445  778</span>
+<span class="co">#&gt; c 0 0   0 556  889</span>
+<span class="co">#&gt; d 0 0   0   0 1000</span>
+<span class="co">#&gt; e 0 0   0   0    0</span>
+
+<span class="va">Adj.5000</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/lower.tri.html">upper.tri</a></span><span class="op">(</span><span class="va">Adj.5000</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">5000</span>,length.out <span class="op">=</span> <span class="op">(</span><span class="va">n</span><span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="va">n</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span> |&gt; <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">Adj.5000</span>
+<span class="co">#&gt;   a b    c    d    e</span>
+<span class="co">#&gt; a 0 1  556 1667 3334</span>
+<span class="co">#&gt; b 0 0 1112 2223 3889</span>
+<span class="co">#&gt; c 0 0    0 2778 4445</span>
+<span class="co">#&gt; d 0 0    0    0 5000</span>
+<span class="co">#&gt; e 0 0    0    0    0</span></code></pre></div>
+<p>We use box plots and scaled edge weights hereafter to ease comparison across orders of magnitudes of sampling efforts:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">replicate_for_sampEffort</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">Adj</span>,<span class="va">samp.effort</span>,<span class="va">n.scans</span> <span class="op">=</span> <span class="va">samp.effort</span>,<span class="va">n.rep</span> <span class="op">=</span> <span class="fl">50</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">Adj.df</span> <span class="op">&lt;-</span> 
+    <span class="va">Adj</span> |&gt; 
+    <span class="fu"><a href="https://rdrr.io/pkg/reshape2/man/melt.html">melt</a></span><span class="op">(</span>varnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"i"</span>,<span class="st">"j"</span><span class="op">)</span>,value.name <span class="op">=</span> <span class="st">"original.weight"</span><span class="op">)</span>
+  
+  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">replicate</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n.rep</span>,<span class="fu"><a href="../../reference/simunet.html">simunet</a></span><span class="op">(</span><span class="va">Adj</span>,<span class="va">samp.effort</span>,<span class="st">"upper"</span>,<span class="va">n.scans</span><span class="op">)</span> |&gt; <span class="fu"><a href="../../reference/sum_scans.html">sum_scans</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://rdrr.io/pkg/reshape2/man/melt.html">melt</a></span><span class="op">(</span>varnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"i"</span>,<span class="st">"j"</span>,<span class="st">"rep"</span><span class="op">)</span>,value.name <span class="op">=</span> <span class="st">"weight"</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">j</span><span class="op">)</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://rdrr.io/r/base/merge.html">merge</a></span><span class="op">(</span><span class="va">Adj.df</span>,by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"i"</span>,<span class="st">"j"</span><span class="op">)</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span>samp.effort <span class="op">=</span> <span class="va">samp.effort</span><span class="op">)</span>
+<span class="op">}</span>
+
+
+<span class="va">edge.weights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span><span class="op">(</span>
+  <span class="fu">replicate_for_sampEffort</span><span class="op">(</span><span class="va">Adj.10</span>,<span class="fl">10L</span><span class="op">)</span>,
+  <span class="fu">replicate_for_sampEffort</span><span class="op">(</span><span class="va">Adj.100</span>,<span class="fl">100L</span><span class="op">)</span>,
+  <span class="fu">replicate_for_sampEffort</span><span class="op">(</span><span class="va">Adj.1000</span>,<span class="fl">1000L</span><span class="op">)</span>,
+  <span class="fu">replicate_for_sampEffort</span><span class="op">(</span><span class="va">Adj.5000</span>,<span class="fl">5000L</span><span class="op">)</span>
+<span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="op">(</span><span class="va">i</span> <span class="op">==</span> <span class="st">"a"</span> <span class="op">&amp;</span> <span class="va">j</span> <span class="op">==</span> <span class="st">"c"</span><span class="op">)</span> <span class="op">|</span> <span class="op">(</span><span class="va">i</span> <span class="op">==</span> <span class="st">"b"</span> <span class="op">&amp;</span> <span class="va">j</span> <span class="op">==</span> <span class="st">"d"</span><span class="op">)</span> <span class="op">|</span> <span class="op">(</span><span class="va">i</span> <span class="op">==</span> <span class="st">"c"</span> <span class="op">&amp;</span> <span class="va">j</span> <span class="op">==</span> <span class="st">"e"</span><span class="op">)</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>ij <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">i</span>,<span class="st">"-"</span>,<span class="va">j</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">edge.weights</span><span class="op">)</span>
+<span class="co">#&gt;    i j rep weight original.weight samp.effort  ij</span>
+<span class="co">#&gt; 51 a c  11      5               2          10 a-c</span>
+<span class="co">#&gt; 52 a c   6      0               2          10 a-c</span>
+<span class="co">#&gt; 53 a c  10      4               2          10 a-c</span>
+<span class="co">#&gt; 54 a c   1      1               2          10 a-c</span>
+<span class="co">#&gt; 55 a c   2      6               2          10 a-c</span>
+<span class="co">#&gt; 56 a c   9      0               2          10 a-c</span>
+
+<span class="va">edge.weights</span> |&gt; 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">/</span> <span class="va">samp.effort</span>,colour <span class="op">=</span> <span class="va">ij</span>,fill <span class="op">=</span> <span class="va">ij</span><span class="op">)</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span><span class="op">(</span><span class="va">samp.effort</span> <span class="op">~</span> <span class="va">ij</span>,scale <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html">geom_histogram</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">stat</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span>,alpha <span class="op">=</span> <span class="fl">.25</span>,bins <span class="op">=</span>  <span class="fl">50</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span>lty <span class="op">=</span> <span class="st">"dashed"</span>,
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>
+      y <span class="op">=</span> <span class="fu">extraDistr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/extraDistr/man/BetaBinom.html">dbbinom</a></span><span class="op">(</span>
+        <span class="va">weight</span>,
+        size <span class="op">=</span> <span class="va">samp.effort</span>,
+        alpha <span class="op">=</span> <span class="va">original.weight</span> <span class="op">+</span> <span class="fl">0.5</span>,
+        beta <span class="op">=</span> <span class="va">samp.effort</span> <span class="op">-</span> <span class="va">original.weight</span> <span class="op">+</span> <span class="fl">0.5</span>
+      <span class="op">)</span> <span class="op">*</span> <span class="va">samp.effort</span>
+    <span class="op">)</span>
+  <span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_ribbon</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>
+      ymax <span class="op">=</span> <span class="fu">extraDistr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/extraDistr/man/BetaBinom.html">dbbinom</a></span><span class="op">(</span><span class="va">weight</span>,size <span class="op">=</span> <span class="va">samp.effort</span>,alpha <span class="op">=</span> <span class="va">original.weight</span> <span class="op">+</span> <span class="fl">0.5</span>,
+        beta <span class="op">=</span> <span class="va">samp.effort</span> <span class="op">-</span> <span class="va">original.weight</span> <span class="op">+</span> <span class="fl">0.5</span>
+      <span class="op">)</span> <span class="op">*</span> <span class="va">samp.effort</span>
+    <span class="op">)</span>,ymin <span class="op">=</span> <span class="fl">0</span>,alpha <span class="op">=</span> <span class="fl">0.15</span>,colour <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">original.weight</span> <span class="op">/</span> <span class="va">samp.effort</span>, y <span class="op">=</span> <span class="fl">0.75</span>, colour <span class="op">=</span> <span class="va">ij</span><span class="op">)</span>,
+             shape <span class="op">=</span> <span class="fl">23</span>,stroke <span class="op">=</span> <span class="fl">1.3</span>,fill <span class="op">=</span> <span class="st">"white"</span>,size <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"none"</span>,fill <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Scaled edge weight"</span>,y <span class="op">=</span> <span class="st">"Counts"</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html">theme_half_open</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">'white'</span>, colour <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p><img src="uncertainty_files/figure-html/varying_sampEff2-1.png" width="700"></p>
+<p>The spread around the scaled theoretical value is smaller for scaled edges weight obtained with higher sampling effort.</p>
+</div>
+<div id="edge-weight-variability-is-not-affected-by-the-number-of-simulated-scans" class="section level4">
+<h4 class="hasAnchor">
+<a href="#edge-weight-variability-is-not-affected-by-the-number-of-simulated-scans" class="anchor"></a>Edge weight variability is not affected by the number of <strong>simulated</strong> scans</h4>
+<p>However, for a given sampling effort, the number of simulated scans is not influential on the (scaled) edge weights, with the distribution converging for <code>n.scans</code> values high enough.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span><span class="op">(</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="fu">replicate_for_sampEffort</span><span class="op">(</span><span class="va">Adj.100</span>,<span class="fl">100L</span>,<span class="fl">10</span><span class="op">)</span>,n.scans <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,
+  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="fu">replicate_for_sampEffort</span><span class="op">(</span><span class="va">Adj.100</span>,<span class="fl">100L</span>,<span class="fl">100</span><span class="op">)</span>,n.scans <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,
+  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="fu">replicate_for_sampEffort</span><span class="op">(</span><span class="va">Adj.100</span>,<span class="fl">100L</span>,<span class="fl">1000</span><span class="op">)</span>,n.scans <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>,
+  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="fu">replicate_for_sampEffort</span><span class="op">(</span><span class="va">Adj.100</span>,<span class="fl">100L</span>,<span class="fl">10000</span><span class="op">)</span>,n.scans <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span>,
+  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="fu">replicate_for_sampEffort</span><span class="op">(</span><span class="va">Adj.100</span>,<span class="fl">100L</span>,<span class="fl">20000</span><span class="op">)</span>,n.scans <span class="op">=</span> <span class="fl">20000</span><span class="op">)</span>
+<span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="op">(</span><span class="va">i</span> <span class="op">==</span> <span class="st">"a"</span> <span class="op">&amp;</span> <span class="va">j</span> <span class="op">==</span> <span class="st">"c"</span><span class="op">)</span> <span class="op">|</span> <span class="op">(</span><span class="va">i</span> <span class="op">==</span> <span class="st">"b"</span> <span class="op">&amp;</span> <span class="va">j</span> <span class="op">==</span> <span class="st">"d"</span><span class="op">)</span> <span class="op">|</span> <span class="op">(</span><span class="va">i</span> <span class="op">==</span> <span class="st">"c"</span> <span class="op">&amp;</span> <span class="va">j</span> <span class="op">==</span> <span class="st">"e"</span><span class="op">)</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>ij <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">i</span>,<span class="st">"-"</span>,<span class="va">j</span><span class="op">)</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">/</span> <span class="va">n.scans</span>,colour <span class="op">=</span> <span class="va">ij</span>,fill <span class="op">=</span> <span class="va">ij</span><span class="op">)</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span><span class="op">(</span><span class="va">n.scans</span> <span class="op">~</span> <span class="va">ij</span>,scale <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html">geom_histogram</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">stat</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span>,alpha <span class="op">=</span> <span class="fl">.25</span>,bins <span class="op">=</span>  <span class="fl">50</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span>lty <span class="op">=</span> <span class="st">"dashed"</span>,
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>
+      y <span class="op">=</span> <span class="fu">extraDistr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/extraDistr/man/BetaBinom.html">dbbinom</a></span><span class="op">(</span>
+        <span class="va">weight</span>,
+        size <span class="op">=</span> <span class="va">n.scans</span>,
+        alpha <span class="op">=</span> <span class="va">original.weight</span> <span class="op">+</span> <span class="fl">0.5</span>,
+        beta <span class="op">=</span> <span class="va">samp.effort</span> <span class="op">-</span> <span class="va">original.weight</span> <span class="op">+</span> <span class="fl">0.5</span>
+      <span class="op">)</span> <span class="op">*</span> <span class="va">n.scans</span>
+    <span class="op">)</span>
+  <span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_ribbon</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>
+      ymax <span class="op">=</span> <span class="fu">extraDistr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/extraDistr/man/BetaBinom.html">dbbinom</a></span><span class="op">(</span><span class="va">weight</span>,size <span class="op">=</span> <span class="va">n.scans</span>,alpha <span class="op">=</span> <span class="va">original.weight</span> <span class="op">+</span> <span class="fl">0.5</span>,
+        beta <span class="op">=</span> <span class="va">samp.effort</span> <span class="op">-</span> <span class="va">original.weight</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">*</span> <span class="va">n.scans</span>
+    <span class="op">)</span>,ymin <span class="op">=</span> <span class="fl">0</span>,alpha <span class="op">=</span> <span class="fl">0.15</span>,colour <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">original.weight</span> <span class="op">/</span> <span class="va">samp.effort</span>, y <span class="op">=</span> <span class="fl">0.75</span>, colour <span class="op">=</span> <span class="va">ij</span><span class="op">)</span>,
+             shape <span class="op">=</span> <span class="fl">23</span>,stroke <span class="op">=</span> <span class="fl">1.3</span>,fill <span class="op">=</span> <span class="st">"white"</span>,size <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"none"</span>,fill <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Scaled edge weight"</span>,y <span class="op">=</span> <span class="st">"Counts"</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/theme_cowplot.html">theme_half_open</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">'white'</span>, colour <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p><img src="uncertainty_files/figure-html/varying_nscans-1.png" width="700"></p>
+</div>
+</div>
+<div id="simulated-network-metrics-distribution" class="section level3">
+<h3 class="hasAnchor">
+<a href="#simulated-network-metrics-distribution" class="anchor"></a>Simulated network metrics distribution</h3>
+<p>Going further from edge weights, one can similarly use <code>SimuNet</code> to extract network metrics from simulated networks. Let’s consider for instance node eigen-vector centrality:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">compute_EV</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mat</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">EV</span> <span class="op">&lt;-</span> <span class="va">mat</span> |&gt; 
+    <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">graph.adjacency</a></span><span class="op">(</span><span class="st">"upper"</span>,weighted <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> |&gt; 
+    <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/eigen_centrality.html">eigen_centrality</a></span><span class="op">(</span>directed <span class="op">=</span> <span class="cn">FALSE</span>,scale <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+  <span class="va">EV</span><span class="op">$</span><span class="va">vector</span>
+<span class="op">}</span>
+
+<span class="va">replicate_EV</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">Adj</span>,<span class="va">samp.effort</span>,<span class="va">n.scans</span> <span class="op">=</span> <span class="va">samp.effort</span>,<span class="va">n.rep</span> <span class="op">=</span> <span class="fl">50</span><span class="op">)</span> <span class="op">{</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">replicate</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n.rep</span>,<span class="fu"><a href="../../reference/simunet.html">simunet</a></span><span class="op">(</span><span class="va">Adj</span>,<span class="va">samp.effort</span>,<span class="st">"upper"</span>,<span class="va">n.scans</span><span class="op">)</span> |&gt; <span class="fu"><a href="../../reference/scale_scans.html">scale_scans</a></span><span class="op">(</span><span class="op">)</span> |&gt; <span class="fu">compute_EV</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://rdrr.io/pkg/reshape2/man/melt.html">melt</a></span><span class="op">(</span>varnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"node"</span>,<span class="st">"rep"</span><span class="op">)</span>,value.name <span class="op">=</span> <span class="st">"EV"</span><span class="op">)</span>
+<span class="op">}</span>
+
+<span class="va">EV.ori</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>node <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span><span class="op">)</span>,EV <span class="op">=</span> <span class="fu">compute_EV</span><span class="op">(</span><span class="va">Adj</span><span class="op">)</span><span class="op">)</span>
+
+<span class="fu">replicate_EV</span><span class="op">(</span><span class="va">Adj</span>,<span class="va">samp.effort</span>,n.rep <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">node</span>,<span class="va">EV</span>,colour <span class="op">=</span> <span class="va">node</span>,fill <span class="op">=</span> <span class="va">node</span><span class="op">)</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_boxplot.html">geom_boxplot</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">EV.ori</span>,shape <span class="op">=</span> <span class="fl">21</span>,size <span class="op">=</span> <span class="fl">3</span>,stroke <span class="op">=</span> <span class="fl">1.5</span>,fill <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"none"</span>,fill <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Node"</span>,y <span class="op">=</span> <span class="st">"Eigen-vector centrality"</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">'white'</span>, colour <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p><img src="uncertainty_files/figure-html/EV1-1.png" width="700"></p>
+<p>And again, let’s replicate this procedure with variable sampling effort:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">EV.ori</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span><span class="op">(</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>node <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span><span class="op">)</span>,EV <span class="op">=</span> <span class="fu">compute_EV</span><span class="op">(</span><span class="va">Adj.10</span><span class="op">)</span>,samp.effort <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span>,
+  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>node <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span><span class="op">)</span>,EV <span class="op">=</span> <span class="fu">compute_EV</span><span class="op">(</span><span class="va">Adj.100</span><span class="op">)</span>,samp.effort <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span>,
+  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>node <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">]</span><span class="op">)</span>,EV <span class="op">=</span> <span class="fu">compute_EV</span><span class="op">(</span><span class="va">Adj.1000</span><span class="op">)</span>,samp.effort <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">)</span><span class="op">)</span>
+<span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span><span class="op">(</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="fu">replicate_EV</span><span class="op">(</span><span class="va">Adj.10</span>,<span class="fl">10L</span>,n.scans <span class="op">=</span> <span class="fl">10</span>,n.rep <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,samp.effort <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span>,
+  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="fu">replicate_EV</span><span class="op">(</span><span class="va">Adj.100</span>,<span class="fl">100L</span>,n.scans <span class="op">=</span> <span class="fl">100</span>,n.rep <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,samp.effort <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span>,
+  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="fu">replicate_EV</span><span class="op">(</span><span class="va">Adj.1000</span>,<span class="fl">1000L</span>,n.scans <span class="op">=</span> <span class="fl">1000</span>,n.rep <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,samp.effort <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">)</span><span class="op">)</span>
+<span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">node</span>,<span class="va">EV</span>,colour <span class="op">=</span> <span class="va">node</span>,fill <span class="op">=</span> <span class="va">node</span><span class="op">)</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span><span class="op">(</span><span class="va">.</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"sampl. effort = "</span>,<span class="va">samp.effort</span><span class="op">)</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_boxplot.html">geom_boxplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/interaction.html">interaction</a></span><span class="op">(</span><span class="va">samp.effort</span>,<span class="va">node</span><span class="op">)</span><span class="op">)</span>,alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">EV.ori</span>,<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/interaction.html">interaction</a></span><span class="op">(</span><span class="va">samp.effort</span>,<span class="va">node</span><span class="op">)</span><span class="op">)</span>,
+             position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_dodge.html">position_dodge</a></span><span class="op">(</span><span class="fl">.8</span><span class="op">)</span>,
+             shape <span class="op">=</span> <span class="fl">21</span>,size <span class="op">=</span> <span class="fl">3</span>,stroke <span class="op">=</span> <span class="fl">1.5</span>,fill <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"none"</span>,fill <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Node"</span>,y <span class="op">=</span> <span class="st">"Eigen-vector centrality"</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span><span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">'white'</span>, colour <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p><img src="uncertainty_files/figure-html/EV2-1.png" width="700"></p>
+<p>Networks metrics available are too many to cover here, but the approach shown here - simulate a network, retrieve the metric, repeat many times - can be used to infere any network metric’s distribution.</p>
+</div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 

@@ -11,7 +11,7 @@ sLapply(sL, FUN, ...)
 \arguments{
 \item{sL}{a \code{scanList} object (see \code{\link[=simunet]{simunet()}})}
 
-\item{FUN}{a function,to apply a function to each 2D matrix contained in \code{sL}}
+\item{FUN}{a function, to apply to each 2D matrix contained in \code{sL}}
 
 \item{...}{extra argument to be passed, notably named arguments used by \code{.f} (see \code{\link[=lapply]{lapply()}})}
 }
