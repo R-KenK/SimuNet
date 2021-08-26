@@ -29,9 +29,12 @@
 #'   matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
 #' Adj[lower.tri(Adj,diag = TRUE)] <- 0L
 #' Adj
-#' mL <- simunet(Adj,samp.effort,"upper",10) |> scanList2matList()
+#'
+#' sL <- simunet(Adj,samp.effort,"upper",10)
+#' mL <- sL |> scanList2matList()
 #' mL
 #' mL |> matList2scanList()
+#' identical(mL |> matList2scanList(),sL)
 scanList2matList <- function(scan.list) {
   mat.list <- array2matList(scan.list)
   mat.list <- copy_attrs_to(scan.list,mat.list)
@@ -62,8 +65,12 @@ scanList2matList <- function(scan.list) {
 #'   matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
 #' Adj[lower.tri(Adj,diag = TRUE)] <- 0L
 #' Adj
-#' mL <- simunet(Adj,samp.effort,"upper",10) |> scanList2matList()
+#'
+#' sL <- simunet(Adj,samp.effort,"upper",10)
+#' mL <- sL |> scanList2matList()
+#' mL
 #' mL |> matList2scanList()
+#' identical(mL |> matList2scanList(),sL)
 matList2scanList <- function(mat.list) {
   scan.list <- matList2array(mat.list)
   scan.list <- copy_attrs_to(mat.list,scan.list)
@@ -115,7 +122,9 @@ matList2array <- function(mat.list) {
 #' @noRd
 print.matList <- function(x,...) {
   print.default(without_attrs(x))
-  cat("\n\nHidden attributes:",names(get_attrs(x)))
+  format_attributes(x,...)
+  invisible(x)
+}
 
 ## To and from igraph ----
 
