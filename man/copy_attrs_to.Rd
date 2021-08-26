@@ -5,13 +5,15 @@
 \title{\code{scanList}'s \code{attrs} attributes related convenience functions: copy attrs from one \code{scanList} to
 another}
 \usage{
-copy_attrs_to(from, to)
+copy_attrs_to(from, to, copy.class = TRUE)
 }
 \arguments{
 \item{from}{a \code{scanList} object which \code{attrs} attribute to copy (see \code{\link[=simunet]{simunet()}})}
 
 \item{to}{a \code{scanList} object to which \code{attrs} attribute should be pasted (see
 \code{\link[=simunet]{simunet()}})}
+
+\item{copy.class}{logical, should the class be copied too if \code{to} is not a \code{scanList}?}
 }
 \value{
 a \code{scanList} object, the 3D array containted in \code{to} with \code{from}'s \code{attrs}
