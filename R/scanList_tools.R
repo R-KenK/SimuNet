@@ -225,13 +225,14 @@ attrs <- function(scan.list,a = NULL) {
 #' @param from a `scanList` object which `attrs` attribute to copy (see [`simunet()`][simunet()])
 #' @param to a `scanList` object to which `attrs` attribute should be pasted (see
 #'   [`simunet()`][simunet()])
+#' @param copy.class logical, should the class be copied too if `to` is not a `scanList`?
 #'
 #' @return a `scanList` object, the 3D array containted in `to` with `from`'s `attrs`
 #' @export
 #'
 #' @keywords internal
-copy_attrs_to <- function(from,to) {
-  if (!inherits(to,"scanList")) {class(to) <- class(from)}
+copy_attrs_to <- function(from,to,copy.class = TRUE) {
+  if (!inherits(to,"scanList") & copy.class) {class(to) <- class(from)}
   attr(to,"attrs") <- attrs(from)
   to
 }
