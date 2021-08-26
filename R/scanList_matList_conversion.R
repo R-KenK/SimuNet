@@ -274,3 +274,38 @@ print.igraphSN <- function(x,...) {
   invisible(x)
 }
 
+
+## From weightedAdj to binary scanList ----
+
+#' Convert `weightedAdj` into 3D binary array `scanList` objects
+#' Back-transform `weightedAdj`into the `scanList` it was summed from (see [`sum_scans()`][sum_scans()])
+#'
+#' @param sum a `weightedAdj` object
+#'
+#' @return `scanList` object. See [`simunet()`][simunet()]
+#' @export
+#'
+#' @examples
+#' set.seed(42)
+#' n <- 5L
+#' samp.effort <- 100L
+#'
+#' # Adjacency matrix import
+#' ## random directed adjacency matrix
+#' Adj <- sample(1:samp.effort,n * n) |>
+#'   matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
+#' Adj[lower.tri(Adj,diag = TRUE)] <- 0L
+#' Adj
+#'
+#' sL <- simunet(Adj,samp.effort,"upper",10)
+#' wAdj <- sL |> sum_scans()
+#' wAdj
+#' wAdj |> weightedAdj2scanList()
+#' identical(wAdj |> weightedAdj2scanList(),sL)
+weightedAdj2scanList <- function(sum) {
+  scan.list <- sum$summed.scanList
+  scan.list <- copy_attrs_to(sum,scan.list,copy.class = FALSE)
+  class(scan.list) <- class(sum)[-1]
+  attrs(scan.list,"summed.scanList") <- attrs(scan.list,"sampled") <- NULL
+  scan.list
+}
