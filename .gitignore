@@ -3,3 +3,5 @@
 .RData
 .Ruserdata
 .WIP/simulation.data/
+.WIP/*.docx
+.WIP/*.png
