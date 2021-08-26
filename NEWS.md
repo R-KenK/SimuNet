@@ -1,4 +1,9 @@
-# SimuNet (development version)
+# SimuNet 2.3.0
+* Added `scanList2igraph()` and `igraph2scanList()` conversion functions:
+    * does what their names implies
+    * but also carries over the `attrs` attributes list
+* Added `weightedAdj()` to convert back a `weightedAdj` `scanList` to its 3D binary array form.
+* `copy_attrs_to()`: added an option to by-pass class modifications. If `copy.class` is set to `FALSE`, only `attrs` attribute is copied.
 
 # SimuNet 2.2.1
 * `$` methods added for `scanList` to retrieve attributes in `attrs`:
