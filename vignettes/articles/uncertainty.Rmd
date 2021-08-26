@@ -10,9 +10,10 @@ knitr::opts_chunk$set(
 ```
 
 ## A Bayesian approach to weighted networks
-`SimuNet`'s simulation process can be assimilated to a network constructed via Bayesian inference
-over the network's edges. Through repeated Bayesian-inferred simulations, one can assess a network
-uncertainty by determining the **distributions of simulated network metrics**.
+`SimuNet`'s simulation process can be assimilated to a network constructed via
+[Bayesian inference](bayesian_framework.html) over the network's edges. Through repeated
+Bayesian-inferred simulations, one can assess a network uncertainty by determining the
+**distributions of simulated network metrics**.
 
 ### Simulated edge weight distribution
 By replicating many simulations, one can assess a distribution of edges' weights:
