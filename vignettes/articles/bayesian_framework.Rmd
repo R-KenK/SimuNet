@@ -1,5 +1,5 @@
 ---
-title: "SimuNet's Bayesian framework"
+title: "`SimuNet`'s Bayesian framework"
 ---
 
 ```{r, include = FALSE}
@@ -9,7 +9,346 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(SimuNet)
+# The ideas behind `SimuNet`'s Bayesian approach
+In this article, we discuss what are the underlying ideas that led us to adopt the Bayesian approach
+at the core of `SimuNet`'s simulations.
+
+## "Binomial" edge weights
+`SimuNet` simulates weighted networks by adopting a "binomial" approach to edge weights:
+
+### Edge weights often starts binary
+It is common with weighted (animal) social networks to quantify edge weights by accumulating
+social data that are inherently **binary**:
+
+* for instance during **scan sampling**, edges are evaluated and are either 0 or 1
+* for **continuous sampling**:
+    * an edge is either present or not when the association/interaction is comparable to a
+    **state** (e.g. behind in contact)
+    * the case of **quasi-instantaneous events** differs a little from a binary outcome. Usually
+    then, it is the number of events over a given amount of time that serve as the edge weight.
+    However, we argue that, realistically, continuous sampling can always be segmented according
+    to a minimum unit of time, during which the event occurs or not, therefore binarizing the
+    event
+```{r place_holder1}
+#TODO: schematic binary nature of edges in scan and continuous sampling
 ```
- Under construction
+
+### Binomial variables and edge weights: similarities and differences
+
+#### Binomial variables: a summary
+Under this assumption that an edge is either 0 or 1 at each scan/unit of time and that the edge
+weight is then the sum of 1s, we propose that edge weights can be viewed as "binomial":
+
+* a binomial variable $X \sim Binomial(n,p)$ can be viewed as the sum
+$X = \Sigma x_i, i \in [\![1,n]\!]$ of Bernoulli variables $x_i \sim Bernoulli(p), iid.$
+* Similarly, an edge weight obtained as the sum of binary outcome _could_ be obtained after
+summing binary variables.
+
+```{r place_holder2}
+#TODO: schematic analogy coin-tosses and edge weights
+```
+
+This however raises questions regarding what differs with a purely binomial process, or requires
+additional assumptions to be met:
+
+#### The case of static networks
+Static networks imply several assumption that allows for an easy "Binomial" approach to edge
+weights:
+
+1. With a binomial variable, $p$ is considered **constant**: we argue that when constructing
+static weighted networks, it is assumed/approximated (consciously or not) that the properties of
+the group, and therefore the social network, **do not change significantly** over the course of
+data acquisition. If such probability of an edge being present existed (i.e. a probability  of
+two nodes associating/interacting during a scan), adopting a static weighted network approach
+would assume that $p$ is constant.
+2. Similarly, a static weighted network approach assumes no significant influence of time:
+considering **each scan as independent from the others** is an assumption to make, but one that
+could potentially already made when one build a static weighted network approach without being
+interested in how the networks are generated.
+```{r place_holder3}
+#TODO: schematic static network
+```
+
+#### The case of dynamic networks
+Considering dynamic networks, such a Binomial approach could still hold under the assumption that
+$p$ would be variable through time:
+
+3. Despite the many temporal or temporally-dependent drivers of two individuals associating, at the
+time of sampling, this could similarly result in effectively a probability of associating at each
+scan/unit of time.
+4. At the moment, `SimuNet` only relies on a constant $p$ throughout all scans, which implies that
+it considers networks mostly static. `SimuNet` is however designed to accommodate time-dependent
+$p$, to therefore simulate dynamic networks
+
+#### The biological/social meaning of $p$
+
+5. Edge weights in _social_ networks usually quantify the relationship/proximity between two
+nodes. Under this "binomial" approach, an edge weight would more precisely quantify (or be
+proportional to) **the probability that a pair of node is associated** during each scan/segment
+of time. $p$ would be the resulting and estimable probability of association, probability that
+can result from the combination of many cognitive and social processes like kin preference,
+personality, etc. No assumption are required in how such $p$ emerges, but sampling to build
+weighted social networks would be intimately related to estimating this quantity.
+
+```{r place_holder4}
+#TODO: schematic from biological/behavioural/social drivers to p
+```
+
+#### Toward a **Bayesian** framework
+
+6. In the context of a binomial variables, $p$ is often considered a **known** probability. The
+Binomial distribution then describes the probability that $X$ will take a value between 0 and
+$n$. In the case of social networks and under our approach to edge weights, however, $p$ is what
+**we want to estimate**.
+
+Point 6. is the main consideration that led `SimuNet` to generate weighted networks under a Bayesian
+framework.
+
+## Estimating edge presence probability via Bayesian inference
+Estimating $p$ for a binomial variable $X \sim Binomial(n,p)$ from observations, e.g. the number of
+heads after $n$ coin-tosses that had probability $p$ of being head, is a common mathematical
+problem. See this [Wikipedia article](https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval)
+on the subject.
+```{r place_holder5}
+#TODO: schematic from obs to a distribution of p
+```
+
+It is however illusory to believe that we can find **a single value** that reflects both our **best
+estimation** of $p$ (a **positional** aspect of $p$) and our **confidence/certainty** in this
+estimation. Intuitively, we also need a notion of spread around our estimation, either in the form
+of a confidence/credible interval, or even better, a distribution of $p$ on $[0,1]$.
+
+Such a distribution of $p$ should:
+
+* demonstrate the importance of $n$, which can be viewed as a **sampling effort**, in determining how
+confident we are in an estimate of $p$, i.e. how wide/narrow should the distribution of $p$ be
+around our best estimator.
+* be skewed when we $p$ is estimated from a value of $X$ close to $0$ or $n$, while being bounded on
+$[0,1]$.
+
+Combining of the two previous points, when $X$ was exactly $0$ or $n$, illustrates these issues of
+confidence/uncertainty: e.g. how confident should one be when estimating $p=\frac{0}{n}=0$ or
+$p=\frac{n}{n}=1$ when $n=5$ _versus_ when $n=5000$?
+
+Hereafter, we demonstrate step-by-step how Bayesian statistics help finding such a distribution of
+$p$.
+
+### Objective: a posterior distribution of $p$
+The problem of estimating the **unknown binomial probability** $p$ from the **observation of an
+outcome** and **prior knowledge** (or lack thereof) is well formalized under a Bayesian inference
+(see [this Wikipedia
+page](https://en.wikipedia.org/wiki/Binomial_distribution#Estimation_of_parameters) and [this
+related one](https://en.wikipedia.org/wiki/Beta_distribution#Bayesian_inference) on this topic). In
+short:
+
+We want to obtain a **posterior distribution** of $p$ after observing $X = a$, noted $P(p|X=a)$,
+using Bayes' theorem:
+$$P(p|X=a) = \frac{P(X=a|p)P(p)}{P(X=a)},$$
+with:
+
+* $P(X=a|p)$ being the **(binomial) likelihood** of observing $X=a$ when knowing $p$
+* $P(p)$ being a **prior distribution** of $p$, representing our prior knowledge of $p$
+* $P(X=a)$ being a **marginal likelihood**, practically viewed as a "standardizing" constant,
+mathematically defined as an "averaged" likelihood of $X=a$ after considering all possible
+values of $p$
+
+Note: across the Bayes' theorem, $P(p)$ is a shortcut for $P(p = \pi),\forall\pi\in[0,1]$ (or rather
+$P(\pi_1\leq p \leq\pi_2]),(\pi_1,\pi_2)\in[0,1]^2$ due to the continuous nature of $p$). But since
+we are interested in a posterior distribution of $p$ over the whole $[0,1]$ interval, it is common
+to omit such notation.
+
+### Tool: Beta conjugation
+The Beta distribution, can be used to model the **prior and posterior distributions** of the
+potential values $p$ can take:
+
+* with relevant support for $p \in [0,1]$.
+* The resulting notation is $p \sim Beta(\alpha,\beta)$, where:
+    * $\alpha$ can represent the **number of "successes"**, e.g. heads in the case of the
+    coin-tosses we mentioned, or times an edge is present ($=1$) between two nodes in the case of
+    scans
+    * $\beta$ can represent the **number of "failures"**, e.g. tails in the case of the coin-tosses
+    we mentioned, or times an edge is absent ($=0$) between two nodes in the case of scans.
+    * Knowing the sampling effort $n$, we can deduce $\beta=n-\alpha$ and **only focus on
+    $\alpha$**.
+```{r place_holder6}
+#TODO: schematic Beta distribution for different values of alpha and beta
+```
+
+The Beta distribution is the **conjugate** of the Binomial distribution in Bayesian statistics,
+which means that when using a **Beta distribution as a prior** with a Binomial likelihood, the
+resulting **posterior** probability distribution is **also Beta distributed**, which allows for an
+"iterative" update of our knowledge of the distribution of $p$.
+
+### Determining the posterior distribution of $p$
+Therefore, prior knowledge, like having observed a previous outcome before trying to estimate $p$
+from observations, can be used as a prior to further inform the posterior distribution of $p$:
+
+* The Beta distributed prior is formulated with $\alpha_{prior}$ and $\beta_{prior}$ representing
+previously observed **(pseudo-)counts of "success" and "failures"** (e.g. coming from previously
+published data)
+* We then observe $X=a$ after a sampling effort $n$. The posterior distribution of $p$ is then:
+$$P(p|X=a)=Beta(a+\alpha_{prior},(n-a)+\beta_{prior})$$
+* We can deduce that if we would use this knowledge as a prior distribution in a new experiment:
+    * with $\alpha' = a+\alpha_{prior}$ and $\beta' = n-a+\beta_{prior}$
+    * and observing $X=a_{new}$ after $n_{new}$ trials
+$$P(p|X=a_{new})=Beta(a_{new}+\alpha',(n_{new}-a_{new})+\beta')=Beta(a_{new}+a+\alpha_{prior},(n_{new}+n)-(a_{new}+a)+\beta_{prior})$$
+    where $a_{new}+a$ is the total number of successes, $(n_{new}+n)$ the total sampling effort, and
+    $\alpha_{prior}$ and $\beta_{prior}$ the original Beta prior parameters
+
+```{r place_holder7}
+#TODO: schematic Bayesian inference combining prior + observation to form the posterior
+```
+
+But what about when we _don't_ have prior knowledge on $p$?
+
+* Different $\alpha_{prior}$ and $\beta_{prior}$ can then be used as **uninformative priors** to end
+up with a posterior distribution of $p$ that is **mostly driven by the observations**. Arguing in
+favor of a choice of $\alpha_{prior}$ and $\beta_{prior}$ is beyond our scope, but two are commonly
+used:
+    * $\alpha_{prior} = \beta_{prior} = 1$, and therefore $Beta(1,1)$, is equivalent to a uniform
+    distribution for $p$ over $[0,1]$
+    * $\alpha_{prior} = \beta_{prior} = \frac{1}{2}$, and therefore $Beta(\frac{1}{2},\frac{1}{2})$,
+    is called [Jeffrey's
+    prior](https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Jeffreys_interval),
+    a widely used non-informative prior in Bayesian statistics
+    * Both result in a **symmetric prior**, and their influence is quickly minor as $n$ increases
+
+```{r place_holder8}
+#TODO: schematic Uninformative Beta priors
+```
+
+We now obtained a posterior distribution of $p$ that best reflects our current knowledge of $p$ by
+combining our prior knowledge and updated it in view of observing $X=a$.
+
+### Example application of Bayesian inference on $p$
+Imagine that two individuals have been observed associating 42 times after observing them 60 times:
+
+* If we don't have any prior knowledge, we can use either $\alpha'=\beta'=1$ or
+$\alpha'=\beta'=\frac{1}{2}$ as parameters of our Beta prior distribution. Let's try with both.
+* Bayesian inference therefore indicate that our posterior distribution of $p$ on $[0,1]$ is:
+$$p|X=42 \sim Beta(42+\frac{1}{2},60 - 42+\frac{1}{2})=Beta(42.5,18.5)$$
+$$p|X=42 \sim Beta(42+1,60 - 42+1)=Beta(43,19)$$
+
+In R, `xbeta()` functions like `dbeta()`, `qbeta()` or `rbeta()` from `stats` implements density, quantile and random number generation function related to the Beta distribution. Here is how the distribution looks like:
+```{r beta_exp1}
+library(ggplot2)
+library(cowplot)
+rbind(
+  data.frame(p = seq(0,1,0.001),post = seq(0,1,0.001) |> dbeta(42.5,18.5),prior = "1/2"),
+  data.frame(p = seq(0,1,0.001),post = seq(0,1,0.001) |> dbeta(43,19),prior = " 1 ")
+) |> 
+  ggplot(aes(p,post,colour = prior))+
+  geom_line(aes(lty = prior),size = 1.1)+
+  geom_vline(xintercept = 7/10,lty = "dashed",colour = "grey50")+
+  geom_ribbon(aes(ymin = 0,ymax = post,fill = prior),alpha = 0.2,colour = NA)+
+  geom_point(aes(x = 41.5 / 59,y = -0.1),colour = "tomato")+
+  geom_errorbarh(aes(y = -0.1,xmin = qbeta(0.025,42.5,18.5),xmax = qbeta(0.975,42.5,18.5)),
+                 colour = "tomato",height = 0.2)+
+  geom_point(aes(x = 42 / 60,y = 0.1),colour = "royalblue")+
+  geom_errorbarh(aes(y = 0.1,xmin = qbeta(0.025,43,19),xmax = qbeta(0.975,43,19)),
+                 colour = "royalblue",height = 0.2)+
+  scale_colour_manual(values = c("royalblue","tomato"))+
+  scale_fill_manual(values = c("royalblue","tomato"))+
+  scale_linetype_manual(values = c("2424","2828"))+
+  guides(linetype = "none")+
+  labs(y = "Posterior distributions")+
+  theme_minimal_grid(15)+
+  theme(plot.background = element_rect(fill = 'white', colour = NA))
+```
+
+where the dots + intervals are the modes and $[2.5\%,97.5\%]$ inter-quantile intervals of the two
+posterior distributions, and the dashed vertical grey line represents $\frac{42}{60}$.
+
+It is visible that the choice between either of the two uninformative priors has already little
+impact on the resulting posterior for $n = 60$.
+
+### The impact of sampling effort $n$
+Let's see how the distribution changes for a similar estimation of $p$ but with lower sample
+size $n$, with $X=7$ and $n=10$ ($\frac{42}{60}=\frac{7}{10}=0.7$):
+
+```{r beta_exp2}
+rbind(
+  data.frame(p = seq(0,1,0.001),post = seq(0,1,0.001) |> dbeta(7.5,3.5),prior = "1/2"),
+  data.frame(p = seq(0,1,0.001),post = seq(0,1,0.001) |> dbeta(8,4),prior = " 1 ")
+) |> 
+  ggplot(aes(p,post,colour = prior))+
+  geom_line(aes(lty = prior),size = 1.1)+
+  geom_vline(xintercept = 7/10,lty = "dashed",colour = "grey50")+
+  geom_ribbon(aes(ymin = 0,ymax = post,fill = prior),alpha = 0.2,colour = NA)+
+  geom_point(aes(x = 6.5 / 9,y = -0.05),colour = "tomato")+
+  geom_errorbarh(aes(y = -0.05,xmin = qbeta(0.025,7.5,3.5),xmax = qbeta(0.975,7.5,3.5)),
+                 colour = "tomato",height = 0.1)+
+  geom_point(aes(x = 7 / 10,y = 0.05),colour = "royalblue")+
+  geom_errorbarh(aes(y = 0.05,xmin = qbeta(0.025,8,4),xmax = qbeta(0.975,8,4)),
+                 colour = "royalblue",height = 0.1)+
+  scale_colour_manual(values = c("royalblue","tomato"))+
+  scale_fill_manual(values = c("royalblue","tomato"))+
+  scale_linetype_manual(values = c("2424","2828"))+
+  guides(linetype = "none")+
+  labs(y = "Posterior distributions")+
+  theme_minimal_grid(15)+
+  theme(plot.background = element_rect(fill = 'white', colour = NA))
+```
+
+The posterior distributions are wider, and at such low sampling effort, a larger difference is
+observed between using one uninformative prior or the other.
+
+## Simulating scans after inferring $p$
+But how to _use_ this inferred distribution of $p$? What value of $p$ to use when randomly
+simulating if an edge should be $0$ or $1$, while still reflecting the gained knowledge on the
+**confidence/uncertainty of $p$**?
+
+As seen in the previous examples, with a uniform prior $Beta(1,1)$, the mode of the posterior
+distribution is for $p=\frac{a}{n}$, and that using Jeffrey's prior leads to posterior converging to
+similar posterior distributions when $n$ increases. Simply using the mode does not reflect the
+confidence/uncertainty, or in other words, how wide/narrow around $\frac{a}{n}$ is the posterior
+distribution of $p$ for different values of $n$, e.g. if comparing $\frac{7}{10}=0.7$ and
+$\frac{42}{60}=0.7$.
+
+### Mixing Beta and Binomial distributions
+We can intuitively see that **a "point" estimate of $p$ might not represent $p$ variability** as
+well as relying on values of $p$ that make **use of the whole posterior distribution**.
+
+To overcome this issue, we propose here to:
+
+1. draw **a random value** of $p$ from the posterior distribution
+2. draw **all the scans** of the simulation with this random $p$
+3. repeat steps 1.-2. if we need a new simulation.
+
+In other words, we can say that:
+
+1. $p\sim Beta(a+\alpha_{prior},n-a+\beta_{prior})$
+2. $\forall x_{simu,i},x_{simu,i} \sim Binomial(n_{simu},p),i \in [\![1,n_{simu}]\!]$
+3. and later obtain $X_{simu}=\Sigma x_{simu,i}$
+
+This process is by definition a 
+[**Beta-Binomial process**](https://en.wikipedia.org/wiki/Beta-binomial_distribution), with
+$$X_{simu} \sim Beta\!-\!Binomial(a+\alpha_{prior},n-a+\beta_{prior},n_{simu})$$
+
+Note that for a given simulation of $n_{simu}$ scans, we draw **a single random $p$** because,
+compared to only drawing a single value of $p$ **before each scan**, this adds additional variance
+to $X_{simu}$, which comes from the **combination of the uncertainty over $p$**, and the added
+**variability from sampling new data**. See [this post on
+StackOverflow](https://stats.stackexchange.com/q/105908) for more details on the difference between
+these two processes.
+
+### Why not simply drawing ege weights from a Beta-Binomial distribution?
+`SimuNet` aims at simulating a sequence of **binary** scans, for which each edge is either 0 or 1.
+This is because we believe that phenomenon or manipulations can happen at **any of these binary
+scans**, with potential impact on network metrics of interest after aggregating these binary scans
+into edge weights.
+
+For instance, missing an edge during sampling - e.g. two individuals are not visible, and it is not
+possible to assess if the individuals are associating/interacting or not, i.e. that the edge between
+them is 0 or 1 - happens or not **during a single scan**.
+
+Simulating sequences of binary scans allows **designing and performing** network manipulations
+**more flexibly** at a "granular" level, in comparison of obtaining directly an integer for the edge
+weight.
+
+`SimuNet` keeps track as much as possible of the **"intermediate" steps leading to a weighted
+network**, especially through the use of an attribute list `attrs`. This way, we hope that `SimuNet`
+can be **used and adapted to generate varied network simulations**.
+```{r place_holder9}
+#TODO: schematic comparison drawing edges from Beta-Binomial vs SimuNet's step-by-step approach
+```
