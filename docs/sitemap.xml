@@ -22,6 +22,9 @@
     <loc>https://r-kenk.github.io/SimuNet//reference/attrs.html</loc>
   </url>
   <url>
+    <loc>https://r-kenk.github.io/SimuNet//reference/convert_to_igraph.html</loc>
+  </url>
+  <url>
     <loc>https://r-kenk.github.io/SimuNet//reference/copy_attrs_to.html</loc>
   </url>
   <url>
@@ -79,6 +82,12 @@
     <loc>https://r-kenk.github.io/SimuNet//reference/group_sample.html</loc>
   </url>
   <url>
+    <loc>https://r-kenk.github.io/SimuNet//reference/igraph2array.html</loc>
+  </url>
+  <url>
+    <loc>https://r-kenk.github.io/SimuNet//reference/igraph2scanList.html</loc>
+  </url>
+  <url>
     <loc>https://r-kenk.github.io/SimuNet//reference/import_from_asnr.html</loc>
   </url>
   <url>
@@ -124,6 +133,9 @@
     <loc>https://r-kenk.github.io/SimuNet//reference/scale_scans.html</loc>
   </url>
   <url>
+    <loc>https://r-kenk.github.io/SimuNet//reference/scanList2igraph.html</loc>
+  </url>
+  <url>
     <loc>https://r-kenk.github.io/SimuNet//reference/scanList2matList.html</loc>
   </url>
   <url>
@@ -140,6 +152,9 @@
   </url>
   <url>
     <loc>https://r-kenk.github.io/SimuNet//reference/sum_scans.html</loc>
+  </url>
+  <url>
+    <loc>https://r-kenk.github.io/SimuNet//reference/weightedAdj2scanList.html</loc>
   </url>
   <url>
     <loc>https://r-kenk.github.io/SimuNet//articles/articles/bayesian_framework.html</loc>

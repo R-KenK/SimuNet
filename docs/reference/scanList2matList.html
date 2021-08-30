@@ -104,7 +104,7 @@ of the attributes list attrs" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0</span>
       </span>
     </div>
 
@@ -199,7 +199,7 @@ of the attributes list attrs" />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Convert scanList 3D array into list of 2D matrices</h1>
-    <small class="dont-index">Source: <a href='https://github.com/R-KenK/SimuNet/blob/master/R/scanList_matList_conversion.R'><code>R/scanList_matList_conversion.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/R-KenK/SimuNet/blob/master/R/scanList_conversion.R'><code>R/scanList_conversion.R</code></a></small>
     <div class="hidden name"><code>scanList2matList.Rd</code></div>
     </div>
 
@@ -246,7 +246,9 @@ handles attributes list <code>attrs</code></p>
 #&gt; b 0   0 20 36 42
 #&gt; c 0   0  0  5 93
 #&gt; d 0   0  0  0 30
-#&gt; e 0   0  0  0  0</div><div class='input'><span class='va'>mL</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simunet.html'>simunet</a></span><span class='op'>(</span><span class='va'>Adj</span>,<span class='va'>samp.effort</span>,<span class='st'>"upper"</span>,<span class='fl'>10</span><span class='op'>)</span> |&gt; <span class='fu'>scanList2matList</span><span class='op'>(</span><span class='op'>)</span>
+#&gt; e 0   0  0  0  0</div><div class='input'>
+<span class='va'>sL</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simunet.html'>simunet</a></span><span class='op'>(</span><span class='va'>Adj</span>,<span class='va'>samp.effort</span>,<span class='st'>"upper"</span>,<span class='fl'>10</span><span class='op'>)</span>
+<span class='va'>mL</span> <span class='op'>&lt;-</span> <span class='va'>sL</span> |&gt; <span class='fu'>scanList2matList</span><span class='op'>(</span><span class='op'>)</span>
 <span class='va'>mL</span>
 </div><div class='output co'>#&gt; [[1]]
 #&gt; 
@@ -392,7 +394,9 @@ handles attributes list <code>attrs</code></p>
 #&gt; [1] "theoretical" "matList"    
 #&gt; 
 #&gt; 
-#&gt; Hidden attributes: scanList.type raw.scanList Adj samp.effort n.scans mode Adj.subfun edge.Prob</div><div class='input'><span class='va'>mL</span> |&gt; <span class='fu'><a href='matList2scanList.html'>matList2scanList</a></span><span class='op'>(</span><span class='op'>)</span>
+#&gt; Hidden attributes:
+#&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode
+#&gt; Adj.subfun - edge.Prob</div><div class='input'><span class='va'>mL</span> |&gt; <span class='fu'><a href='matList2scanList.html'>matList2scanList</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; 
 #&gt; scan: 1           
 #&gt; a . 1 1 . 1
@@ -420,7 +424,8 @@ handles attributes list <code>attrs</code></p>
 #&gt; 
 #&gt; Hidden attributes:
 #&gt; scanList.type - raw.scanList - Adj - samp.effort - n.scans - mode
-#&gt; Adj.subfun - edge.Prob</div></pre>
+#&gt; Adj.subfun - edge.Prob</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span><span class='op'>(</span><span class='va'>mL</span> |&gt; <span class='fu'><a href='matList2scanList.html'>matList2scanList</a></span><span class='op'>(</span><span class='op'>)</span>,<span class='va'>sL</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] TRUE</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

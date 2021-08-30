@@ -101,7 +101,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.0</span>
       </span>
     </div>
 
@@ -199,9 +199,20 @@
       <small>Source: <a href='https://github.com/R-KenK/SimuNet/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="simunet-development-version" class="section level1">
-<h1 class="page-header" data-toc-text="development version">
-<a href="#simunet-development-version" class="anchor"></a>SimuNet (development version)</h1>
+    <div id="simunet-230" class="section level1">
+<h1 class="page-header" data-toc-text="2.3.0">
+<a href="#simunet-230" class="anchor"></a>SimuNet 2.3.0</h1>
+<ul>
+<li>Added <code><a href="../reference/scanList2igraph.html">scanList2igraph()</a></code> and <code><a href="../reference/igraph2scanList.html">igraph2scanList()</a></code> conversion functions:
+<ul>
+<li>does what their names implies</li>
+<li>but also carries over the <code>attrs</code> attributes list</li>
+</ul>
+</li>
+<li>Added <code>weightedAdj()</code> to convert back a <code>weightedAdj</code> <code>scanList</code> to its 3D binary array form.</li>
+<li>
+<code><a href="../reference/copy_attrs_to.html">copy_attrs_to()</a></code>: added an option to by-pass class modifications. If <code>copy.class</code> is set to <code>FALSE</code>, only <code>attrs</code> attribute is copied.</li>
+</ul>
 </div>
     <div id="simunet-221" class="section level1">
 <h1 class="page-header" data-toc-text="2.2.1">
