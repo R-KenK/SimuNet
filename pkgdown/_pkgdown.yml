@@ -33,10 +33,10 @@ reference:
     desc: Interact with some specificities of SimuNet classes of objects
     contents:
       - '`attrs`'
-      - '`matList2scanList`'
       - '`scanList2matList`'
-      - '`igraph2scanList`'
+      - '`matList2scanList`'
       - '`scanList2igraph`'
+      - '`igraph2scanList`'
       - '`weightedAdj2scanList`'
       - '`sLapply`'
       - '`sLlapply`'

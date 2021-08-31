@@ -151,10 +151,10 @@
 
     
     
-<div id="mathemtatical-framework" class="section level2">
+<div id="mathematical-framework" class="section level2">
 <h2 class="hasAnchor">
-<a href="#mathemtatical-framework" class="anchor"></a>Mathemtatical framework</h2>
-<p>A network is particular mathematical object consisting in a set of nodes connected with edges. If the nodes’ indices are used as the row and columns of a matrix, edges’ presences or weights can be represented by numbers populating this thus-called <strong>adjacency matrix</strong>.</p>
+<a href="#mathematical-framework" class="anchor"></a>Mathematical framework</h2>
+<p>A network is a particular mathematical object consisting in a set of nodes connected with edges. If the nodes’ indices are used as the row and columns of a matrix, edges’ presences or weights can be represented by numbers populating this thus-called <strong>adjacency matrix</strong>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># TODO: illustrate a binary network/matrix</span></code></pre></div>
 <p><code>SimuNet</code> internally represents networks as adjacency matrices, shortened in variable names as <code>Adj</code>. Various methods and functions can be used to convert such matrices into R objects more dedicated to representing network objects, e.g. the <a href="https://igraph.org/r/"><code>igraph</code></a> package relying on <code><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">igraph::graph_from_adjacency_matrix()</a></code> (or the shorter <code><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">igraph::graph.adjacency()</a></code>) to convert matrices into igraph network objects.</p>

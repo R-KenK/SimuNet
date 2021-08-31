@@ -9,8 +9,8 @@ knitr::opts_chunk$set(
 )
 ```
 
-## Mathemtatical framework
-A network is particular mathematical object consisting in a set of nodes connected with edges. If
+## Mathematical framework
+A network is a particular mathematical object consisting in a set of nodes connected with edges. If
 the nodes' indices are used as the row and columns of a matrix, edges' presences or weights can be
 represented by numbers populating this thus-called **adjacency matrix**.
 
