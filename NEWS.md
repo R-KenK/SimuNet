@@ -1,3 +1,6 @@
+# SimuNet 2.3.1
+* Releasing to Zenodo
+
 # SimuNet 2.3.0
 * Added `scanList2igraph()` and `igraph2scanList()` conversion functions:
     * does what their names implies
