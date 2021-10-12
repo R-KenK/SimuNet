@@ -40,8 +40,7 @@
 #'
 #' # Adjacency matrix import
 #' ## random directed adjacency matrix
-#' Adj <- sample(1:samp.effort,n * n) |>
-#'   matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
+#' Adj <- matrix(sample(1:samp.effort,n * n),nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
 #' diag(Adj) <- 0L
 #' Adj
 #'
@@ -78,7 +77,7 @@ sum_scans.scanList <- function(scan.list,which = c("auto","theoretical","raw"),.
   summed <- rowSums(scan.list,na.rm = TRUE,dims = 2L)
   summed <- copy_attrs_to(sL.ori,summed)
   attrs(summed,"summed.scanList") <- without_attrs(sL.ori)
-  attrs(summed,"sampled") <- scan.list |> count_nonNA()
+  attrs(summed,"sampled") <- count_nonNA(scan.list)
   class(summed) <- c("weightedAdj",class(scan.list))
   summed
 }
@@ -171,9 +170,7 @@ scale_scans.weightedAdj <- function(scan.list,...) {
 #' @export
 #' @noRd
 scale_scans.scanList <- function(scan.list,...) {
-  scan.list |>
-    sum_scans() |>
-    scale_scans()
+  scale_scans(sum_scans(scan.list))
 }
 
 #' scale_scans method for `empirical` (`scanList`) objects
@@ -239,8 +236,8 @@ count_NA <- function(scan.list,...) {
 #' @noRd
 count_NA.scanList <- function(scan.list,...) {
   sf <- attrs(scan.list,"Adj.subfun")
-  scan.sampled <- scan.list |> is.na() |> ifelse(1L,0L) %>% copy_attrs_to(from = scan.list)
-  scan.sampled <- scan.sampled |> rowSums(na.rm = TRUE,dims = 2L)
+  scan.sampled <-  copy_attrs_to(from = scan.list,ifelse(is.na(scan.list),1L,0L))
+  scan.sampled <- rowSums(scan.sampled,na.rm = TRUE,dims = 2L)
   scan.sampled[!sf(scan.sampled)] <- 0L
   scan.sampled <- copy_attrs_to(scan.list,scan.sampled)
   class(scan.sampled) <- c("weightedAdj",class(scan.list))
@@ -312,8 +309,8 @@ count_nonNA <- function(scan.list,...) {
 #' @noRd
 count_nonNA.scanList <- function(scan.list,...) {
   sf <- attrs(scan.list,"Adj.subfun")
-  scan.sampled <- scan.list |> is.na() |> ifelse(0L,1L) %>% copy_attrs_to(from = scan.list)
-  scan.sampled <- scan.sampled |> rowSums(na.rm = TRUE,dims = 2L)
+  scan.sampled <- copy_attrs_to(from = scan.list,to = ifelse(is.na(scan.list),0L,1L))
+  scan.sampled <- rowSums(scan.sampled,na.rm = TRUE,dims = 2L)
   scan.sampled[!sf(scan.sampled)] <- 0L
   scan.sampled <- copy_attrs_to(scan.list,scan.sampled)
   class(scan.sampled) <- c("weightedAdj",class(scan.list))
@@ -472,14 +469,9 @@ remove_mostPeripheral <- function(scan.list,...) {
 remove_mostPeripheral.scanList <- function(scan.list,...) {
   mode <- attrs(scan.list,"mode")
   directed <- switch(mode,"directed" = TRUE,FALSE)
-  scan.list |>
-    sum_scans() |>
-    igraph::graph.adjacency(weighted = TRUE) |>
-    igraph::eigen_centrality(directed = directed) %>%
-    .$vector |>
-    which.min() %>%
-    {scan.list[-c(.),-c(.),]} |>
-    copy_attrs_to(from = scan.list)
+  G <- igraph::graph.adjacency(sum_scans(scan.list),weighted = TRUE)
+  m <- which.min(igraph::eigen_centrality(G,directed = directed)$vector)
+  copy_attrs_to(from = scan.list,to = scan.list[-c(m),-c(m),])
 }
 
 #' remove_mostPeripheral method for `sLlist` objects
@@ -541,14 +533,9 @@ remove_mostCentral <- function(scan.list,...) {
 remove_mostCentral.scanList <- function(scan.list,...) {
   mode <- attrs(scan.list,"mode")
   directed <- switch(mode,"directed" = TRUE,FALSE)
-  scan.list |>
-    sum_scans() |>
-    igraph::graph.adjacency(weighted = TRUE) |>
-    igraph::eigen_centrality(directed = directed) %>%
-    .$vector |>
-    which.max() %>%
-    {scan.list[-c(.),-c(.),]} |>
-    copy_attrs_to(from = scan.list)
+  G <- igraph::graph.adjacency(sum_scans(scan.list),weighted = TRUE)
+  m <- which.max(igraph::eigen_centrality(G,directed = directed)$vector)
+  copy_attrs_to(from = scan.list,to = scan.list[-c(m),-c(m),])
 }
 
 #' remove_mostCentral method for `sLlist` objects

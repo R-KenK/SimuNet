@@ -98,7 +98,7 @@ matList2scanList <- function(mat.list) {
 #'
 #' @keywords internal
 array2matList <- function(array.3D) {
-  lapply(1:dim(array.3D)[3],\(s) array.3D[,,s])
+  lapply(1:dim(array.3D)[3],function(s) array.3D[,,s])
 }
 
 #' Convert list of 2D matrices into scanList 3D array
@@ -188,8 +188,7 @@ scanList2igraph <- function(scan.list) {
 #' @keywords internal
 convert_to_igraph <- function(scan.list) {
   mode <- scan.list$mode
-  scan.list |>
-    igraph::graph.adjacency(mode = mode,weighted = TRUE)
+  igraph::graph.adjacency(scan.list,mode = mode,weighted = TRUE)
 }
 
 #' Convert `igraphSN` into `scanList` objects

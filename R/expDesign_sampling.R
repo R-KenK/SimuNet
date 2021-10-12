@@ -108,7 +108,7 @@
 #' ### user-defined functions can also be passed as anonymous functions
 #' focal.fun2 <- design_sampling(method = "focal",sampling = function(Adj) Adj |>
 #'                                    igraph::graph.adjacency(mode = "upper",weighted = TRUE) |>
-#'                                    igraph::eigen_centrality() |> {\(x) x$vector}()
+#'                                    igraph::eigen_centrality() |> {function(x) x$vector}()
 #' )                            # probabilities proportional to nodes' eigen-vector centralities
 #'
 #' # Design and run experiment based on these sampling regime
@@ -136,11 +136,11 @@ design_sampling <- function(method = c("group","focal"),
   samp.type <- determine_sampling_type(method = method,sampling = sampling)
 
   FUN <- switch(method,
-         "group" = \(scan.list) group_sample(scan.list = scan.list,
+         "group" = function(scan.list) group_sample(scan.list = scan.list,
                                              sampling = sampling,
                                              all.sampled = all.sampled
          ),
-         "focal" = \(scan.list) focal_sample(scan.list = scan.list,
+         "focal" = function(scan.list) focal_sample(scan.list = scan.list,
                                              sampling = sampling,
                                              all.sampled = all.sampled
          )
@@ -248,12 +248,9 @@ group_sample <- function(scan.list,sampling = c("constant","matrix","random","fu
 
   groupSampled <-
     sLvapply(scan.list,
-            \(s) {
-              s[sf(s)] <-
-                s[sf(s)] |>
-                {\(x) ifelse(stats::rbinom(x,1L,obs.P[sf(obs.P)]) == 1,x,NA)}()
-              s |>
-                resolve_NA(mode = mode)
+            function(s) {
+              s[sf(s)] <- ifelse(stats::rbinom(s[sf(s)],1L,obs.P[sf(obs.P)]) == 1,s[sf(s)],NA)
+              resolve_NA(s,mode = mode)
             }
     )
 
@@ -398,8 +395,8 @@ draw_focalList<- function(scan.list,sampling = c("even","random","function"),all
 
   # retrieve variables from scan.list
   Adj <- attrs(scan.list,"Adj")
-  n <- Adj |> nrow()
-  node_names <- Adj |> rownames()
+  n <- nrow(Adj)
+  node_names <- rownames(Adj)
   n.scans <- attrs(scan.list,"n.scans")
 
   # shape future focal.list, filling it with NAs
@@ -408,9 +405,8 @@ draw_focalList<- function(scan.list,sampling = c("even","random","function"),all
   switch(sampling,
          # manage the case of an even focal.list
          "even" = {
-           focal.list <-
-             c(rep(1:n,n.scans %/% n),sample(1:n,n.scans %% n)) |>
-             {\(f) f[sample(seq_along(f))]}()
+           l <- c(rep(1:n,n.scans %/% n),sample(1:n,n.scans %% n))
+           focal.list <- l[sample(seq_along(l))]
          },
          # if not even, select at least each each node once, and adjust the rest of the sampling effort needed
          "random" = {
@@ -459,7 +455,7 @@ mask_non.focals <- function(scan.list,focalList) {
   sf <- attrs(scan.list,"Adj.subfun")
 
   vapply(1:dim(scan.list)[3],
-         \(s) {
+         function(s) {
            scan <- scan.list[,,s]
            foc <- focalList[s]
 

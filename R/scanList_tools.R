@@ -105,7 +105,7 @@ generate_empiscanList <- function(scan.list,exp.design) {
 draw_raw_scanList <- function(edge.Prob,n.scans) {
   sL <- vapply(
     1:n.scans,
-    \(s) {
+    function(s) {
       stats::rbinom(edge.Prob$P,1L,edge.Prob$P)
     },edge.Prob$Adj
   )
@@ -262,14 +262,16 @@ copy_attrs_to <- function(from,to,copy.class = TRUE) {
 #' Adj
 #'
 #' sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L)
-#' sL |> sLapply(\(scan) {scan[1,2] <- NA;scan})
+#' sL |> sLapply(function(scan) {scan[1,2] <- NA;scan})
 sLapply <- function(sL,FUN,...) {
   sL.ori <- sL
   sL <-
-    lapply(
-      X = 1:(dim(sL)[3]),
-      FUN = function(x) FUN(sL[,,x],...)
-    ) |> matList2array()
+    matList2array(
+      lapply(
+        X = 1:(dim(sL)[3]),
+        FUN = function(x) FUN(sL[,,x],...)
+      )
+    )
   sL <- copy_attrs_to(sL.ori,sL)
   sL
 }
@@ -301,7 +303,7 @@ sLapply <- function(sL,FUN,...) {
 #' Adj
 #'
 #' sL <- simunet(Adj = Adj,samp.effort = samp.effort,mode = "upper",n.scans = 120L)
-#' sL |> sLvapply(\(scan) {scan[1,2] <- NA;scan})
+#' sL |> sLvapply(function(scan) {scan[1,2] <- NA;scan})
 sLvapply <- function(sL,.f,...,USE.NAMES = TRUE) {
   sL.ori <- sL
   sL <-
@@ -442,7 +444,7 @@ print.edgeProb <- function(x,...) {
 #' @export
 #' @noRd
 print.edgeProbMat <- function(x,digits = 3,...) {
-  to.print <- x |> round(digits = digits)
+  to.print <- round(x,digits = digits)
   class(to.print) <- NULL
   print_clean_scan(to.print,"Edge presence probability matrix",...)
   format_attributes(x,...)
@@ -453,7 +455,7 @@ print.edgeProbMat <- function(x,digits = 3,...) {
 #' @export
 #' @noRd
 print.scaled <- function(x,digits = 3,...) {
-  to.print <- without_attrs(x) |> round(digits = digits)
+  to.print <- round(without_attrs(x),digits = digits)
   class(to.print) <- NULL
   print_clean_scan(to.print,"Scaled weighted adjacency matrix",...)
   format_attributes(x,...)
@@ -476,7 +478,7 @@ print_sLarray <- function(sL,...) {
     scan.ind <- choose_scan_to_print(sL)
     truncated <- attr(scan.ind,"truncated")
     # prints all but the last
-    lapply(scan.ind,\(s) print_clean_scan(sL[,,s],s,...))
+    lapply(scan.ind,function(s) print_clean_scan(sL[,,s],s,...))
     if (truncated) cat("\n... (",dim(sL)[3] - 3," more scans)\n")
     print_clean_scan(sL[,,dim(sL)[3]],dim(sL)[3],...)
   }
@@ -525,9 +527,8 @@ print_clean_scan <- function(mat,s,
     cat("\n",s,sep = "")
   m <- mat
   class(m) <- NULL
-  methods::as(m,"dgCMatrix") |>
-    Matrix::printSpMatrix(col.names = col.names,note.dropping.colnames = note.dropping.colnames,
-                          ...)
+  Matrix::printSpMatrix(methods::as(m,"dgCMatrix"),col.names = col.names,
+                        note.dropping.colnames = note.dropping.colnames,...)
   invisible(mat)
 }
 
@@ -540,9 +541,7 @@ print_clean_scan <- function(mat,s,
 format_attributes <- function(x,...) {
   if (!is.null(get_attrs(x))) {
     attrs.names <-
-      get_attrs(x) |>
-      names() |>
-      split_returnCarriage_attributes()
+      split_returnCarriage_attributes(names(get_attrs(x)))
     cat("\n\nHidden attributes:\n",attrs.names,"\n",sep = "")
   }
   if (inherits(x,"edgeProbMat")) {
@@ -559,7 +558,7 @@ format_attributes <- function(x,...) {
 #'
 #' @noRd
 split_returnCarriage_attributes <- function(attrs.names,n.attrs = 6) {
-  split(attrs.names, ceiling(seq_along(attrs.names) / n.attrs)) |>
-    lapply(paste,collapse = " - ") %>%
-    {do.call(paste,list(.,collapse = "\n"))}
+  l <- split(attrs.names, ceiling(seq_along(attrs.names) / n.attrs))
+  l <- lapply(l,paste,collapse = " - ")
+  do.call(paste,list(l,collapse = "\n"))
 }

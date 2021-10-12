@@ -18,12 +18,12 @@ resolve_NA <- function(scan.list,mode = c("directed", "undirected", "max","min",
   else mode <- match.arg(mode)
   switch(mode,
          "undirected" = , # as in `igraph`, consider this mode to be the same as `max`
-         "max" = scan.list |>
-           {\(x) ifelse(is.na(x) | is.na(t(x)),ifelse(x == 1 | t(x) == 1,1L,NA),x)}(),
-         "min" = scan.list |>
-           {\(x) ifelse(is.na(x) | is.na(t(x)),ifelse(x == 0 | t(x) == 0,0L,NA),x)}(),
-         "plus" = scan.list |>
-           {\(x) ifelse(is.na(x) | is.na(t(x)),as.integer(NA),x)}(),  # WHAT DOES THIS MEAN FOR BINARY SCANS?
+         "max" = ifelse(is.na(scan.list) | is.na(t(scan.list)),
+                        ifelse(scan.list == 1 | t(scan.list) == 1,1L,NA),scan.list),
+         "min" = ifelse(is.na(scan.list) | is.na(t(scan.list)),
+                        ifelse(scan.list == 0 | t(scan.list) == 0,0L,NA),scan.list),
+         "plus" = ifelse(is.na(scan.list) | is.na(t(scan.list)),
+                         as.integer(NA),scan.list),  # WHAT DOES THIS MEAN FOR BINARY SCANS?
          "directed" = ,
          "upper" = ,
          "lower" =  ,

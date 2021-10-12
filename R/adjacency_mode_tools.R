@@ -45,14 +45,11 @@ apply_mode <-
   function(raw.scanList,
            mode = c("directed", "undirected", "max","min", "upper", "lower", "plus","vector")){
     switch(mode,
-           "undirected" = , # as in `igraph`, consider this mode to be the same as `max`
-           "max" = raw.scanList |>
-             {\(x) ifelse(x >= t(x),x,t(x))}(),
-           "min" = raw.scanList |>
-             {\(x) ifelse(x <= t(x),x,t(x))}(),
+           "undirected" = , # as in `igraph`, consider this mode to be the same as `maraw.scanList`
+           "maraw.scanList" = ifelse(raw.scanList >= t(raw.scanList),raw.scanList,t(raw.scanList)),
+           "min" = ifelse(raw.scanList <= t(raw.scanList),raw.scanList,t(raw.scanList)),
            "plus" = {  # WHAT DOES THIS MEAN FOR BINARY SCANS?
-             !is.na(raw.scanList) & !is.na(t(raw.scanList)) |>
-               ifelse(raw.scanList,t(raw.scanList))
+             ifelse(!is.na(raw.scanList) & !is.na(t(raw.scanList)),raw.scanList,t(raw.scanList))
            },
            "directed" = ,
            "upper" = ,

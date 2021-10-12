@@ -121,8 +121,8 @@ determine_edgeProb <- function(Adj = NULL,mode = NULL,samp.effort = NULL,edge.Pr
 #'
 #' # Adjacency matrix import
 #' ## random directed adjacency matrix
-#' Adj <- sample(1:samp.effort,n * n) |>
-#'   matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
+#' Adj <- matrix(sample(1:samp.effort,n * n),
+#'   nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
 #' diag(Adj) <- 0L
 #' Adj
 #'
@@ -136,8 +136,11 @@ draw_edgeProb <- function(Adj,samp.effort,
   if (samp.effort < max(Adj)) {stop("samp.effort provided incompatible with the maximum value found in the provided adjacency matrix.")}
   P <- Adj
   P[Adj.subfun(P)] <-
-    Adj[Adj.subfun(Adj)] |>
-    {\(x) stats::rbeta(length(x),shape1 = x + alpha.prior,shape2 = samp.effort - x + beta.prior)}()
+    stats::rbeta(
+      length(Adj[Adj.subfun(Adj)]),
+      shape1 = Adj[Adj.subfun(Adj)] + alpha.prior,
+      shape2 = samp.effort - Adj[Adj.subfun(Adj)] + beta.prior
+    )
   class(P) <- c("edgeProbMat","weightedAdj")
   attr(P,"Beta priors") <- c(alpha.prior,beta.prior)
   P

@@ -110,7 +110,7 @@ design_exp <- function(...,.dir = c("forward", "backward")) {
 
   named.list <- do.call(namedList,dots.fun)
   # return(named.list)
-  FUN.seq <- do.call(\(...) purrr::compose(...,.dir = .dir),dots.fun)
+  FUN.seq <- do.call(function(...) purrr::compose(...,.dir = .dir),dots.fun)
   generate_expDesign(FUN.seq = FUN.seq,
                      fun.input = named.list,
                      input = dots.call
@@ -128,8 +128,7 @@ design_exp <- function(...,.dir = c("forward", "backward")) {
 replace_expDesign_by_funs <- function(...) {
   dots.call <- as.list(substitute(...()))
   dots.content <- list(...)
-  is.expDesign <- dots.content |>
-    sapply(inherits,what = "expDesign")
+  is.expDesign <- sapply(dots.content,inherits,what = "expDesign")
   if (any(is.expDesign)) {
     dots.call[is.expDesign] <-
       lapply(dots.content[is.expDesign],"[[","input")
@@ -224,7 +223,7 @@ perform_exp <- function(scan.list,exp.design = NULL,...){
     generate_empiscanList(scan.list,exp.design)
   } else {
     expD.list <- list(exp.design,...)
-    sL.list <- lapply(expD.list,\(expD) generate_empiscanList(scan.list = scan.list,exp.design = expD))
+    sL.list <- lapply(expD.list,function(expD) generate_empiscanList(scan.list = scan.list,exp.design = expD))
     class(sL.list) <- "sLlist"
     sL.list
   }
@@ -280,8 +279,8 @@ namedList <- function(...) {
 #' @noRd
 rename_sampling <- function(nm,...) {
   L <- list(...)
-  is.sampling <- sapply(L,\(fn) !is.null(attr(fn,"FUN.names")))
-  nm[is.sampling] <- sapply(L[is.sampling],\(fn) attr(fn,"FUN.names"))
+  is.sampling <- sapply(L,function(fn) !is.null(attr(fn,"FUN.names")))
+  nm[is.sampling] <- sapply(L[is.sampling],function(fn) attr(fn,"FUN.names"))
   nm
 }
 
@@ -312,10 +311,11 @@ print.expDesign <- function(x,...) {
 #' Format function sequence names
 #' @noRd
 format_FUN.names <- function(FUN.names) {
-  paste0(FUN.names," ->") |>
-    paste(collapse = "\n ") %>%
+  cat(
     c("Theoretical scanList ->\n ------------\n ",
-      .,
-      "\n ------------\n empirical scanList\n") |>
-    cat(sep = "")
+      paste(paste0(FUN.names," ->"),collapse = "\n "),
+      "\n ------------\n empirical scanList\n"
+    ),
+    sep = ""
+  )
 }

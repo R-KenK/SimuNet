@@ -153,12 +153,11 @@ simunet <- function(Adj = NULL,
 ) {
   mode <- match.arg(mode)
 
-  scan.list <-
-    determine_edgeProb(Adj = Adj,
-                       mode = mode,
-                       samp.effort = samp.effort,
-                       edge.Prob = edge.Prob) |>
-    generate_scanList(n.scans = n.scans)
+  eP <- determine_edgeProb(Adj = Adj,
+                     mode = mode,
+                     samp.effort = samp.effort,
+                     edge.Prob = edge.Prob)
+  scan.list <- generate_scanList(eP,n.scans = n.scans)
 
   perform_exp(scan.list = scan.list,exp.design = exp.design,...)
 }
