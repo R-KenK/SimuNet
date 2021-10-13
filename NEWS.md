@@ -1,3 +1,7 @@
+# SimuNet 2.4.0
+* Removed used of `|>` and `\(.)` to bump down from R (>= 4.1) to R (>= 2.10)
+* Cleaned non-script files and folder
+
 # SimuNet 2.3.1
 * Releasing to Zenodo
 
