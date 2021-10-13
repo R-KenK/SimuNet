@@ -133,7 +133,7 @@ focal.fun1 <- design_sampling(method = "focal",sampling = f.fun1)
 ### user-defined functions can also be passed as anonymous functions
 focal.fun2 <- design_sampling(method = "focal",sampling = function(Adj) Adj |>
                                    igraph::graph.adjacency(mode = "upper",weighted = TRUE) |>
-                                   igraph::eigen_centrality() |> {\(x) x$vector}()
+                                   igraph::eigen_centrality() |> {function(x) x$vector}()
 )                            # probabilities proportional to nodes' eigen-vector centralities
 
 # Design and run experiment based on these sampling regime

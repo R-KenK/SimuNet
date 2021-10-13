@@ -69,8 +69,8 @@ samp.effort <- 241L
 
 # Adjacency matrix import
 ## random directed adjacency matrix
-Adj <- sample(1:samp.effort,n * n) |>
-  matrix(nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
+Adj <- matrix(sample(1:samp.effort,n * n),
+  nrow = 5,dimnames = list(letters[1:n],letters[1:n]))
 diag(Adj) <- 0L
 Adj
 
