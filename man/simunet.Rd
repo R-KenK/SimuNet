@@ -11,7 +11,9 @@ simunet(
   n.scans = NULL,
   exp.design = NULL,
   ...,
-  edge.Prob = NULL
+  edge.Prob = NULL,
+  alpha.prior = 0.5,
+  beta.prior = 0.5
 )
 }
 \arguments{
@@ -76,6 +78,12 @@ contain the following components:
 logical matrix with \code{TRUE} values only for matrix cells relevant to the igraph \code{mode.} e.g.
 only the upper triangle for \code{mode = "upper"}
 }}
+
+\item{alpha.prior}{positive numeric scalar, the parameter alpha (added to shape1 in \code{rbeta()})
+used in the prior beta distribution. See \code{\link[stats:Beta]{rbeta()}}}
+
+\item{beta.prior}{positive numeric scalar, the parameter beta (added to shape2 in \code{rbeta()})
+used in the prior beta distribution. See \code{\link[stats:Beta]{rbeta()}}}
 }
 \value{
 a \code{scanList} object, primarily a 3 dimensional array representing the (binary) adjacency

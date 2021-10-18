@@ -4,7 +4,14 @@
 \alias{generate_edgeProb}
 \title{\code{edgeProb} object generator}
 \usage{
-generate_edgeProb(Adj, samp.effort, mode, Adj.subfun = NULL)
+generate_edgeProb(
+  Adj,
+  samp.effort,
+  mode,
+  Adj.subfun = NULL,
+  alpha.prior = 0.5,
+  beta.prior = 0.5
+)
 }
 \arguments{
 \item{Adj}{integer matrix, the adjacency matrix (see \code{\link[=simunet]{simunet()}})}
@@ -15,6 +22,12 @@ generate_edgeProb(Adj, samp.effort, mode, Adj.subfun = NULL)
 
 \item{Adj.subfun}{function, the matrix subsetting function relevant for the adjacency matrix
 \code{mode} (see \code{\link[=simunet]{simunet()}})}
+
+\item{alpha.prior}{positive numeric scalar, the parameter alpha (added to shape1 in \code{rbeta()})
+used in the prior beta distribution. See \code{\link[stats:Beta]{rbeta()}}}
+
+\item{beta.prior}{positive numeric scalar, the parameter beta (added to shape2 in \code{rbeta()})
+used in the prior beta distribution. See \code{\link[stats:Beta]{rbeta()}}}
 }
 \value{
 an \code{edgeProb} object, i.e. a list containing:

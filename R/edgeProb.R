@@ -5,6 +5,10 @@
 #' @param mode character scalar, the network igraph's mode (see [`simunet()`][simunet()])
 #' @param Adj.subfun function, the matrix subsetting function relevant for the adjacency matrix
 #'   `mode` (see [`simunet()`][simunet()])
+#' @param alpha.prior positive numeric scalar, the parameter alpha (added to shape1 in `rbeta()`)
+#'   used in the prior beta distribution. See [`rbeta()`][stats::rbeta()]
+#' @param beta.prior  positive numeric scalar, the parameter beta (added to shape2 in `rbeta()`)
+#'   used in the prior beta distribution. See [`rbeta()`][stats::rbeta()]
 #'
 #' @return an `edgeProb` object, i.e. a list containing:
 #' * `P`: the edge presence probability matrix
@@ -16,8 +20,8 @@
 #' @export
 #'
 #' @keywords internal
-generate_edgeProb <- function(Adj,samp.effort,mode,
-                                  Adj.subfun = NULL){
+generate_edgeProb <- function(Adj,samp.effort,mode,Adj.subfun = NULL,
+                              alpha.prior = 0.5,beta.prior = 0.5){
   Adj[] <- as.integer(Adj)
   class(Adj) <- "weightedAdj"
   if (is.null(Adj.subfun)) {
@@ -25,7 +29,8 @@ generate_edgeProb <- function(Adj,samp.effort,mode,
   }
 
   edge.Prob <- list(
-    P = draw_edgeProb(Adj = Adj,samp.effort = samp.effort,Adj.subfun = Adj.subfun),
+    P = draw_edgeProb(Adj = Adj,samp.effort = samp.effort,Adj.subfun = Adj.subfun,
+                      alpha.prior = alpha.prior,beta.prior = beta.prior),
     Adj = Adj,
     samp.effort = samp.effort,
     mode = mode,
@@ -41,6 +46,10 @@ generate_edgeProb <- function(Adj,samp.effort,mode,
 #' @param mode character scalar, the network igraph's mode (see [`simunet()`][simunet()])
 #' @param samp.effort integer scalar, the sampling effort (see [`simunet()`][simunet()])
 #' @param edge.Prob optional, an `edgeProb` object (see [`generate_edgeProb()`][generate_edgeProb()])
+#' @param alpha.prior positive numeric scalar, the parameter alpha (added to shape1 in `rbeta()`)
+#'   used in the prior beta distribution. See [`rbeta()`][stats::rbeta()]
+#' @param beta.prior  positive numeric scalar, the parameter beta (added to shape2 in `rbeta()`)
+#'   used in the prior beta distribution. See [`rbeta()`][stats::rbeta()]
 #'
 #' @return an `edgeProb` object, i.e. a list containing:
 #' * `P`: the edge presence probability matrix
@@ -49,7 +58,8 @@ generate_edgeProb <- function(Adj,samp.effort,mode,
 #' * `mode`: the inputted `mode`
 #' * `Adj.subfun`: the inputted `Adj.subfun`
 #' @noRd
-determine_edgeProb <- function(Adj = NULL,mode = NULL,samp.effort = NULL,edge.Prob = NULL) {
+determine_edgeProb <- function(Adj = NULL,mode = NULL,samp.effort = NULL,edge.Prob = NULL,
+                               alpha.prior = 0.5,beta.prior = 0.5) {
   if (!is.null(edge.Prob)) {
     if (!is.null(Adj) & !is.null(samp.effort)) {
       stop("Both Adj/samp.effort and edge.Prob have been provided. Please provide either.")
@@ -59,7 +69,8 @@ determine_edgeProb <- function(Adj = NULL,mode = NULL,samp.effort = NULL,edge.Pr
     if (is.null(Adj) | is.null(samp.effort)) {
       stop("Adj or samp.effort missing. Either provide both, or provide an edge.Prob.")
     }
-    generate_edgeProb(Adj = Adj,mode = mode,samp.effort = samp.effort)
+    generate_edgeProb(Adj = Adj,mode = mode,samp.effort = samp.effort,
+                      alpha.prior = alpha.prior,beta.prior = beta.prior)
   }
 }
 
@@ -104,6 +115,10 @@ determine_edgeProb <- function(Adj = NULL,mode = NULL,samp.effort = NULL,edge.Pr
 #' @param beta.prior  positive numeric scalar, the parameter beta (added to shape2 in `rbeta()`)
 #'   used in the prior beta distribution. See [`rbeta()`][stats::rbeta()]
 #' @param samp.effort integer scalar, the sampling effort (see [`simunet()`][simunet()])
+#' @param alpha.prior positive numeric scalar, the parameter alpha (added to shape1 in `rbeta()`)
+#'   used in the prior beta distribution. See [`rbeta()`][stats::rbeta()]
+#' @param beta.prior  positive numeric scalar, the parameter beta (added to shape2 in `rbeta()`)
+#'   used in the prior beta distribution. See [`rbeta()`][stats::rbeta()]
 #'
 #' @return numeric matrix of edge presence probabilities
 #'

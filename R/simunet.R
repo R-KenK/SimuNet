@@ -49,6 +49,10 @@
 #'   * `Adj.subfun`: a matrix function, determined from the igraph `mode` (cf. ), that return a
 #'   logical matrix with `TRUE` values only for matrix cells relevant to the igraph `mode.` e.g.
 #'   only the upper triangle for `mode = "upper"`
+#' @param alpha.prior positive numeric scalar, the parameter alpha (added to shape1 in `rbeta()`)
+#'   used in the prior beta distribution. See [`rbeta()`][stats::rbeta()]
+#' @param beta.prior  positive numeric scalar, the parameter beta (added to shape2 in `rbeta()`)
+#'   used in the prior beta distribution. See [`rbeta()`][stats::rbeta()]
 #'
 #' @return a `scanList` object, primarily a 3 dimensional array representing the (binary) adjacency
 #'   matrices (coded within the first two dimensions of the 3D-array) obtained at each simulated
@@ -149,14 +153,18 @@ simunet <- function(Adj = NULL,
                     n.scans = NULL,
                     exp.design = NULL,
                     ...,
-                    edge.Prob = NULL
+                    edge.Prob = NULL,
+                    alpha.prior = 0.5,
+                    beta.prior = 0.5
 ) {
   mode <- match.arg(mode)
 
   eP <- determine_edgeProb(Adj = Adj,
                      mode = mode,
                      samp.effort = samp.effort,
-                     edge.Prob = edge.Prob)
+                     edge.Prob = edge.Prob,
+                     alpha.prior = alpha.prior,
+                     beta.prior = beta.prior)
   scan.list <- generate_scanList(eP,n.scans = n.scans)
 
   perform_exp(scan.list = scan.list,exp.design = exp.design,...)
