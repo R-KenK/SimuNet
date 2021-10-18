@@ -105,7 +105,7 @@ Written as a S3 method to be applied to scanList or sLlist (list of scanList) ob
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
       </span>
     </div>
 
@@ -257,8 +257,7 @@ not <code>NA</code>). Determined via <code><a href='count_nonNA.html'>count_nonN
 
 <span class='co'># Adjacency matrix import</span>
 <span class='co'>## random directed adjacency matrix</span>
-<span class='va'>Adj</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='va'>samp.effort</span>,<span class='va'>n</span> <span class='op'>*</span> <span class='va'>n</span><span class='op'>)</span> |&gt;
-  <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span>nrow <span class='op'>=</span> <span class='fl'>5</span>,dimnames <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='va'>letters</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='va'>n</span><span class='op'>]</span>,<span class='va'>letters</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='va'>n</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>Adj</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='va'>samp.effort</span>,<span class='va'>n</span> <span class='op'>*</span> <span class='va'>n</span><span class='op'>)</span>,nrow <span class='op'>=</span> <span class='fl'>5</span>,dimnames <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='va'>letters</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='va'>n</span><span class='op'>]</span>,<span class='va'>letters</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='va'>n</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/diag.html'>diag</a></span><span class='op'>(</span><span class='va'>Adj</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='fl'>0L</span>
 <span class='va'>Adj</span>
 </div><div class='output co'>#&gt;     a   b   c   d   e

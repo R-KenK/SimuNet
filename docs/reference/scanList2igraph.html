@@ -104,7 +104,7 @@ handles attributes list attrs" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
       </span>
     </div>
 
@@ -199,7 +199,7 @@ handles attributes list attrs" />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Convert scanList 3D array into <code>igraph</code> object (with <code>attrs</code>)</h1>
-    <small class="dont-index">Source: <a href='https://github.com/R-KenK/SimuNet/blob/master/R/scanList_conversion.R'><code>R/scanList_conversion.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/R-KenK/SimuNet/blob/master/R/scanList_matList_conversion.R'><code>R/scanList_matList_conversion.R</code></a></small>
     <div class="hidden name"><code>scanList2igraph.Rd</code></div>
     </div>
 
@@ -250,9 +250,9 @@ inputted <code>scanList</code></p></li>
 <span class='va'>sL</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simunet.html'>simunet</a></span><span class='op'>(</span><span class='va'>Adj</span>,<span class='va'>samp.effort</span>,<span class='st'>"upper"</span>,<span class='fl'>10</span><span class='op'>)</span>
 <span class='va'>G</span> <span class='op'>&lt;-</span> <span class='va'>sL</span> |&gt; <span class='fu'>scanList2igraph</span><span class='op'>(</span><span class='op'>)</span>
 <span class='va'>G</span>
-</div><div class='output co'>#&gt; IGRAPH 83e16b1 UNW- 5 9 -- 
+</div><div class='output co'>#&gt; IGRAPH c280060 UNW- 5 9 -- 
 #&gt; + attr: name (v/c), weight (e/n)
-#&gt; + edges from 83e16b1 (vertex names):
+#&gt; + edges from c280060 (vertex names):
 #&gt; [1] a--b a--c a--d a--e b--c b--d b--e c--e d--e
 #&gt; 
 #&gt; 

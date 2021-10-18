@@ -103,7 +103,7 @@ scanList object" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimuNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.4.0</span>
       </span>
     </div>
 
@@ -198,7 +198,7 @@ scanList object" />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Convert <code>igraphSN</code> into <code>scanList</code> objects</h1>
-    <small class="dont-index">Source: <a href='https://github.com/R-KenK/SimuNet/blob/master/R/scanList_conversion.R'><code>R/scanList_conversion.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/R-KenK/SimuNet/blob/master/R/scanList_matList_conversion.R'><code>R/scanList_matList_conversion.R</code></a></small>
     <div class="hidden name"><code>igraph2scanList.Rd</code></div>
     </div>
 
@@ -247,9 +247,9 @@ returned</p></td>
 <span class='va'>sL</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simunet.html'>simunet</a></span><span class='op'>(</span><span class='va'>Adj</span>,<span class='va'>samp.effort</span>,<span class='st'>"upper"</span>,<span class='fl'>10</span><span class='op'>)</span>
 <span class='va'>G</span> <span class='op'>&lt;-</span> <span class='va'>sL</span> |&gt; <span class='fu'><a href='scanList2igraph.html'>scanList2igraph</a></span><span class='op'>(</span><span class='op'>)</span>
 <span class='va'>G</span>
-</div><div class='output co'>#&gt; IGRAPH 81c6cdc UNW- 5 9 -- 
+</div><div class='output co'>#&gt; IGRAPH c015008 UNW- 5 9 -- 
 #&gt; + attr: name (v/c), weight (e/n)
-#&gt; + edges from 81c6cdc (vertex names):
+#&gt; + edges from c015008 (vertex names):
 #&gt; [1] a--b a--c a--d a--e b--c b--d b--e c--e d--e
 #&gt; 
 #&gt; 

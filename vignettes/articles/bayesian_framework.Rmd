@@ -41,18 +41,25 @@ weight is then the sum of 1s, we propose that edge weights can be viewed as "bin
 
 * a binomial variable $X \sim Binomial(n,p)$ can be viewed as the sum
 $X = \Sigma x_i, i \in [\![1,n]\!]$ of Bernoulli variables $x_i \sim Bernoulli(p), iid.$
-* Similarly, an edge weight obtained as the sum of binary outcome _could_ be obtained after
-summing binary variables.
+* Similarly, an edge weight obtained as the sum of binary outcome _could_ be obtained after summing
+binary variables.
+* In this article, we use $p$ as the probability of association during a scan for the dyad $ij$,
+with $i$ and $j$ two nodes of the network. However, note that building a network based on
+probabilities of association implies calculating such a probability for _each_ dyad, i.e.
+calculating $p_{ij}, \forall (i,j) \in \{nodes\}^2$, but we chose hereafter to note this probability
+$p$ for a given dyad $ij$ to not overload formulas. This applies to the other variables used 
+($X, a, \alpha,\beta, etc.$) which are also expected to vary across dyads and could have a "$_{ij}$"
+appended.
 
 ```{r place_holder2}
 #TODO: schematic analogy coin-tosses and edge weights
 ```
 
-This however raises questions regarding what differs with a purely binomial process, or requires
-additional assumptions to be met:
+Considering the probabilities of association as binomial variable however raises questions regarding
+what differs with a purely binomial process, or requires additional assumptions to be met:
 
 #### The case of static networks
-Static networks imply several assumption that allows for an easy "Binomial" approach to edge
+Static networks imply several assumption that allows for an easy "binomial" approach to edge
 weights:
 
 1. With a binomial variable, $p$ is considered **constant**: we argue that when constructing
@@ -70,7 +77,7 @@ interested in how the networks are generated.
 ```
 
 #### The case of dynamic networks
-Considering dynamic networks, such a Binomial approach could still hold under the assumption that
+Considering dynamic networks, such a "binomial" approach could still hold under the assumption that
 $p$ would be variable through time:
 
 3. Despite the many temporal or temporally-dependent drivers of two individuals associating, at the
@@ -84,7 +91,7 @@ $p$, to therefore simulate dynamic networks
 
 5. Edge weights in _social_ networks usually quantify the relationship/proximity between two
 nodes. Under this "binomial" approach, an edge weight would more precisely quantify (or be
-proportional to) **the probability that a pair of node is associated** during each scan/segment
+proportional to) **the probability that the pair of node is associated** during each scan/segment
 of time. $p$ would be the resulting and estimable probability of association, probability that
 can result from the combination of many cognitive and social processes like kin preference,
 personality, etc. No assumption are required in how such $p$ emerges, but sampling to build
@@ -115,8 +122,10 @@ on the subject.
 
 It is however illusory to believe that we can find **a single value** that reflects both our **best
 estimation** of $p$ (a **positional** aspect of $p$) and our **confidence/certainty** in this
-estimation. Intuitively, we also need a notion of spread around our estimation, either in the form
-of a confidence/credible interval, or even better, a distribution of $p$ on $[0,1]$.
+estimation (cf. the [Bias-Variance
+tradeoff](https://en.wikipedia.org/wiki/Bias%E2%80%93variance_tradeoff)). Intuitively, we also need
+a notion of spread around our estimation, either in the form of a confidence/credible interval, or
+even better, a distribution of $p$ on $[0,1]$.
 
 Such a distribution of $p$ should:
 

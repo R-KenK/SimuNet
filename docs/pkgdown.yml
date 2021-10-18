@@ -1,4 +1,4 @@
-pandoc: 2.11.4
+pandoc: 2.14.2
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
@@ -10,7 +10,7 @@ articles:
   articles/sampling: sampling.html
   articles/SimuNet: SimuNet.html
   articles/uncertainty: uncertainty.html
-last_built: 2021-09-27T20:07Z
+last_built: 2021-10-18T02:54Z
 urls:
   reference: https://r-kenk.github.io/SimuNet//reference
   article: https://r-kenk.github.io/SimuNet//articles
