@@ -13,10 +13,10 @@ n.each <- 49L
 ### Running the simulations ----
 param.n <-
   #seq(6,30,by = 3)
-  c(5,8,10,15,20)[c(1,3)]
+  c(5,8,10,15,20)
 param.samp.eff <-
   # seq(20,500,by = 20)
-  c(10,25,50,75,100,150,250,500)[c(4,5)]
+  c(10,25,50,75,100,150,250,500)
 
 param.netgen <-
   list(
@@ -34,13 +34,34 @@ param.list <-
   )[group.number <= 2 & group.rep <= 28]
 param.list[]
 
-### Exporting objects to parallel workers ----
-cl <- prepare_clusters(7,param.list)
-results <- copy(param.list)
+### Running simulations ----
 start.time <- Sys.time()
 start.time
-results <- run_simulations(results,n.steps = 3)
-results <- aggregate_edgeDT(results,cl = cl,n.steps = 2)
+param.list <- run_simulations(param.list,n.cores = 7)
+end.time <- Sys.time()
+end.time
+end.time - start.time
+param.list
+
+aggregate_edgeDT(param.list,n.cores = 7)
+
+arrow::open_dataset(".WIP/simulation.data/edgeDTtest/") |>
+  pull(group.rep) |> unique() |> sort()
+
+arrow::open_dataset(".WIP/simulation.data/edgeDT/") |>
+  group_by(n,samp.eff,group.number,group.rep) |>
+  collect() |>
+  count(name = "nrow") |>
+  group_by(n,nrow) |>
+  count(name = "m")
+
+arrow::open_dataset(".WIP/simulation.data/edgeDTtest/") |>
+  group_by(n,samp.eff,group.number,group.rep) |>
+  collect() |>
+  count(name = "nrow") |>
+  group_by(n,nrow) |>
+  count(name = "m")
+
 results <- prepare_for_distances(results)
 
 snow::clusterCall(cl,\() {rm(results, pos = globalenv()); gc()})
@@ -51,13 +72,240 @@ results <- measure_all_distances(results,cl = cl)
 end.time <- Sys.time()
 end.time
 end.time - start.time
-
+snow::stopCluster(cl);rm(cl)
 results
 
+# saveRDS(results,".WIP/simulation.data/results.GWC.n_8.10.15.seff_75.100.150.rds")
 
-saveRDS(results,".WIP/simulation.data/results.GWC.n_8.10.15.seff_75.100.150.rds")
+# Results wrangling ----
+## Aggregate RDS files ----
+filepaths <- list.files(".WIP/simulation.data/",pattern = "GWC",full.names = TRUE)
 
-results <- readRDS(".WIP/simulation.data/")
+## Aggregating edge.distances.dt ----
+cl <- snow::makeCluster(7)
+snow::clusterExport(cl,list("filepaths","get_from_RDS"))
+edge.distances.dt <- pbapply::pblapply(filepaths,get_from_RDS,dt.name = "edge.distances.dt",cl = cl) |>
+  rbindlist(use.names = TRUE)
+snow::stopCluster(cl);rm(cl)
+
+## Saving in optimal file type ----
+edge.distances.dt |>
+  arrow::write_dataset(
+    path = ".WIP/simulation.data/edgeDistanceDT/",
+    format = "parquet",
+    partitioning = c("n")
+  )
+
+## Retrieving from optimal file type ----
+col.labs <- c(
+  "Itself (expected null distance)",
+  "SimuNet",
+  "another network (similar generation)",
+  "an Erdős–Rényi graph (p = 0.5)",
+  "a Random network (fixed prob.)",
+  "a Random network (variable prob.)"
+)
+
+arrow::open_dataset(sources = ".WIP/simulation.data/edgeDistanceDT/") |>
+  select(n, samp.eff, group.number, reference, type, i, j, KL) |>
+  group_by(n, samp.eff, group.number, reference, type) |>
+  summarise(
+    KL = mean(KL),
+    inf   = quantile(KL, probs = 0.25),
+    sup   = quantile(KL, probs = 0.75)
+  ) |>
+  collect() |>
+  subset(reference == "real") |>
+  mutate(linet = ifelse(type %in% c("real.bis","SimuNet"),"dashed",NA)) |>
+  mutate(alph = ifelse(type %in% c("real.bis","SimuNet"),"1","2")) |>
+  ggplot(aes(samp.eff,KL,colour = type,fill = type))+
+  facet_grid(paste0("repeatition n°",group.number) ~ paste0("n = ",n))+
+  geom_ribbon(aes(ymin = inf,ymax = sup,lty = linet,alpha = alph))+
+  geom_line()+
+  geom_point()+
+  scale_fill_manual(labels = col.labs,values = c("tomato","royalblue",gg_color_hue(7)[2:5]))+
+  scale_colour_manual(labels = col.labs,values = c("tomato","royalblue",gg_color_hue(7)[2:5]))+
+  scale_linetype_manual(values = c("dotted"))+
+  scale_alpha_manual(values = c(.3,.1))+
+  geom_vline(xintercept = 0,colour = "black")+
+  geom_hline(yintercept = 0,colour = "black")+
+  scale_x_continuous(expand = c(0,NA))+
+  scale_y_continuous(expand = c(0,NA))+
+  guides(linetype = "none",alpha = "none")+
+  xlab("Sampling effort")+ylab("Kullback-Leibler divergence")+
+  labs(colour = "Real network compared to...",fill = "Real network compared to...")+
+  theme_minimal(14)+theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank())
+
+## Aggregating edge.dt: too big in a single data.table... ----
+source(".WIP/experiments_on_modelling_networks_generated_by_complex_processes_tools.R")
+filepaths <-
+  list.files(".WIP/simulation.data/",pattern = "GWC",full.names = TRUE) |>
+  grep(pattern = "20_",value = TRUE)
+
+cl <- snow::makeCluster(min(7,length(filepaths)))
+snow::clusterExport(cl,list("filepaths","get_from_RDS"))
+edge.dt <-
+  pbapply::pblapply(filepaths,get_from_RDS,dt.name = "edge.dt",cl = cl) |>
+  rbindlist(use.names = TRUE) |>
+  subset(n == 20)
+snow::stopCluster(cl);rm(cl);gc()
+
+## Saving in optimal file type ----
+arrow::write_parquet(edge.dt,sink = ".WIP/simulation.data/parquet/edge.dt.n_20.parquet")
+rm(edge.dt);gc()
+
+## Retrieving from optimal file type ----
+edge.dt <- arrow::read_parquet(file = ".WIP/simulation.data/test/edge.dt.parquet")
+
+edge.dt <-
+  list.files(".WIP/simulation.data/parquet/",pattern = "parquet",full.names = TRUE) |>
+  lapply(arrow::read_parquet) |>
+  rbindlist()
+
+arrow::write_dataset(edge.dt,
+                     path = ".WIP/simulation.data/edgeDT/",format = "parquet",
+                     partitioning = c("n","group.number")
+)
+
+weidgt.dt <-
+  arrow::open_dataset(".WIP/simulation.data/edgeDT") |>
+  filter(n %in% c(5,8,10)) |>
+  select(i,j,n,samp.eff,type,group.number,group.rep,weight) |>
+  group_by(i,j,n,samp.eff,type,group.number,group.rep) |>
+  summarise(
+    weight = median(weight),
+    inf = quantile(weight,probs = 0.025),
+    sup = quantile(weight,probs = 0.975)
+  ) |>
+  dplyr::collect()
+
+setDT(weidgt.dt)
+
+weidgt.dt
+
+
+n.val <-
+  arrow::open_dataset(".WIP/simulation.data/edgeDT") |>
+  select(n) |>
+  distinct() |>
+  collect() |>
+  pull()
+
+w.dt <-
+  lapply(
+    c(5,8,10),
+    function(val) {
+      arrow::open_dataset(".WIP/simulation.data/edgeDT") |>
+        filter(n == val) |>
+        select(i,j,n,samp.eff,type,group.number,weight) |>
+        mutate(weight = weight / samp.eff) |>
+        group_by(i,j,n,samp.eff,type,group.number) |>
+        summarise(
+          weight = median(weight),
+          inf = quantile(weight,probs = 0.025),
+          sup = quantile(weight,probs = 0.975)
+        ) |>
+        dplyr::collect()
+    }
+  ) |>
+  bind_rows()
+
+setDT(w.dt)
+
+type.str <- c("the real network",
+              "the real network bis",
+              "SimuNet network",
+              "another network (similar generation)",
+              "an Erdős–Rényi graph (p = 0.5)",
+              "a Random network (fixed prob.)",
+              "a Random network (variable prob.)")
+
+w.dt |>
+  # subset(i <= 5 & j <= 5) |>
+  subset(group.number == 1) |>
+  subset(n == 10) %>% {
+    ggplot(data = .,aes(type,weight, colour = samp.eff, fill = type))+
+      geom_line(aes(group = interaction(group.number,samp.eff)),lty = "dashed",alpha = 0.6,position = position_dodge(0.5))+
+      geom_errorbar(aes(group = interaction(group.number,samp.eff),ymin = inf,ymax = sup),position = position_dodge(0.5))+
+      geom_point(aes(group = interaction(group.number,samp.eff)),position = position_dodge(0.5))+
+      facet_grid(i ~ j,scales = "free_y")+
+      # geom_density(bw = 0.05,alpha = 0.25,position = "identity",colour = NA)+
+      # geom_density(data = .[type %in% c("SimuNet","real")],
+      #              bw = 0.05,alpha = 0.15,position = "identity")+
+      # geom_vline(data = SimuNet.dt,aes(xintercept = weight),
+      #            colour = "tomato",lty = "dashed",size = 1.1)+
+      # geom_vline(data = real.dt,aes(xintercept = weight),
+      #            colour = "royalblue",lty = "dashed",size = 1.1)+
+      # geom_point(data = Adj.obs.dt,aes(x = weight,y = 0),fill = "white",
+      #            colour = "tomato",shape = 21,stroke = 1.5,size = 2)+
+      # scale_colour_manual(values = c("tomato","royalblue",gg_color_hue(6)[2:6]),labels = type.str)+
+      scale_colour_gradient(low = "royalblue",high = "orange")+
+      scale_fill_manual(values = c("tomato","royalblue",gg_color_hue(6)[2:6]),labels = type.str)+
+      scale_x_discrete(labels = type.str)+
+      scale_y_continuous(breaks = c(0,.5,1),labels = c('0','0.5','1'),expand = c(0,NA))+
+      labs(colour = "Sampling effort")+
+      guides(fill = "none")+
+      xlab("Network type")+ylab("Edge weight")+
+      geom_hline(yintercept = 0)+
+      # geom_vline(xintercept = 0)+
+      coord_flip()+
+      cowplot::theme_minimal_hgrid(12)+theme()
+  }
+
+
+  arrow::open_dataset(".WIP/simulation.data/edgeDT") |>
+  filter(n == 5) |>
+  select(i,j,n,samp.eff,type,group.number,group.rep,weight) |>
+  mutate(weight = weight / samp.eff) |>
+  group_by(i,j,n,samp.eff,type,group.number,group.rep) |>
+  summarise(
+    weight = median(weight),
+    inf = quantile(weight,probs = 0.025),
+    sup = quantile(weight,probs = 0.975)
+  )
+
+edge.distances.dt <-
+  edge.distances.dt[order(n,samp.eff,group.number,group.rep,reference,type,i,j)] %>%
+  .[,by = .(n,samp.eff,group.number,reference,type,i,j),
+    .(
+      mean.diff= median(mean.diff),
+      KS.stat  = median(KS.stat),
+      KS.p     = median(KS.p),
+      KL       = median(KL),
+      JS       = median(JS),
+      EMD.e    = median(EMD.e),
+      EMD.m    = median(EMD.m),
+      mean.diff.low= quantile(probs = 0.25,mean.diff),
+      KS.stat.low  = quantile(probs = 0.25,KS.stat),
+      KS.p.low     = quantile(probs = 0.25,KS.p),
+      KL.low       = quantile(probs = 0.25,KL),
+      JS.low       = quantile(probs = 0.25,JS),
+      EMD.e.low    = quantile(probs = 0.25,EMD.e),
+      EMD.m.low    = quantile(probs = 0.25,EMD.m),
+      mean.diff.hig= quantile(probs = 0.975,mean.diff),
+      KS.stat.hig  = quantile(probs = 0.975,KS.stat),
+      KS.p.hig     = quantile(probs = 0.975,KS.p),
+      KL.hig       = quantile(probs = 0.975,KL),
+      JS.hig       = quantile(probs = 0.975,JS),
+      EMD.e.hig    = quantile(probs = 0.975,EMD.e),
+      EMD.m.hig    = quantile(probs = 0.975,EMD.m)
+    )
+  ]
+
+get_from_RDS(".WIP/simulation.data/results.GWC.n_5.8_seff_10.25.50.rds","edge.distance.dt")
+
+test <- readRDS(".WIP/simulation.data/results.GWC.n_5.8_seff_10.25.50.rds")$edge.distances.dt
+tast <- test$edge.distance.dt |> rbindlist()
+test.2 <- test[,netgen_output := NULL]
+
+results |> object.size() %>% {. / 1024^2}
+test$netgen_fun |> as.character() |> as.list() |> as.function()
+
+
+# Importing results ----
+list.files(".WIP/simulation.data/",full.names = TRUE)
+data.table::fread(".WIP/simulation.data/results.GWC.n_8.10.15.seff_75.100.150.rds")
+results <- readRDS(".WIP/simulation.data/results.GWC.n_8.10.15.seff_75.100.150.rds")
 results
 
 # test bench measure distances ----
@@ -104,8 +352,10 @@ x.labs.face <- c(
 
 x.fill <- c("#FF6347","#4169E1",gg_color_hue(5)[2:5]) # "tomato" and "royalblue"
 results[,edge.distance.dt :=lapply(edge.distance.dt,\(ddt) ddt$type <- ddt$type |>
-                   factor(levels = c("real","real.bis","SimuNet","other","ER","fixed.rand","total.rand"))
-          )]
+                                     factor(levels = c("real","real.bis","SimuNet","other","ER","fixed.rand","total.rand"))
+)]
+results[,type := type |>
+          factor(levels = c("real","real.bis","SimuNet","other","ER","fixed.rand","total.rand"))]
 ### Single case as boxplots ----
 KS.stat <-
   results |>
@@ -190,7 +440,7 @@ KL <-
   subset(n == 10) |>
   subset(samp.eff == 75) |>
   subset(group.number <= 1) |>
-  extract_column("edge.distance.dt") |>
+  # extract_column("edge.distance.dt") |>
   plot_distance_distrib(dist = "KL",xlab = "Kullback-Leibler divergence",x.lims = c(0,NA))#+
 # facet_grid(. ~ samp.eff)
 
@@ -227,9 +477,9 @@ gridExtra::grid.arrange(KS.stat,KS.p,KL,JS,EMD.e,EMD.m,ncol = 2,
 
 # Graphic exploration ---------------------------------------------------------------------------------------
 ## single sim ----
-type.str <- c("SimuNet network",
-              "the real network",
+type.str <- c("the real network",
               "the real network bis",
+              "SimuNet network",
               "another network (similar generation)",
               "an Erdős–Rényi graph (p = 0.5)",
               "a Random network (fixed prob.)",
