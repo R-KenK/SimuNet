@@ -1,6 +1,8 @@
 # SimuNet (development version)
 * `simunet()` and `edgeProb` related function within: Added explicit `alpha.prior` and `beta.prior`
 arguments for proper user input processing
+* `sums_scans.scanList()`: now returns integer weighted adjacency matrices. Probably leads to space
+and speed benefits when repeated many times.
 
 # SimuNet 2.4.0
 * Removed used of `|>` and `\(.)` to bump down from R (>= 4.1) to R (>= 2.10)
