@@ -75,6 +75,7 @@ sum_scans.scanList <- function(scan.list,which = c("auto","theoretical","raw"),.
          "raw" = scan.list <- attrs(scan.list,"raw.scanList.type")
   )
   summed <- rowSums(scan.list,na.rm = TRUE,dims = 2L)
+  mode(summed) <- "integer"
   summed <- copy_attrs_to(sL.ori,summed)
   attrs(summed,"summed.scanList") <- without_attrs(sL.ori)
   attrs(summed,"sampled") <- count_nonNA(scan.list)
