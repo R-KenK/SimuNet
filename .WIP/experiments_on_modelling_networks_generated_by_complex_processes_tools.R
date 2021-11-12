@@ -185,95 +185,14 @@ generate_paramList <- function(param.n,param.samp.eff,param.netgen,
   param.list
 }
 
-## Network data extraction ----
+## Network data extraction: WIP ----
 compute.EV <- function(M) {
   M |>
     igraph::graph.adjacency(mode = "upper",weighted = TRUE)  %>%
     {igraph::eigen_centrality(.)$vector}
 }
 
-## Network comparison ----
-prepare_for_distances <- function(param.list) {
-  message("Calculating weight probabilities...")
-  param.list[,possible    := lapply(samp.eff,\(r) 0:r)]
-  param.list[,edge.weight := lapply(edge.dt,\(dt) dt[,c("type","i","j","weight")])]
-  param.list[,edge.weight := lapply(edge.weight,\(dt) dt[,.(weight = list(.SD$weight)),by = .(type,i,j)])]
-  param.list[,edge.weight := mapply(
-    \(ew.dt,pos) ew.dt[
-      ,
-      weight.prob := lapply(weight,factor,levels = pos) |>
-        lapply(table) |>
-        lapply(\(w) w / sum(w))
-    ][
-      ,
-      weight.mat := lapply(weight.prob,\(prob) cbind(pos,prob))
-    ],
-    ew.dt = edge.weight,pos = possible,SIMPLIFY = FALSE)]
-  message("Formatting data...")
-  param.list[,edge.weight := lapply(edge.weight,\(ew.dt) ew.dt[,weight.mean := sapply(weight,mean)])]
-  param.list[
-    ,
-    edge.weight :=
-      lapply(
-        edge.weight,
-        \(ew.dt) lapply(unique(ew.dt$type),\(ty) ew.dt[type == ty]) %>%
-          {names(.) <- unique(ew.dt$type);.}
-      )
-  ]
-  param.list[]
-}
-
-measure_distances <- function(param.list,x,y) {
-  message("Measuring distances ",x,"-",y,"...")
-  edge.weight.distance <-
-    lapply(
-      param.list$edge.weight,
-      \(ew.list) cbind(
-        reference = ew.list[[x]]$type,
-        ew.list[[y]][,c("type","i","j")],
-        data.table(
-          mean.diff = abs(ew.list[[y]]$weight.mean - ew.list[[x]]$weight.mean),
-          KS.stat   = mapply(\(x,y) suppressWarnings(ks.test(x,y,exact = FALSE)$statistic),
-                             x = ew.list[[x]]$weight,y = ew.list[[y]]$weight),
-          KS.p      = mapply(\(x,y) suppressWarnings(ks.test(x,y,exact = FALSE)$p.value),
-                             x = ew.list[[x]]$weight,y = ew.list[[y]]$weight),
-          KL        = mapply(\(x,y) suppressMessages(philentropy::KL(rbind(x,y))),
-                             x = ew.list[[x]]$weight.prob,y = ew.list[[y]]$weight.prob),
-          JS        = mapply(\(x,y) suppressMessages(philentropy::JSD(rbind(x,y))),
-                             x = ew.list[[x]]$weight.prob,y = ew.list[[y]]$weight.prob),
-          EMD.e     = mapply(\(x,y) emdist::emd(x,y,dist = "euclidean"),
-                             x = ew.list[[x]]$weight.mat,y = ew.list[[y]]$weight.mat),
-          EMD.m     = mapply(\(x,y) emdist::emd(x,y,dist = "manhattan"),
-                             x = ew.list[[x]]$weight.mat,y = ew.list[[y]]$weight.mat)
-        )
-      )
-    )
-  mapply(cbind,n = param.list$n,samp.eff = param.list$samp.eff,n.rep = param.list$n.rep,
-         group.number = param.list$group.number,group.rep = param.list$group.rep,
-         edge.weight.distance,SIMPLIFY = FALSE
-  )
-}
-
-measure_all_distances <- function(param.list,x = "real",y = c("real.bis","other","ER",
-                                                              "fixed.rand","total.rand","SimuNet"),
-                                  cl) {
-  distances <- data.table(x = x,y = y)
-  param.list$edge.distances.dt <-
-    pbapply::pblapply(
-      1:nrow(distances),
-      \(r) {
-        x <- distances$x[r];y <- distances$y[r]
-        measure_distances(param.list,x,y)
-      },cl = cl
-    ) |>
-    split_seq() |>
-    lapply(do.call,what = rbind)
-  param.list[,":="(possible = NULL,edge.weight = NULL)]
-  param.list[]
-}
-
-
-## Encapsulating case study ----
+## Simulating weighted adjacency matrices ----
 run_simulation_single <- function(r) {
   n               <- param.list$n[r];
   samp.eff        <- param.list$samp.eff[r];
@@ -369,6 +288,7 @@ run_simulations <- function(param.list,n.cores = 7) {
   param.list[]
 }
 
+## Aggregating edge weight data ----
 agregate_edgeDT_single <- function(r,dataset.path = ".WIP/simulation.data/edgeDT/") {
   n            <- param.list$n[r]
   samp.eff     <- param.list$samp.eff[r]
@@ -404,7 +324,7 @@ agregate_edgeDT_single <- function(r,dataset.path = ".WIP/simulation.data/edgeDT
               weight = SimuNet[as.matrix(x)])
       )
     }() |>
-    data.table()
+    data.table::data.table()
   edge.dt$type <-
     edge.dt$type |>
     factor(levels = c("real","real.bis","SimuNet","other","ER","fixed.rand","total.rand"))
@@ -435,26 +355,141 @@ aggregate_edgeDT <- function(param.list,n.cores = 7) {
   )
 }
 
-calculate_edgeDistanceDT <- function(param.list,cl) {
-  param.list <- prepare_for_distances(param.list)
-  measure_all_distances(param.list,cl = cl)
+## Calculating edge weight distribution distances ----
+### formating edge weight data to measure distances ----
+prepare_for_distances_single <-
+  function(r,
+           edgeDT.path = ".WIP/simulation.data/edgeDT/",
+           edgeDistanceData.path = ".WIP/simulation.data/edgeDistanceData/") {
+    .netgen_name <- dist.param$netgen_name[r]
+    .n           <- dist.param$n[r]
+    .samp.eff    <- dist.param$samp.eff[r]
+    dt <-
+      arrow::open_dataset(".WIP/simulation.data/edgeDT/") |>
+      dplyr::select(-n.rep,-rep) |>
+      dplyr::filter(netgen_name %in% .netgen_name &
+                      n %in% .n &samp.eff %in% .samp.eff) |>
+      dplyr::collect() |>
+      tidyfast::dt_nest(netgen_name,n,samp.eff,group.number,group.rep,type,i,j,.key = "weight") |>
+      {
+        \(dt) dt[
+          ,possible := lapply(samp.eff,\(s) data.table::data.table(possible = 0:s))
+        ][
+          ,weight.mat :=
+            mapply(\(w,p) factor(w$weight,levels = p$possible),
+                   w = weight,p = possible,SIMPLIFY = FALSE) |>
+            lapply(table) |>
+            {\(.) mapply(\(p,w) cbind(p,weight.prob = c(w / sum(w))),
+                         p = possible,w = .,SIMPLIFY = FALSE)}()
+        ][
+          ,weight.mean := lapply(weight,"[[","weight") |> sapply(mean)
+        ][
+          ,`:=`(weight =  NULL,possible = NULL)
+        ][]
+      }() |>
+      tidyfast::dt_unnest(weight.mat)
+
+    dt <-
+      dt[type == "real"][,type := NULL][] |>
+      data.table::setnames(
+        old = c("weight.mean","weight.prob"),
+        new = c("real.weight.mean","real.weight.prob")) |>
+      data.table::merge.data.table(
+        x = dt,
+        by = c("netgen_name","n","samp.eff","group.number","group.rep","i","j","possible")) |>
+      subset(type != "real")
+
+
+    arrow::write_dataset(dt,path = ".WIP/simulation.data/edgeDistanceData/",
+                         format = "feather",
+                         partitioning = c("netgen_name","n","samp.eff"))
+    rm(dt);gc()
+    NULL
+  }
+
+prepare_for_distances <- function(dist.param,n.cores = 7L) {
+  message("Creating parallel workers...")
+  cl <- parallel::makeCluster(n.cores)
+  on.exit({parallel::stopCluster(cl);rm(cl);gc()})
+  parallel::clusterExport(cl,list("dist.param","prepare_for_distances_single"),envir = .GlobalEnv)
+
+  message("Preparing distances data...")
+  pbapply::pblapply(1:nrow(dist.param),prepare_for_distances_single,cl = cl)
 }
 
-## Aggregating experiment results ----
+### measure edge weight distributions distances ----
+measure_distances_single <-
+  function(r,
+           edgeDistanceData.path = ".WIP/simulation.data/edgeDistanceData/",
+           edgeDistanceDT.path = ".WIP/simulation.data/edgeDistanceDT/") {
+    .netgen_name <- dist.param$netgen_name[r]
+    .n           <- dist.param$n[r]
+    .samp.eff    <- dist.param$samp.eff[r]
+    arrow::open_dataset(sources = edgeDistanceData.path,format = "feather") |>
+      dplyr::filter(netgen_name %in% .netgen_name &
+                      n %in% .n & samp.eff %in% .samp.eff) |>
+      dplyr::collect() |>
+      {\(.) {
+        .[order(netgen_name,n,samp.eff,group.number,group.rep,type,i,j,possible)
+        ][
+          ,mean.diff := abs(weight.mean - real.weight.mean)
+        ][
+          ,c("KS.stat","KS.p") :=
+            suppressWarnings(
+              ks.test(weight.prob,real.weight.prob,exact = FALSE)[c("statistic","p.value")]
+            )
+          ,by = .(netgen_name,n,samp.eff,group.number,group.rep,type,i,j)
+        ][
+          ,.(
+            KL    = suppressMessages(philentropy::KL(rbind(weight.prob,real.weight.prob))),
+            JS    = suppressMessages(philentropy::JSD(rbind(weight.prob,real.weight.prob)))#,
+            # EMD.e = emdist::emd(cbind(possible,weight.prob),
+            #                     cbind(possible,real.weight.prob),dist = "euclidean"),
+            # EMD.m = emdist::emd(cbind(possible,weight.prob),
+            #                     cbind(possible,real.weight.prob),dist = "manhattan")
+          )
+          ,by = .(netgen_name,n,samp.eff,group.number,group.rep,type,i,j,weight.mean,KS.stat,KS.p)
+        ][
+          ,reference := "real"
+        ]
+      }}() |>
+      data.table::setcolorder(c("netgen_name","n","samp.eff",
+                    "group.number","group.rep",
+                    "reference","type","i","j")) |>
+      arrow::write_dataset(path = edgeDistanceDT.path,
+                           partitioning = c("netgen_name","n","samp.eff"))
+    rm(dt);gc()
+    NULL
+  }
 
-# ## Extracting results ----
-# extract_column <- function(dt,colname) {
-#   dt |>
-#     pull(colname) |>
-#     rbindlist()
-# }
-#
-# get_from_RDS <- function(path,dt.name) {
-#   dt <- readRDS(path)
-#   dt[[dt.name]] |>
-#     data.table::rbindlist()
-# }
+measure_distances <- function(dist.param,n.cores = 7L) {
+  message("Creating parallel workers...")
+  cl <- parallel::makeCluster(n.cores)
+  on.exit({parallel::stopCluster(cl);rm(cl);gc()})
+  parallel::clusterExport(cl,list("dist.param","measure_distances_single"),envir = .GlobalEnv)
 
+  message("Preparing distances data...")
+  pbapply::pblapply(1:nrow(dist.param),measure_distances_single,cl = cl)
+}
+
+## Retrieve from Arrow's datasets ----
+query_edgeDT <- function(edgeDT.path = ".WIP/simulation.data/edgeDT/") {
+  arrow::open_dataset(sources = edgeDT.path) |>
+    dplyr::relocate(c("netgen_name","n","samp.eff",
+                      "group.number","group.rep",
+                      "type","n.rep","rep","i","j","weight")) |>
+    dplyr::arrange(n,samp.eff,group.number,group.rep,n.rep,rep,i,j)
+}
+
+query_edgeDistanceDT <- function(edgeDistanceDT.path = ".WIP/simulation.data/edgeDistanceDT/") {
+  arrow::open_dataset(sources = ".WIP/simulation.data/edgeDistanceDT/") |>
+    dplyr::relocate(c("netgen_name","n","samp.eff",
+                      "group.number","group.rep",
+                      "reference","type","i","j",
+                      "weight.mean","KS.stat","KS.p",
+                      "KL","JS")) |>
+    dplyr::arrange(n,samp.eff,group.number,group.rep,i,j)
+}
 
 ## Plotting ----
 ### tools ----
@@ -465,35 +500,54 @@ gg_color_hue <- function(n) {
 
 ### graphs ----
 #### Distances & divergences ----
-plot_distance <- function(data,dist,ylab) {
-  ggplot(data = data,aes_string(x = "type",y = dist,colour = "type",fill = "type"))+
-    geom_point(aes_string(group = "interaction(i,j,type)"),alpha = 0.2,position = position_jitterdodge())+
-    geom_boxplot(aes_string(group = "interaction(i,j,type)"),alpha = 0.4)+
-    geom_hline(yintercept = 0)+geom_vline(xintercept = 0)+
-    geom_vline(xintercept = 1.5,size = 1.2)+
-    scale_x_discrete(labels = x.labs)+
-    scale_fill_manual(values = x.fill)+
-    scale_colour_manual(values = x.fill)+
-    xlab("")+ylab(label = ylab)+
-    guides(colour = "none",fill = "none")+
-    coord_flip()+
-    theme_minimal(12)+theme(axis.text.y = element_text(face = x.labs.face))
-}
+x.labs <- c(
+  "Expected null distance",
+  paste0("... ",c("the real network",
+                  "another network (similar generation)",
+                  "an Erdős–Rényi graph (p = 0.5)",
+                  "a Random network (fixed prob.)",
+                  "a Random network (variable prob.)"))
+)
 
-plot_distance_distrib <- function(data,dist,xlab,x.lims) {
-  ggplot(data = data,aes_string(x = dist,y = "type",colour = "type",fill = "type"))+
-    geom_density_ridges(aes_string(y = "type",group = "interaction(i,j,type,group.number)"),
-                        fill = NA,scale = .8)+
-    geom_density_ridges(aes_string(y = "type",group = "interaction(i,j,type,group.number)"),
-                        colour = NA,alpha = 0.005,scale = .8)+
-    geom_hline(yintercept = 0)+geom_vline(xintercept = 0)+
-    geom_hline(yintercept = 1.9,size = 1.2)+
-    scale_y_discrete(labels = x.labs)+
-    scale_x_continuous(limits = x.lims)+
-    scale_fill_manual(values = x.fill)+
-    scale_colour_manual(values = paste0(x.fill,"25"))+
-    ylab("")+xlab(label = xlab)+
-    guides(colour = "none",fill = "none")+
-    theme_minimal(12)+theme(axis.text.y = element_text(face = x.labs.face))
-}
+x.labs.face <- c(
+  "bold",
+  rep("plain",length(x.labs) - 1)
+)
 
+x.fill <- c("#FF6347","#4169E1",gg_color_hue(5)[2:5]) # "tomato" and "royalblue"
+
+plot_distance <- function(data,dist,ylab,geom = c("boxplot","density"),
+                          x.lims = c(NA,NA),.group = "interaction(i,j,type,group.number)") {
+  geom <- match.arg(geom)
+  switch(
+    geom,
+    "boxplot" =
+      ggplot(data = data,aes_string(x = "type",y = dist,colour = "type",fill = "type"))+
+      geom_point(aes_string(group = .group),alpha = 0.2,position = position_jitterdodge())+
+      geom_boxplot(aes_string(group = .group),alpha = 0.4)+
+      geom_hline(yintercept = 0)+geom_vline(xintercept = 0)+
+      geom_vline(xintercept = 1.5,size = 1.2)+
+      scale_x_discrete(labels = x.labs)+
+      scale_fill_manual(values = x.fill)+
+      scale_colour_manual(values = x.fill)+
+      xlab("")+ylab(label = ylab)+
+      guides(colour = "none",fill = "none")+
+      coord_flip()+
+      theme_minimal(12)+theme(axis.text.y = element_text(face = x.labs.face)),
+    "density" =
+      ggplot(data = data,aes_string(x = dist,y = "type",colour = "type",fill = "type"))+
+      geom_density_ridges(aes_string(y = "type",group = .group),
+                          fill = NA,scale = .8)+
+      geom_density_ridges(aes_string(y = "type",group = .group),
+                          colour = NA,alpha = 0.005,scale = .8)+
+      geom_hline(yintercept = 0)+geom_vline(xintercept = 0)+
+      geom_hline(yintercept = 1.9,size = 1.2)+
+      scale_y_discrete(labels = x.labs)+
+      scale_x_continuous(limits = x.lims)+
+      scale_fill_manual(values = x.fill)+
+      scale_colour_manual(values = paste0(x.fill,"25"))+
+      ylab("")+xlab(label = ylab)+
+      guides(colour = "none",fill = "none")+
+      theme_minimal(12)+theme(axis.text.y = element_text(face = x.labs.face))
+  )
+}
