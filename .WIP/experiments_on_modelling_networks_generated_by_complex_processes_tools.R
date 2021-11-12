@@ -473,6 +473,36 @@ measure_distances <- function(dist.param,n.cores = 7L) {
 }
 
 ## Retrieve from Arrow's datasets ----
+complete_edgedt <- function(dt,n,n.rep) {
+  expand.grid(rep = 1:n.rep,i = 1:n,j = 1:n,weight = 0L) |>
+    setDT() |>
+    subset(i >= j) |>
+    rbind(dt) |>
+    arrange(rep,j,i,rep)
+}
+
+reconstruct_adjacencies <- function(.netgen_name,
+                                    .n,
+                                    .samp.eff,
+                                    .type,
+                                    .group.number,
+                                    .group.rep,
+                                    n.rep = 105L,
+                                    edgeDT.path = ".WIP/simulation.data/edgeDT/") {
+  query_edgeDT(edgeDT.path = edgeDT.path) |>
+    filter(netgen_name  == .netgen_name,
+           n            == .n,
+           samp.eff     == .samp.eff,
+           type         == .type,
+           group.number == .group.number,
+           group.rep    == .group.rep) |>
+    select(rep,i,j,weight) |>
+    collect() |>
+    complete_edgedt(n = .n,n.rep = n.rep) |>
+    pull(weight) |>
+    array(c(.n,.n,n.rep),dimnames = list(as.character(1:.n),as.character(1:.n),NULL))
+}
+
 query_edgeDT <- function(edgeDT.path = ".WIP/simulation.data/edgeDT/") {
   arrow::open_dataset(sources = edgeDT.path) |>
     dplyr::relocate(c("netgen_name","n","samp.eff",
