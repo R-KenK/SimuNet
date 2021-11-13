@@ -245,14 +245,26 @@ run_simulation_single <- function(r) {
       {
         netgen_output <-
           data.table::data.table(
-            type = c(
-              "real",
-              "real.bis",
-              "other",
-              "ER",
-              "fixed.rand",
-              "total.rand",
-              "SimuNet"
+            type = factor(
+              c(
+                "real",
+                "real.bis",
+                "SimuNet",
+                "other",
+                "ER",
+                "fixed.rand",
+                "total.rand"
+              ),
+              levels =
+                c(
+                  "real",
+                  "real.bis",
+                  "SimuNet",
+                  "other",
+                  "ER",
+                  "fixed.rand",
+                  "total.rand"
+                )
             ),
             dist = list(
               real,
