@@ -194,6 +194,7 @@ compute.EV <- function(M) {
 
 ## Simulating weighted adjacency matrices ----
 run_simulation_single <- function(r) {
+  param.list.row  <- param.list[r,]
   n               <- param.list$n[r];
   samp.eff        <- param.list$samp.eff[r];
   n.rep           <- param.list$n.rep[r];
@@ -239,28 +240,43 @@ run_simulation_single <- function(r) {
                        alpha.prior = 1,beta.prior = 1) |>
       SimuNet::sum_scans()
   )
-  data.table::data.table(
-    type = c("real",
-             "real.bis",
-             "other",
-             "ER",
-             "fixed.rand",
-             "total.rand",
-             "SimuNet"),
-    dist = lapply(
-      list(real,
-           real.bis,
-           other,
-           ER,
-           fixed.rand,
-           total.rand,
-           SimuNet),
-      list
+  param.list.row[
+    ,netgen_output := list(
+      {
+        netgen_output <-
+          data.table::data.table(
+            type = c(
+              "real",
+              "real.bis",
+              "other",
+              "ER",
+              "fixed.rand",
+              "total.rand",
+              "SimuNet"
+            ),
+            dist = list(
+              real,
+              real.bis,
+              other,
+              ER,
+              fixed.rand,
+              total.rand,
+              SimuNet
+            )
+          )
+        netgen_output[,dist := lapply(dist,adjacencies_to_dt)] |>
+          tidyfast::dt_unnest(dist)
+      }
     )
-  )
+  ] |>
+    tidyfast::dt_unnest(netgen_output) |>
+    arrow::write_dataset(path = edgeDT.path,
+                         partitioning = c("netgen_name","n","samp.eff","group.number","group.rep")
+    )
+  message("Simulations done!")
 }
 
-run_simulations <- function(param.list,n.cores = 7) {
+run_simulations <- function(param.list,n.cores = 7,edgeDT.path = ".WIP/simulation.data/edgeDT/") {
   message("Creating parallel workers...")
   cl <- parallel::makeCluster(n.cores)
   on.exit({parallel::stopCluster(cl);rm(cl);gc()})
@@ -269,12 +285,14 @@ run_simulations <- function(param.list,n.cores = 7) {
     list(
       "param.list",
       "run_simulation_single",
+      "adjacencies_to_dt",
       "is_sameClique","draw_matbinom","greg_product",
       "ER_generate_asso",
       "fixedRandom_generate_asso",
       "totalRandom_generate_asso"
     )
   )
+  parallel::clusterExport(cl,list("edgeDT.path"),envir = environment())
   message("Running the simulations...")
   param.list[
     ,
@@ -285,10 +303,20 @@ run_simulations <- function(param.list,n.cores = 7) {
         cl = cl
       )
   ]
-  param.list[]
+  message("Simulations done!")
 }
 
 ## Aggregating edge weight data ----
+adjacencies_to_dt <- function(adj.array) {
+  .n     <- dim(adj.array)[1]
+  .n.rep <- dim(adj.array)[3]
+
+  expand.grid(i = 1:.n,j = 1:.n,rep = 1:.n.rep) |>
+    data.table::setDT() |>
+    cbind(weight = c(adj.array)) |>
+    subset(i < j)
+}
+
 agregate_edgeDT_single <- function(r,dataset.path = ".WIP/simulation.data/edgeDT/") {
   n            <- param.list$n[r]
   samp.eff     <- param.list$samp.eff[r]
