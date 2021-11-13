@@ -540,7 +540,7 @@ query_edgeDT <- function(edgeDT.path = ".WIP/simulation.data/edgeDT/") {
 }
 
 query_edgeDistanceDT <- function(edgeDistanceDT.path = ".WIP/simulation.data/edgeDistanceDT/") {
-  arrow::open_dataset(sources = ".WIP/simulation.data/edgeDistanceDT/") |>
+  arrow::open_dataset(sources = edgeDistanceDT.path) |>
     dplyr::relocate(c("netgen_name","n","samp.eff",
                       "group.number","group.rep",
                       "reference","type","i","j",
