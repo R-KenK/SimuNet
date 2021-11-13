@@ -444,7 +444,7 @@ prepare_for_distances_single <-
 
 
     arrow::write_dataset(dt,path = ".WIP/simulation.data/edgeDistanceData/",
-                         format = "feather",
+                         format = "parquet",
                          partitioning = c("netgen_name","n","samp.eff","group.number"))
     rm(dt);gc()
     NULL
@@ -469,7 +469,7 @@ measure_distances_single <-
     .n            <- dist.param$n[r]
     .samp.eff     <- dist.param$samp.eff[r]
     .group.number <- dist.param$group.number[r]
-    arrow::open_dataset(sources = edgeDistanceData.path,format = "feather") |>
+    arrow::open_dataset(sources = edgeDistanceData.path,format = "parquet") |>
       dplyr::filter(netgen_name %in% .netgen_name &
                       n %in% .n &
                       samp.eff %in% .samp.eff &
