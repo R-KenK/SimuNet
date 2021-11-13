@@ -30,7 +30,7 @@ param.list <-
                      n.group = n.group,
                      n.each = n.each
   )
-param.list[]
+param.list <- param.list[sample(1:nrow(param.list))] # perhaps shuffling the row could yield better ETAs
 
 dist.param <-
   param.list |>
@@ -39,21 +39,18 @@ dist.param <-
   ungroup() |>
   relocate(c(netgen_name,n,samp.eff)) |>
   data.table() |>
-  # subset(group.number %in% 1:4)
-  subset(group.number %in% 5:7)
+  subset(group.number %in% 1:4)
+  # subset(group.number %in% 5:7)
 dist.param
 
 # Running simulations ----
 ## Generating the weighted adjacency matrices ----
 start.time <- Sys.time()
 start.time
-param.list <- run_simulations(param.list,n.cores = 7)
-Sys.time()
-param.list
-
-## Storing the simulated edge weights into arrow compatible format ----
-aggregate_edgeDT(param.list,n.cores = 7)
-Sys.time()
+run_simulations(param.list,n.cores = 7)
+end.time <- Sys.time()
+end.time
+end.time - start.time
 
 # Calculating network differences ----
 ## Preparing to measure edge weights distribution distances ----
@@ -68,7 +65,8 @@ end.time - start.time
 
 
 # Reimporting results ----
-query_edgeDistanceDT() |> filter(n == 5) |> collect()
+query_edgeDistanceDT(edgeDistanceDT.path = ".WIP/simulation.data/edgeDTbis/") |>
+  filter(n == 5) |> collect()
 arrow::open_dataset(sources = ".WIP/simulation.data/edgeDT/")
 
 ## Plotting distances ----
@@ -290,3 +288,4 @@ results$edge.distance.dt[order(mean.diff)] |>
   GGally::ggpairs(mapping = aes(colour = type,alpha = 0.2),columns = c("mean.diff","KS.stat","KS.p","KL","JS","EMD.e","EMD.m"))+
   geom_hline(yintercept = 0)+geom_vline(xintercept = 0)+
   theme_minimal()
+
