@@ -389,14 +389,17 @@ prepare_for_distances_single <-
   function(r,
            edgeDT.path = ".WIP/simulation.data/edgeDT/",
            edgeDistanceData.path = ".WIP/simulation.data/edgeDistanceData/") {
-    .netgen_name <- dist.param$netgen_name[r]
-    .n           <- dist.param$n[r]
-    .samp.eff    <- dist.param$samp.eff[r]
+    .netgen_name  <- dist.param$netgen_name[r]
+    .n            <- dist.param$n[r]
+    .samp.eff     <- dist.param$samp.eff[r]
+    .group.number <- dist.param$group.number[r]
     dt <-
       arrow::open_dataset(".WIP/simulation.data/edgeDT/") |>
       dplyr::select(-n.rep,-rep) |>
       dplyr::filter(netgen_name %in% .netgen_name &
-                      n %in% .n &samp.eff %in% .samp.eff) |>
+                      n %in% .n &
+                      samp.eff %in% .samp.eff &
+                      group.number %in% .group.number) |>
       dplyr::collect() |>
       tidyfast::dt_nest(netgen_name,n,samp.eff,group.number,group.rep,type,i,j,.key = "weight") |>
       {
@@ -430,7 +433,7 @@ prepare_for_distances_single <-
 
     arrow::write_dataset(dt,path = ".WIP/simulation.data/edgeDistanceData/",
                          format = "feather",
-                         partitioning = c("netgen_name","n","samp.eff"))
+                         partitioning = c("netgen_name","n","samp.eff","group.number"))
     rm(dt);gc()
     NULL
   }
@@ -450,12 +453,15 @@ measure_distances_single <-
   function(r,
            edgeDistanceData.path = ".WIP/simulation.data/edgeDistanceData/",
            edgeDistanceDT.path = ".WIP/simulation.data/edgeDistanceDT/") {
-    .netgen_name <- dist.param$netgen_name[r]
-    .n           <- dist.param$n[r]
-    .samp.eff    <- dist.param$samp.eff[r]
+    .netgen_name  <- dist.param$netgen_name[r]
+    .n            <- dist.param$n[r]
+    .samp.eff     <- dist.param$samp.eff[r]
+    .group.number <- dist.param$group.number[r]
     arrow::open_dataset(sources = edgeDistanceData.path,format = "feather") |>
       dplyr::filter(netgen_name %in% .netgen_name &
-                      n %in% .n & samp.eff %in% .samp.eff) |>
+                      n %in% .n &
+                      samp.eff %in% .samp.eff &
+                      group.number %in% .group.number) |>
       dplyr::collect() |>
       {\(.) {
         .[order(netgen_name,n,samp.eff,group.number,group.rep,type,i,j,possible)
@@ -485,7 +491,7 @@ measure_distances_single <-
                     "group.number","group.rep",
                     "reference","type","i","j")) |>
       arrow::write_dataset(path = edgeDistanceDT.path,
-                           partitioning = c("netgen_name","n","samp.eff"))
+                           partitioning = c("netgen_name","n","samp.eff","group.number"))
     rm(dt);gc()
     NULL
   }
