@@ -31,6 +31,7 @@ param.list <-
                      n.each = n.each
   )
 param.list <- param.list[sample(1:nrow(param.list))] # perhaps shuffling the row could yield better ETAs
+param.list
 
 dist.param <-
   param.list |>
@@ -41,6 +42,7 @@ dist.param <-
   data.table() |>
   subset(group.number %in% 1:4)
   # subset(group.number %in% 5:7)
+dist.param <- dist.param[sample(1:nrow(dist.param))] # perhaps shuffling the row could yield better ETAs
 dist.param
 
 # Running simulations ----
@@ -54,10 +56,16 @@ end.time - start.time
 
 # Calculating network differences ----
 ## Preparing to measure edge weights distribution distances ----
+start.time <- Sys.time()
+start.time
 prepare_for_distances(dist.param)
-Sys.time()
+end.time <- Sys.time()
+end.time
+end.time - start.time
 
 ## Measure edge weights distribution distances ----
+start.time <- Sys.time()
+start.time
 measure_distances(dist.param)
 end.time <- Sys.time()
 end.time
