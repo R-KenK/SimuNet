@@ -5,8 +5,8 @@ source(".WIP/experiments_on_modelling_networks_generated_by_complex_processes_to
 set.seed(42)
 
 n.rep   <- 105L
-n.group <- 7L
-n.each  <- 35L
+n.group <- 21L
+n.each  <- 56L
 
 ## generating the list of parameters ----
 param.n <-
@@ -29,7 +29,7 @@ param.list <-
                      n.rep = n.rep,
                      n.group = n.group,
                      n.each = n.each
-  )
+  )[]
 # param.list <- param.list[sample(1:nrow(param.list))] # perhaps shuffling the row could yield better ETAs
 param.list
 
@@ -41,12 +41,14 @@ run_simulations(param.list = param.list,n.cores = 7)
 end.time <- Sys.time()
 end.time
 end.time - start.time
+# Time difference of 1.649793 hours for param.list of 40 combination of parameters,
+# 21 groups with 56 rep each (47040 * 105 simus)
 
 # Calculating network differences ----
 ## Preparing to measure edge weights distribution distances ----
 start.time <- Sys.time()
 start.time
-prepare_for_distances(param.list = param.list)
+prepare_for_distances(param.list = param.list,n.each = n.each,n.chunks = 14)
 end.time <- Sys.time()
 end.time
 end.time - start.time
@@ -63,9 +65,13 @@ end.time - start.time
 query_edgeDT(edgeDT.path = ".WIP/simulation.data/edgeDT/") |>
   filter(n == 5 & samp.eff == 150 & group.number == 3) |>
   collect()
-query_edgeDistanceDT(edgeDistanceDT.path = ".WIP/simulation.data/edgeDistanceDT/") |>
-  filter(n == 5,samp.eff == 150 & group.number == 3) |> collect()
+query_edgeDistanceData(".WIP/simulation.data/edgeDistanceData/") |>
+  filter(n == 5 & samp.eff == 10 & group.number == 3) |>
+  collect()
 arrow::open_dataset(sources = ".WIP/simulation.data/edgeDT/")
+query_edgeDistanceDT(edgeDistanceDT.path = ".WIP/simulation.data/edgeDistanceDT/") |>
+  filter(n == 5,samp.eff == 150 & group.number == 3) |>
+  collect()
 
 ## Plotting distances ----
 ### Single case as boxplots ----
