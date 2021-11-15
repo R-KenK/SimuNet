@@ -30,20 +30,28 @@ param.list <-
                      n.group = n.group,
                      n.each = n.each
   )
-param.list <- param.list[sample(1:nrow(param.list))] # perhaps shuffling the row could yield better ETAs
+# param.list <- param.list[sample(1:nrow(param.list))] # perhaps shuffling the row could yield better ETAs
 param.list
 
 dist.param <-
   param.list |>
-  group_by(n,netgen_name,samp.eff,group.number) |>
-  summarise() |>
-  ungroup() |>
-  relocate(c(netgen_name,n,samp.eff)) |>
-  data.table() |>
-  subset(group.number %in% 1:4)
+  select(n,netgen_name,samp.eff,group.number,group.rep)
+  # group_by(n,netgen_name,samp.eff,group.number) |>
+  # summarise() |>
+  # ungroup() |>
+  # relocate(c(netgen_name,n,samp.eff)) |>
+  # data.table() |>
+  # subset(group.number %in% 1:4)
   # subset(group.number %in% 5:7)
-dist.param <- dist.param[sample(1:nrow(dist.param))] # perhaps shuffling the row could yield better ETAs
+# dist.param <- dist.param[sample(1:nrow(dist.param))] # perhaps shuffling the row could yield better ETAs
 dist.param
+
+dist.param.aggregated <-
+  dist.param |>
+  select(-group.number,-group.rep) |>
+  group_by(n,netgen_name,samp.eff) |>
+  summarise() |>
+  setDT()
 
 # Running simulations ----
 ## Generating the weighted adjacency matrices ----
@@ -71,10 +79,45 @@ end.time <- Sys.time()
 end.time
 end.time - start.time
 
+# Aggregatting parquets files ----
+aggregate_parquets(
+  dist.param.aggregated,
+  dataset = "edgeDistanceDT",
+  sources.path = ".WIP/simulation.data/edgeDistanceDT/",
+  new.path = ".WIP/simulation.data/edgeDistanceDTbis/",
+  partitioning.vec = c("netgen_name","n","samp.eff")
+)
+
+aggregate_parquets(
+  dist.param.aggregated,
+  dataset          = "edgeDT",
+  sources.path     = ".WIP/simulation.data/edgeDT/",
+  new.path         = ".WIP/simulation.data/edgeDTbis/",
+  partitioning.vec = c("netgen_name","n","samp.eff")
+)
+
+arrow::open_dataset(sources = ".WIP/simulation.data/edgeDistanceDTbis/",format = "parquet") |>
+  dplyr::relocate(c("netgen_name","n","samp.eff",
+                    "group.number","group.rep",
+                    "reference","type","i","j",
+                    "weight.mean","KS.stat","KS.p",
+                    "KL","JS")) |>
+  dplyr::arrange(n,samp.eff,group.number,group.rep,i,j)
 
 # Reimporting results ----
-query_edgeDistanceDT(edgeDistanceDT.path = ".WIP/simulation.data/edgeDTbis/") |>
-  filter(n == 5) |> collect()
+bench <-
+  microbenchmark::microbenchmark(
+    aggregated = reconstruct_adjacencies(.netgen_name = "GWC",.n = 15,.samp.eff = 500,.type = "real",.group.number = 3,.group.rep = 24,
+                            edgeDT.path = ".WIP/simulation.data/edgeDTbis/"),
+    split = reconstruct_adjacencies(.netgen_name = "GWC",.n = 15,.samp.eff = 500,.type = "real",.group.number = 3,.group.rep = 24,
+                            edgeDT.path = ".WIP/simulation.data/edgeDT/"),
+    times = 10,unit = "ms"
+  )
+bench |> plot()
+query_edgeDT(edgeDT.path = ".WIP/simulation.data/edgeDT/") |>
+  filter(n == 5,samp.eff == 150 & group.number == 3) |> collect()
+query_edgeDistanceDT(edgeDistanceDT.path = ".WIP/simulation.data/edgeDistanceDT/") |>
+  filter(n == 5,samp.eff == 150 & group.number == 3) |> collect()
 arrow::open_dataset(sources = ".WIP/simulation.data/edgeDT/")
 
 ## Plotting distances ----
