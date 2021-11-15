@@ -411,7 +411,7 @@ prepare_for_distances <- function(param.list,
                                   edgeDistanceData.path = ".WIP/simulation.data/edgeDistanceData/",
                                   edgeDistanceData.path.tmp = pastetmp(edgeDistanceData.path),
                                   partitioning.vec = c("netgen_name","n","samp.eff"),
-                                  n.chunks = 3L,n.cores = 7L) {
+                                  n.each,n.chunks = 3L,n.cores = 7L) {
   n.each <- max(param.list$group.rep)
   dist.param <-
     param.list |>
@@ -420,7 +420,8 @@ prepare_for_distances <- function(param.list,
     {\(.) suppressMessages(dplyr::summarise(.))}() |>
     data.table::setDT() |>
     {\(.) lapply(parallel::splitIndices(n.each,n.chunks),\(v) {.$group.rep <- list(v);.})}() |>
-    data.table::rbindlist()
+    data.table::rbindlist() |>
+    {\(.) .[order(netgen_name,n,samp.eff,group.number)]}()
 
   message("Creating parallel workers...")
   cl <- parallel::makeCluster(n.cores)
@@ -520,7 +521,9 @@ measure_distances <- function(param.list,
     {\(.) suppressMessages(dplyr::summarise(.))}() |>
     data.table::setDT() |>
     {\(.) lapply(parallel::splitIndices(n.each,n.chunks),\(v) {.$group.rep <- list(v);.})}() |>
-    data.table::rbindlist()
+    data.table::rbindlist() |>
+    {\(.) .[order(netgen_name,n,samp.eff,group.number)]}()
+
   message("Creating parallel workers...")
   cl <- parallel::makeCluster(n.cores)
   on.exit({parallel::stopCluster(cl);rm(cl);gc()})
@@ -568,6 +571,7 @@ adjacencies_to_dt <- function(adj.array) {
 
 ## Aggregate parquet files ----
 aggregate_parquets_single <- function(r,
+                                      param.list.aggregated = param.list.aggregated,
                                       dataset = c("edgeDT","edgeDistanceDT","edgeDistanceData"),
                                       sources.path,
                                       new.path,
@@ -609,6 +613,7 @@ aggregate_parquets <- function(param.list.aggregated,
   pbapply::pblapply(
     X = 1:nrow(param.list.aggregated),
     FUN = aggregate_parquets_single,
+    param.list.aggregated = param.list.aggregated,
     dataset = dataset,
     sources.path = sources.path,
     new.path = new.path,
@@ -616,6 +621,7 @@ aggregate_parquets <- function(param.list.aggregated,
     cl = cl
   )
 }
+
 
 ## Retrieve from Arrow's datasets ----
 complete_edgedt <- function(dt,n,n.rep) {
