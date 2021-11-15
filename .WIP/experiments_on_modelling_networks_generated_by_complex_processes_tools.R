@@ -318,83 +318,6 @@ run_simulations <- function(param.list,n.cores = 7,edgeDT.path = ".WIP/simulatio
   message("Simulations done!")
 }
 
-## Aggregating edge weight data ----
-adjacencies_to_dt <- function(adj.array) {
-  .n     <- dim(adj.array)[1]
-  .n.rep <- dim(adj.array)[3]
-
-  expand.grid(i = 1:.n,j = 1:.n,rep = 1:.n.rep) |>
-    data.table::setDT() |>
-    cbind(weight = c(adj.array)) |>
-    subset(i < j)
-}
-
-agregate_edgeDT_single <- function(r,dataset.path = ".WIP/simulation.data/edgeDT/") {
-  n            <- param.list$n[r]
-  samp.eff     <- param.list$samp.eff[r]
-  netgen_name  <- param.list$netgen_name [r]
-  n.rep        <- param.list$n.rep[r]
-  group.number <- param.list$group.number[r]
-  group.rep    <- param.list$group.rep[r]
-  real         <- param.list$netgen_output[[r]][type == "real"]$dist[[1]][[1]]
-  real.bis     <- param.list$netgen_output[[r]][type == "real.bis"]$dist[[1]][[1]]
-  other        <- param.list$netgen_output[[r]][type == "other"]$dist[[1]][[1]]
-  ER           <- param.list$netgen_output[[r]][type == "ER"]$dist[[1]][[1]]
-  fixed.rand   <- param.list$netgen_output[[r]][type == "fixed.rand"]$dist[[1]][[1]]
-  total.rand   <- param.list$netgen_output[[r]][type == "total.rand"]$dist[[1]][[1]]
-  SimuNet      <- param.list$netgen_output[[r]][type == "SimuNet"]$dist[[1]][[1]]
-  edge.dt <-
-    expand.grid(i = 1:n,j = 1:n,rep = 1:n.rep) |>
-    subset(i < j) |>
-    {
-      \(x) rbind(
-        cbind(x,n = n,samp.eff = samp.eff,n.rep = n.rep,type = "real",
-              weight = real[as.matrix(x)]),
-        cbind(x,n = n,samp.eff = samp.eff,n.rep = n.rep,type = "real.bis",
-              weight = real.bis[as.matrix(x)]),
-        cbind(x,n = n,samp.eff = samp.eff,n.rep = n.rep,type = "other",
-              weight = other[as.matrix(x)]),
-        cbind(x,n = n,samp.eff = samp.eff,n.rep = n.rep,type = "ER",
-              weight = ER[as.matrix(x)]),
-        cbind(x,n = n,samp.eff = samp.eff,n.rep = n.rep,type = "fixed.rand",
-              weight = fixed.rand[as.matrix(x)]),
-        cbind(x,n = n,samp.eff = samp.eff,n.rep = n.rep,type = "total.rand",
-              weight = total.rand[as.matrix(x)]),
-        cbind(x,n = n,samp.eff = samp.eff,n.rep = n.rep,type = "SimuNet",
-              weight = SimuNet[as.matrix(x)])
-      )
-    }() |>
-    data.table::data.table()
-  edge.dt$type <-
-    edge.dt$type |>
-    factor(levels = c("real","real.bis","SimuNet","other","ER","fixed.rand","total.rand"))
-  cbind(edge.dt,netgen_name = netgen_name,group.number = group.number,group.rep = group.rep) |>
-    arrow::write_dataset(path = dataset.path,
-                         partitioning = c("netgen_name","n","samp.eff","group.number","group.rep")
-    )
-  NULL
-}
-
-aggregate_edgeDT <- function(param.list,n.cores = 7) {
-  message("Creating parallel workers...")
-  cl <- parallel::makeCluster(n.cores)
-  on.exit({parallel::stopCluster(cl);rm(cl);gc()})
-  parallel::clusterExport(
-    cl,
-    list(
-      "param.list",
-      "agregate_edgeDT_single",
-      "data.table"
-    )
-  )
-  message("Aggregating edge weights into Arrow dataset...")
-  pbapply::pblapply(
-    X = 1:nrow(param.list),
-    FUN = agregate_edgeDT_single,
-    cl = cl
-  )
-}
-
 ## Calculating edge weight distribution distances ----
 ### formating edge weight data to measure distances ----
 prepare_for_distances_single <-
@@ -514,7 +437,7 @@ measure_distances <- function(dist.param,n.cores = 7L) {
   on.exit({parallel::stopCluster(cl);rm(cl);gc()})
   parallel::clusterExport(cl,list("dist.param","measure_distances_single"),envir = .GlobalEnv)
 
-  message("Preparing distances data...")
+  message("Measuring distances...")
   pbapply::pblapply(1:nrow(dist.param),measure_distances_single,cl = cl)
 }
 
@@ -583,16 +506,16 @@ reconstruct_adjacencies <- function(.netgen_name,
                                     n.rep = 105L,
                                     edgeDT.path = ".WIP/simulation.data/edgeDT/") {
   query_edgeDT(edgeDT.path = edgeDT.path) |>
-    filter(netgen_name  == .netgen_name,
+    dplyr::filter(netgen_name  == .netgen_name,
            n            == .n,
            samp.eff     == .samp.eff,
            type         == .type,
            group.number == .group.number,
            group.rep    == .group.rep) |>
-    select(rep,i,j,weight) |>
+    dplyr::select(rep,i,j,weight) |>
     collect() |>
     complete_edgedt(n = .n,n.rep = n.rep) |>
-    pull(weight) |>
+    dplyr::pull(weight) |>
     array(c(.n,.n,n.rep),dimnames = list(as.character(1:.n),as.character(1:.n),NULL))
 }
 
