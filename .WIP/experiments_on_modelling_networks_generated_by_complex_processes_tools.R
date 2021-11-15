@@ -410,6 +410,7 @@ prepare_for_distances <- function(param.list,
                                   edgeDT.path = ".WIP/simulation.data/edgeDT/",
                                   edgeDistanceData.path = ".WIP/simulation.data/edgeDistanceData/",
                                   edgeDistanceData.path.tmp = pastetmp(edgeDistanceData.path),
+                                  delete.tmp = TRUE,
                                   partitioning.vec = c("netgen_name","n","samp.eff"),
                                   n.each,n.chunks = 3L,n.cores = 7L) {
   n.each <- max(param.list$group.rep)
@@ -453,7 +454,8 @@ prepare_for_distances <- function(param.list,
     partitioning.vec = partitioning.vec,
     n.cores = n.cores
   )
-  unlink(edgeDistanceData.path.tmp,recursive = TRUE)
+  if (delete.tmp)
+    unlink(edgeDistanceData.path.tmp,recursive = TRUE)
   message("Preparations done!")
 }
 
