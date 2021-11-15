@@ -518,6 +518,53 @@ measure_distances <- function(dist.param,n.cores = 7L) {
   pbapply::pblapply(1:nrow(dist.param),measure_distances_single,cl = cl)
 }
 
+## Aggregate parquet files ----
+aggregate_parquets_single <- function(r,
+                                      dataset = c("edgeDT","edgeDistanceDT"),
+                                      sources.path,
+                                      new.path,
+                                      partitioning.vec = c("netgen_name","n","samp.eff")) {
+  dataset <- match.arg(dataset)
+  query_fun <- switch(dataset,"edgeDT" = query_edgeDT,"edgeDistanceDT" = query_edgeDistanceDT)
+  .n             <- dist.param.aggregated$n[r]
+  .samp.eff      <- dist.param.aggregated$samp.eff[r]
+  # .group.number  <- dist.param.aggregated$group.number[r]
+
+  query_fun(sources.path) |>
+    dplyr::filter(n == .n & samp.eff == .samp.eff) |># & group.number == .group.number) |>
+    arrow::write_dataset(path = new.path,
+                         partitioning = partitioning.vec)
+  message("Aggregation done!")
+  "Aggregation done!"
+}
+
+aggregate_parquets <- function(dist.param.aggregated,
+                               dataset = c("edgeDT","edgeDistanceDT"),
+                               sources.path,
+                               new.path,
+                               partitioning.vec = c("netgen_name","n","samp.eff"),
+                               n.cores = 7L) {
+  message("Creating parallel workers...")
+  cl <- parallel::makeCluster(7L)
+  on.exit({parallel::stopCluster(cl);rm(cl);gc()})
+  parallel::clusterExport(cl,
+                          list("dist.param.aggregated",
+                                  "aggregate_parquets_single",
+                                  "query_edgeDT",
+                                  "query_edgeDistanceDT"),
+                          envir = environment())
+  message("Aggregating parquet files...")
+  pbapply::pblapply(
+    X = 1:nrow(dist.param.aggregated),
+    FUN = aggregate_parquets_single,
+    dataset = dataset,
+    sources.path = sources.path,
+    new.path = new.path,
+    partitioning.vec = partitioning.vec,
+    cl = cl
+  )
+}
+
 ## Retrieve from Arrow's datasets ----
 complete_edgedt <- function(dt,n,n.rep) {
   expand.grid(rep = 1:n.rep,i = 1:n,j = 1:n,weight = 0L) |>
