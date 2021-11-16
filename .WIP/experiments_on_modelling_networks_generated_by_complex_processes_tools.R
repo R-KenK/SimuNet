@@ -468,13 +468,13 @@ measure_distances_single <-
     .n            <- dist.param$n[r]
     .samp.eff     <- dist.param$samp.eff[r]
     .group.number <- dist.param$group.number[r]
-    # .group.rep    <- dist.param$group.rep[r]
+    .group.rep    <- dist.param$group.rep[[r]]
     arrow::open_dataset(sources = edgeDistanceData.path,format = "parquet") |>
       dplyr::filter(netgen_name %in% .netgen_name &
                       n %in% .n &
                       samp.eff %in% .samp.eff &
-                      group.number %in% .group.number# &
-                      # group.rep %in% .group.rep
+                      group.number %in% .group.number &
+                      group.rep %in% .group.rep
                     ) |>
       dplyr::collect() |>
       {\(.) {
@@ -505,7 +505,7 @@ measure_distances_single <-
                     "group.number","group.rep",
                     "reference","type","i","j")) |>
       arrow::write_dataset(path = edgeDistanceDT.path,
-                           partitioning = c("netgen_name","n","samp.eff","group.number"))#,"group.rep"))
+                           partitioning = c("netgen_name","n","samp.eff","group.number","group.rep"))
     rm(dt);gc()
     NULL
   }
@@ -514,8 +514,9 @@ measure_distances <- function(param.list,
                               edgeDistanceData.path = ".WIP/simulation.data/edgeDistanceData/",
                               edgeDistanceDT.path = ".WIP/simulation.data/edgeDistanceDT/",
                               edgeDistanceDT.path.tmp = pastetmp(edgeDistanceDT.path),
+                              delete.tmp = TRUE,
                               partitioning.vec = c("netgen_name","n","samp.eff"),
-                              n.chunks = 3L,n.cores = 7L) {
+                              n.each,n.chunks = 3L,n.cores = 7L) {
   dist.param <-
     param.list |>
     dplyr::select(n,netgen_name,samp.eff,group.number) |>
@@ -602,7 +603,7 @@ aggregate_parquets <- function(param.list.aggregated,
                                partitioning.vec = c("netgen_name","n","samp.eff"),
                                n.cores = 7L) {
   message("Creating parallel workers...")
-  cl <- parallel::makeCluster(7L)
+  cl <- parallel::makeCluster(n.cores)
   on.exit({parallel::stopCluster(cl);rm(cl);gc()})
   parallel::clusterExport(cl,
                           list("param.list.aggregated",
