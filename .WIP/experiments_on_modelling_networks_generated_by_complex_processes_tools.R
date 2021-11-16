@@ -299,6 +299,7 @@ run_simulation_single <- function(r) {
 run_simulations <- function(param.list,n.cores = 7,
                             edgeDT.path = ".WIP/simulation.data/edgeDT/",
                             edgeDT.path.tmp = pastetmp(edgeDT.path),
+                            delete.tmp = TRUE,
                             partitioning.vec = c("netgen_name","n","samp.eff")) {
   message("Creating parallel workers...")
   cl <- parallel::makeCluster(n.cores)
@@ -330,22 +331,12 @@ run_simulations <- function(param.list,n.cores = 7,
   ]
   message("Flushing parallel workers...")
   parallel::stopCluster(cl);rm(cl);gc();on.exit()
-  param.list.aggregated <-
-    param.list |>
-    select(-group.number,-group.rep) |>
-    group_by(n,netgen_name,samp.eff) |>
-    {\(.) suppressMessages(summarise(.))}() |>
-    setDT()
-  param.list.aggregated[]
-  aggregate_parquets(
-    param.list.aggregated = param.list.aggregated,
-    dataset = "edgeDT",
-    sources.path = edgeDT.path.tmp,
-    new.path = edgeDT.path,
-    partitioning.vec = partitioning.vec,
-    n.cores = n.cores
-  )
-  unlink(edgeDT.path.tmp,recursive = TRUE)
+  query_edgeDistanceDT(edgeDT.path.tmp) |>
+    arrow::write_dataset(path = edgeDT.path,
+                         partitioning = partitioning.vec)
+  if (delete.tmp)
+    unlink(edgeDistanceDT.path.tmp,recursive = TRUE)
+
   message("Simulations done!")
 }
 
@@ -617,12 +608,12 @@ aggregate_parquets <- function(param.list.aggregated,
 
 
 ## Retrieve from Arrow's datasets ----
-complete_edgedt <- function(dt,n,n.rep) {
-  expand.grid(rep = 1:n.rep,i = 1:n,j = 1:n,weight = 0L) |>
+complete_edgedt <- function(dt,.group.rep,n,n.rep) {
+  expand.grid(group.rep = .group.rep,rep = 1:n.rep,i = 1:n,j = 1:n,weight = 0L) |>
     setDT() |>
     subset(i >= j) |>
     rbind(dt) |>
-    arrange(rep,j,i,rep)
+    arrange(rep,group.rep,j,i)
 }
 
 reconstruct_adjacencies <- function(.netgen_name,
@@ -634,17 +625,18 @@ reconstruct_adjacencies <- function(.netgen_name,
                                     n.rep = 105L,
                                     edgeDT.path = ".WIP/simulation.data/edgeDT/") {
   query_edgeDT(edgeDT.path = edgeDT.path) |>
-    dplyr::filter(netgen_name  == .netgen_name,
-           n            == .n,
-           samp.eff     == .samp.eff,
-           type         == .type,
-           group.number == .group.number,
-           group.rep    == .group.rep) |>
-    dplyr::select(rep,i,j,weight) |>
+    dplyr::filter(
+      netgen_name  %in% .netgen_name,
+      n            %in% .n,
+      samp.eff     %in% .samp.eff,
+      type         %in% .type,
+      group.number %in% .group.number,
+      group.rep    %in% .group.rep) |>
+    dplyr::select(group.rep,rep,i,j,weight) |>
     collect() |>
-    complete_edgedt(n = .n,n.rep = n.rep) |>
+    complete_edgedt(.group.rep = .group.rep,n = .n,n.rep = n.rep * length(.group.rep)) |>
     dplyr::pull(weight) |>
-    array(c(.n,.n,n.rep),dimnames = list(as.character(1:.n),as.character(1:.n),NULL))
+    array(c(.n,.n,n.rep * length(.group.rep)),dimnames = list(as.character(1:.n),as.character(1:.n),NULL))
 }
 
 query_edgeDT <- function(edgeDT.path = ".WIP/simulation.data/edgeDT/") {

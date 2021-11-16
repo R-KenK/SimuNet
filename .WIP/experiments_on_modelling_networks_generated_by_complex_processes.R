@@ -37,7 +37,7 @@ param.list
 ## Generating the weighted adjacency matrices ----
 start.time <- Sys.time()
 start.time
-run_simulations(param.list = param.list,n.cores = 7)
+run_simulations(param.list = param.list,delete.tmp = FALSE,n.cores = 7)
 end.time <- Sys.time()
 end.time
 end.time - start.time
@@ -72,6 +72,30 @@ query_edgeDistanceDT(edgeDistanceDT.path = ".WIP/simulation.data/edgeDistanceDT/
   filter(n == 5 & samp.eff == 150) |>
   collect()
 
+query_edgeDT(edgeDT.path = ".WIP/simulation.data/edgeDT/") |>
+  filter(n == 5 & samp.eff == 500 & group.number == 1 & group.rep == 1) |>
+  filter(type %in% c("real","real.bis","SimuNet")) |>
+  collect() |>
+  ggplot(aes(type,weight,colour = type))+
+  geom_point(aes(interaction(type,j,i)),alpha = .3,position = position_jitterdodge())+
+  theme_bw()
+
+
+reconstruct_adjacencies(.netgen_name = "GWC",.n = 15,.samp.eff = 250,.type = "SimuNet",
+                        .group.number = 1,.group.rep = 1,n.rep = 105L) |>
+  {\(.) .[,,1]}()
+
+reconstruct_adjacencies(.netgen_name = "GWC",.n = 15,.samp.eff = 250,.type = "real",
+                        .group.number = 1,.group.rep = 1,n.rep = 105L) |>
+  {\(.) .[,,1]}() |>
+  {\(.) replicate(
+    n = 105,
+    simunet(.,250,"upper",250) |>
+      sum_scans()
+  )}()
+
+reconstruct_adjacencies(.netgen_name = "GWC",.n = 15,.samp.eff = 250,.type = "SimuNet",
+                        .group.number = 1,.group.rep = 1,n.rep = 105L)
 ## Plotting distances ----
 ### Single case as boxplots ----
 KS.stat <-
