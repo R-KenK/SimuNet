@@ -543,21 +543,11 @@ measure_distances <- function(param.list,
   message("Flushing parallel workers...")
   parallel::stopCluster(cl);rm(cl);gc();on.exit()
 
-  param.list.aggregated <-
-    param.list |>
-    dplyr::select(-group.number,-group.rep) |>
-    dplyr::group_by(n,netgen_name,samp.eff) |>
-    {\(.) suppressMessages(dplyr::summarise(.))}() |>
-    data.table::setDT()
-  aggregate_parquets(
-    param.list.aggregated = param.list.aggregated,
-    dataset = "edgeDistanceDT",
-    sources.path = edgeDistanceDT.path.tmp,
-    new.path = edgeDistanceDT.path,
-    partitioning.vec = partitioning.vec,
-    n.cores = n.cores
-  )
-  unlink(edgeDistanceDT.path.tmp,recursive = TRUE)
+  query_edgeDistanceDT(edgeDistanceDT.path.tmp) |>
+    arrow::write_dataset(path = edgeDistanceDT.path,
+                         partitioning = partitioning.vec)
+  if (delete.tmp)
+    unlink(edgeDistanceDT.path.tmp,recursive = TRUE)
   message("Distances measured!")
 }
 
