@@ -201,7 +201,8 @@ pastetmp <- function(path) {
 }
 
 ## Simulating weighted adjacency matrices ----
-run_simulation_single <- function(r) {
+run_simulation_single <- function(r,
+                                  edgeDT.path = ".WIP/simulation.data/edgeDT/") {
   param.list.row  <- param.list[r,]
   n               <- param.list$n[r];
   samp.eff        <- param.list$samp.eff[r];
@@ -277,11 +278,11 @@ run_simulation_single <- function(r) {
             dist = list(
               real,
               real.bis,
+              SimuNet,
               other,
               ER,
               fixed.rand,
-              total.rand,
-              SimuNet
+              total.rand
             )
           )
         netgen_output[,dist := lapply(dist,adjacencies_to_dt)] |>
@@ -318,20 +319,16 @@ run_simulations <- function(param.list,n.cores = 7,
     ),
     envir = environment()
   )
-  parallel::clusterExport(cl,list("edgeDT.path.tmp"),envir = environment())
   message("Running the simulations...")
-  param.list[
-    ,
-    netgen_output :=
-      pbapply::pblapply(
-        X = 1:nrow(param.list),
-        FUN = run_simulation_single,
-        cl = cl
-      )
-  ]
+  pbapply::pblapply(
+    X = 1:nrow(param.list),
+    FUN = run_simulation_single,
+    edgeDT.path = edgeDT.path.tmp,
+    cl = cl
+  )
   message("Flushing parallel workers...")
   parallel::stopCluster(cl);rm(cl);gc();on.exit()
-  query_edgeDistanceDT(edgeDT.path.tmp) |>
+  query_edgeDT(edgeDT.path.tmp) |>
     arrow::write_dataset(path = edgeDT.path,
                          partitioning = partitioning.vec)
   if (delete.tmp)
