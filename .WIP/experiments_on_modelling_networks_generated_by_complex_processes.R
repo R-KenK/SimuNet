@@ -56,7 +56,7 @@ end.time - start.time
 ## Measure edge weights distribution distances ----
 start.time <- Sys.time()
 start.time
-measure_distances(dist.param)
+measure_distances(param.list = param.list,n.each = n.each,n.chunks = 7)
 end.time <- Sys.time()
 end.time
 end.time - start.time
@@ -68,9 +68,8 @@ query_edgeDT(edgeDT.path = ".WIP/simulation.data/edgeDT/") |>
 query_edgeDistanceData(".WIP/simulation.data/edgeDistanceData/") |>
   filter(n == 5 & samp.eff == 10 & group.number == 3) |>
   collect()
-arrow::open_dataset(sources = ".WIP/simulation.data/edgeDT/")
 query_edgeDistanceDT(edgeDistanceDT.path = ".WIP/simulation.data/edgeDistanceDT/") |>
-  filter(n == 5,samp.eff == 150 & group.number == 3) |>
+  filter(n == 5 & samp.eff == 150) |>
   collect()
 
 ## Plotting distances ----
