@@ -338,11 +338,11 @@ run_simulations <- function(param.list,n.cores = 7,
 }
 
 ## Calculating edge weight distribution distances ----
-### formating edge weight data to measure distances ----
-prepare_for_distances_single <-
+### formatting edge weight data to measure distances ----
+measure_distances_single <-
   function(r,
            edgeDT.path = ".WIP/simulation.data/edgeDT/",
-           edgeDistanceData.path = ".WIP/simulation.data/edgeDistanceData/") {
+           edgeDistanceDT.path = ".WIP/simulation.data/edgeDistanceDT/") {
     .netgen_name  <- dist.param$netgen_name[r]
     .n            <- dist.param$n[r]
     .samp.eff     <- dist.param$samp.eff[r]
@@ -377,94 +377,14 @@ prepare_for_distances_single <-
       }() |>
       tidyfast::dt_unnest(weight.mat)
 
-    dt <-
-      dt[type == "real"][,type := NULL][] |>
+    dt[type == "real"][,type := NULL][] |>
       data.table::setnames(
         old = c("weight.mean","weight.prob"),
         new = c("real.weight.mean","real.weight.prob")) |>
       data.table::merge.data.table(
         x = dt,
         by = c("netgen_name","n","samp.eff","group.number","group.rep","i","j","possible")) |>
-      subset(type != "real")
-
-    arrow::write_dataset(dt,path = edgeDistanceData.path,
-                         format = "parquet",
-                         partitioning = c("netgen_name","n","samp.eff","group.number","group.rep"))
-    rm(dt);gc()
-    NULL
-  }
-
-prepare_for_distances <- function(param.list,
-                                  edgeDT.path = ".WIP/simulation.data/edgeDT/",
-                                  edgeDistanceData.path = ".WIP/simulation.data/edgeDistanceData/",
-                                  edgeDistanceData.path.tmp = pastetmp(edgeDistanceData.path),
-                                  delete.tmp = TRUE,
-                                  partitioning.vec = c("netgen_name","n","samp.eff"),
-                                  n.each,n.chunks = 3L,n.cores = 7L) {
-  n.each <- max(param.list$group.rep)
-  dist.param <-
-    param.list |>
-    dplyr::select(n,netgen_name,samp.eff,group.number) |>
-    dplyr::group_by(n,netgen_name,samp.eff,group.number) |>
-    {\(.) suppressMessages(dplyr::summarise(.))}() |>
-    data.table::setDT() |>
-    {\(.) lapply(parallel::splitIndices(n.each,n.chunks),\(v) {.$group.rep <- list(v);.})}() |>
-    data.table::rbindlist() |>
-    {\(.) .[order(netgen_name,n,samp.eff,group.number)]}()
-
-  message("Creating parallel workers...")
-  cl <- parallel::makeCluster(n.cores)
-  on.exit({parallel::stopCluster(cl);rm(cl);gc()})
-  parallel::clusterExport(cl,list("dist.param","prepare_for_distances_single"),envir = environment())
-
-  message("Preparing distances data...")
-  pbapply::pblapply(
-    1:nrow(dist.param),
-    prepare_for_distances_single,
-    edgeDT.path = edgeDT.path,
-    edgeDistanceData.path = edgeDistanceData.path.tmp,
-    cl = cl
-  )
-  message("Flushing parallel workers...")
-  parallel::stopCluster(cl);rm(cl);gc();on.exit()
-
-  param.list.aggregated <-
-    param.list |>
-    dplyr::select(-group.number,-group.rep) |>
-    dplyr::group_by(n,netgen_name,samp.eff) |>
-    {\(.) suppressMessages(dplyr::summarise(.))}() |>
-    data.table::setDT()
-  aggregate_parquets(
-    param.list.aggregated = param.list.aggregated,
-    dataset = "edgeDistanceData",
-    sources.path = edgeDistanceData.path.tmp,
-    new.path = edgeDistanceData.path,
-    partitioning.vec = partitioning.vec,
-    n.cores = n.cores
-  )
-  if (delete.tmp)
-    unlink(edgeDistanceData.path.tmp,recursive = TRUE)
-  message("Preparations done!")
-}
-
-### measure edge weight distributions distances ----
-measure_distances_single <-
-  function(r,
-           edgeDistanceData.path = ".WIP/simulation.data/edgeDistanceData/",
-           edgeDistanceDT.path = ".WIP/simulation.data/edgeDistanceDT/") {
-    .netgen_name  <- dist.param$netgen_name[r]
-    .n            <- dist.param$n[r]
-    .samp.eff     <- dist.param$samp.eff[r]
-    .group.number <- dist.param$group.number[r]
-    .group.rep    <- dist.param$group.rep[[r]]
-    arrow::open_dataset(sources = edgeDistanceData.path,format = "parquet") |>
-      dplyr::filter(netgen_name %in% .netgen_name &
-                      n %in% .n &
-                      samp.eff %in% .samp.eff &
-                      group.number %in% .group.number &
-                      group.rep %in% .group.rep
-                    ) |>
-      dplyr::collect() |>
+      subset(type != "real") |>
       {\(.) {
         .[order(netgen_name,n,samp.eff,group.number,group.rep,type,i,j,possible)
         ][
@@ -490,21 +410,22 @@ measure_distances_single <-
         ]
       }}() |>
       data.table::setcolorder(c("netgen_name","n","samp.eff",
-                    "group.number","group.rep",
-                    "reference","type","i","j")) |>
+                                "group.number","group.rep",
+                                "reference","type","i","j")) |>
       arrow::write_dataset(path = edgeDistanceDT.path,
                            partitioning = c("netgen_name","n","samp.eff","group.number","group.rep"))
     rm(dt);gc()
-    NULL
+    message("distances measured!")
   }
 
 measure_distances <- function(param.list,
-                              edgeDistanceData.path = ".WIP/simulation.data/edgeDistanceData/",
-                              edgeDistanceDT.path = ".WIP/simulation.data/edgeDistanceDT/",
-                              edgeDistanceDT.path.tmp = pastetmp(edgeDistanceDT.path),
-                              delete.tmp = TRUE,
-                              partitioning.vec = c("netgen_name","n","samp.eff"),
-                              n.each,n.chunks = 3L,n.cores = 7L) {
+                                  edgeDT.path = ".WIP/simulation.data/edgeDT/",
+                                  edgeDistanceDT.path = ".WIP/simulation.data/edgeDistanceDT/",
+                                  edgeDistanceDT.path.tmp = pastetmp(edgeDistanceDT.path),
+                                  delete.tmp = TRUE,
+                                  partitioning.vec = c("netgen_name","n","samp.eff"),
+                                  n.each,n.chunks = 3L,n.cores = 7L) {
+  n.each <- max(param.list$group.rep)
   dist.param <-
     param.list |>
     dplyr::select(n,netgen_name,samp.eff,group.number) |>
@@ -524,20 +445,128 @@ measure_distances <- function(param.list,
   pbapply::pblapply(
     1:nrow(dist.param),
     measure_distances_single,
-    edgeDistanceData.path = edgeDistanceData.path,
+    edgeDT.path = edgeDT.path,
     edgeDistanceDT.path = edgeDistanceDT.path.tmp,
     cl = cl
   )
   message("Flushing parallel workers...")
   parallel::stopCluster(cl);rm(cl);gc();on.exit()
 
+  message("Aggregating individual .parquet files...")
   query_edgeDistanceDT(edgeDistanceDT.path.tmp) |>
     arrow::write_dataset(path = edgeDistanceDT.path,
                          partitioning = partitioning.vec)
+
+  # param.list.aggregated <-
+  #   param.list |>
+  #   dplyr::select(-group.number,-group.rep) |>
+  #   dplyr::group_by(n,netgen_name,samp.eff) |>
+  #   {\(.) suppressMessages(dplyr::summarise(.))}() |>
+  #   data.table::setDT()
+  # aggregate_parquets(
+  #   param.list.aggregated = param.list.aggregated,
+  #   dataset = "edgeDistanceDT",
+  #   sources.path = edgeDistanceDT.path.tmp,
+  #   new.path = edgeDistanceDT.path,
+  #   partitioning.vec = partitioning.vec,
+  #   n.cores = n.cores
+  # )
   if (delete.tmp)
     unlink(edgeDistanceDT.path.tmp,recursive = TRUE)
   message("Distances measured!")
 }
+
+### measure edge weight distributions distances ----
+# measure_distances_single <-
+#   function(r,
+#            edgeDistanceData.path = ".WIP/simulation.data/edgeDistanceData/",
+#            edgeDistanceDT.path = ".WIP/simulation.data/edgeDistanceDT/") {
+#     .netgen_name  <- dist.param$netgen_name[r]
+#     .n            <- dist.param$n[r]
+#     .samp.eff     <- dist.param$samp.eff[r]
+#     .group.number <- dist.param$group.number[r]
+#     .group.rep    <- dist.param$group.rep[[r]]
+#     arrow::open_dataset(sources = edgeDistanceData.path,format = "parquet") |>
+#       dplyr::filter(netgen_name %in% .netgen_name &
+#                       n %in% .n &
+#                       samp.eff %in% .samp.eff &
+#                       group.number %in% .group.number &
+#                       group.rep %in% .group.rep
+#                     ) |>
+#       dplyr::collect() |>
+#       {\(.) {
+#         .[order(netgen_name,n,samp.eff,group.number,group.rep,type,i,j,possible)
+#         ][
+#           ,mean.diff := abs(weight.mean - real.weight.mean)
+#         ][
+#           ,c("KS.stat","KS.p") :=
+#             suppressWarnings(
+#               ks.test(weight.prob,real.weight.prob,exact = FALSE)[c("statistic","p.value")]
+#             )
+#           ,by = .(netgen_name,n,samp.eff,group.number,group.rep,type,i,j)
+#         ][
+#           ,.(
+#             KL    = suppressMessages(philentropy::KL(rbind(weight.prob,real.weight.prob))),
+#             JS    = suppressMessages(philentropy::JSD(rbind(weight.prob,real.weight.prob)))#,
+#             # EMD.e = emdist::emd(cbind(possible,weight.prob),
+#             #                     cbind(possible,real.weight.prob),dist = "euclidean"),
+#             # EMD.m = emdist::emd(cbind(possible,weight.prob),
+#             #                     cbind(possible,real.weight.prob),dist = "manhattan")
+#           )
+#           ,by = .(netgen_name,n,samp.eff,group.number,group.rep,type,i,j,weight.mean,KS.stat,KS.p)
+#         ][
+#           ,reference := "real"
+#         ]
+#       }}() |>
+#       data.table::setcolorder(c("netgen_name","n","samp.eff",
+#                     "group.number","group.rep",
+#                     "reference","type","i","j")) |>
+#       arrow::write_dataset(path = edgeDistanceDT.path,
+#                            partitioning = c("netgen_name","n","samp.eff","group.number","group.rep"))
+#     rm(dt);gc()
+#     NULL
+#   }
+#
+# measure_distances <- function(param.list,
+#                               edgeDistanceData.path = ".WIP/simulation.data/edgeDistanceData/",
+#                               edgeDistanceDT.path = ".WIP/simulation.data/edgeDistanceDT/",
+#                               edgeDistanceDT.path.tmp = pastetmp(edgeDistanceDT.path),
+#                               delete.tmp = TRUE,
+#                               partitioning.vec = c("netgen_name","n","samp.eff"),
+#                               n.each,n.chunks = 3L,n.cores = 7L) {
+#   dist.param <-
+#     param.list |>
+#     dplyr::select(n,netgen_name,samp.eff,group.number) |>
+#     dplyr::group_by(n,netgen_name,samp.eff,group.number) |>
+#     {\(.) suppressMessages(dplyr::summarise(.))}() |>
+#     data.table::setDT() |>
+#     {\(.) lapply(parallel::splitIndices(n.each,n.chunks),\(v) {.$group.rep <- list(v);.})}() |>
+#     data.table::rbindlist() |>
+#     {\(.) .[order(netgen_name,n,samp.eff,group.number)]}()
+#
+#   message("Creating parallel workers...")
+#   cl <- parallel::makeCluster(n.cores)
+#   on.exit({parallel::stopCluster(cl);rm(cl);gc()})
+#   parallel::clusterExport(cl,list("dist.param","measure_distances_single"),envir = environment())
+#
+#   message("Measuring distances...")
+#   pbapply::pblapply(
+#     1:nrow(dist.param),
+#     measure_distances_single,
+#     edgeDistanceData.path = edgeDistanceData.path,
+#     edgeDistanceDT.path = edgeDistanceDT.path.tmp,
+#     cl = cl
+#   )
+#   message("Flushing parallel workers...")
+#   parallel::stopCluster(cl);rm(cl);gc();on.exit()
+#
+#   query_edgeDistanceDT(edgeDistanceDT.path.tmp) |>
+#     arrow::write_dataset(path = edgeDistanceDT.path,
+#                          partitioning = partitioning.vec)
+#   if (delete.tmp)
+#     unlink(edgeDistanceDT.path.tmp,recursive = TRUE)
+#   message("Distances measured!")
+# }
 
 ## Aggregating edge weight data ----
 adjacencies_to_dt <- function(adj.array) {
