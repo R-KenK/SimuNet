@@ -143,8 +143,8 @@ generate_paramList <- function(param.n,param.samp.eff,param.netgen,
 
   param.list <-
     # generate one group per group.number
-    param.list[,by = .(n,samp.eff,netgen_name,n.rep,group.number),
-               .(netgen_args = list(
+    param.list[,by = .(n,netgen_name,n.rep,group.number),
+               `:=`(netgen_args = list(
                  group = data.table(
                    name = as.character(1:n),
                    value = runif(n),
@@ -155,33 +155,41 @@ generate_paramList <- function(param.n,param.samp.eff,param.netgen,
                )
                )
     ] |>
-    merge.data.table(x = param.list,by = c("n","samp.eff","netgen_name","n.rep","group.number")) %>%
     # generate one other group per group.number & group.rep
     {
-      .[,by = .(n,samp.eff,netgen_name,n.rep,group.number,group.rep),
-        .(
-          netgen_other = list(
-            group = data.table(
-              name = as.character(1:n),
-              value = runif(n),
-              rank = sample(1:n,n),
-              gregariousness = runif(n),
-              clique = sample(LETTERS[1:(rpois(1,1) + 1)],n,replace = TRUE)
-            )
-          ),
-          fixed.rand.prob = list(runif(n = (n^2 - n) / 2))
+      \(.) .[,by = .(n,netgen_name,n.rep,group.number),
+             `:=`(
+               netgen_other = list(
+                 group = data.table(
+                   name = as.character(1:n),
+                   value = runif(n),
+                   rank = sample(1:n,n),
+                   gregariousness = runif(n),
+                   clique = sample(LETTERS[1:(rpois(1,1) + 1)],n,replace = TRUE)
+                 )
+               )
+             )
+      ]
+    }() |>
+    {
+      \(.) .[,by = .(n,netgen_name,samp.eff,n.rep,group.number,group.rep),
+             `:=`(
+               fixed.rand.prob = list(runif(n = (n^2 - n) / 2))
+             )
+      ]
+    }() |>
+    {
+      \(.) .[
+        ,
+        `:=`(netgen_args = mapply(list,samp.eff = samp.eff,group = netgen_args,
+                                  fixed.rand.prob = fixed.rand.prob,SIMPLIFY = FALSE),
+             netgen_other = mapply(list,samp.eff = samp.eff,group = netgen_other,SIMPLIFY = FALSE)
         )
-      ] |>
-        merge.data.table(x = .,by = c("n","samp.eff","netgen_name","n.rep","group.number","group.rep"))
-    } %>%
-    # aggregates into a list the arguments to be passed to the netgen_fun
-    .[,
-      `:=`(netgen_args = mapply(list,samp.eff = samp.eff,group = netgen_args,
-                                fixed.rand.prob = fixed.rand.prob,SIMPLIFY = FALSE),
-           netgen_other = mapply(list,samp.eff = samp.eff,group = netgen_other,SIMPLIFY = FALSE)
-      )
-    ] %>%
-    .[,fixed.rand.prob := NULL]
+      ]
+    }() |>
+  # aggregates into a list the arguments to be passed to the netgen_fun
+    {\(.) .[,fixed.rand.prob := NULL]}()
+
   param.list
 }
 
