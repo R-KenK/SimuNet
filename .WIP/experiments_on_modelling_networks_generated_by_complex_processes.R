@@ -11,7 +11,7 @@ n.each  <- 56L
 ## generating the list of parameters ----
 param.n <-
   # seq(6,30,by = 3)
-  c(5,8,10,15,18)
+  c(5,8,10,15,18)[1]
 param.samp.eff <-
   # seq(20,500,by = 20)
   c(10,25,50,75,100,150,250,500)
@@ -61,6 +61,20 @@ end.time <- Sys.time()
 end.time
 end.time - start.time
 
+# troubleshooting bench ----
+param.list <-
+  param.list |> subset(n == 5 & samp.eff == 100 & group.number == 1)
+query_edgeDT() |>
+  filter(n == 5 & group.rep <= 10 & type %in% c("real","real.bis","SimuNet")) |>
+  collect() |>
+  ggplot(aes(type,weight,colour = type))+
+  geom_point(aes(interaction(type,j,i)),alpha = .3,position = position_jitterdodge())+
+  theme_bw()
+
+  param.list |> subset(n == 5 & samp.eff == 100 & group.number == 1)
+
+param.list[1]
+
 # Reimporting results ----
 query_edgeDT(edgeDT.path = ".WIP/simulation.data/edgeDT/") |>
   filter(n == 5 & samp.eff == 150 & group.number == 3) |>
@@ -81,18 +95,13 @@ query_edgeDT(edgeDT.path = ".WIP/simulation.data/edgeDT/") |>
   theme_bw()
 
 
-reconstruct_adjacencies(.netgen_name = "GWC",.n = 15,.samp.eff = 250,.type = "SimuNet",
-                        .group.number = 1,.group.rep = 1,n.rep = 105L) |>
-  {\(.) .[,,1]}()
+reconstruct_adjacencies(.netgen_name = "GWC",.n = 5,.samp.eff = 100,.type = "SimuNet",
+                        .group.number = 1,.group.rep = 1:5,n.rep = 105L) |>
+  {\(.) .[2,3,]}()
 
-reconstruct_adjacencies(.netgen_name = "GWC",.n = 15,.samp.eff = 250,.type = "real",
-                        .group.number = 1,.group.rep = 1,n.rep = 105L) |>
-  {\(.) .[,,1]}() |>
-  {\(.) replicate(
-    n = 105,
-    simunet(.,250,"upper",250) |>
-      sum_scans()
-  )}()
+reconstruct_adjacencies(.netgen_name = "GWC",.n = 5,.samp.eff = 100,.type = "real",
+                        .group.number = 1,.group.rep = 1:5,n.rep = 105L) |>
+  {\(.) .[2,3,]}()
 
 reconstruct_adjacencies(.netgen_name = "GWC",.n = 15,.samp.eff = 250,.type = "SimuNet",
                         .group.number = 1,.group.rep = 1,n.rep = 105L)
@@ -151,28 +160,28 @@ KS.stat <-
   filter(n == 8 & samp.eff == 75) |>
   collect() |>
   plot_distance(dist = "KS.stat",ylab = "Kolmogorov-Smirnoff statistic",
-                geom = "density",x.lims = c(0,1))
+                geom = "density",.group = "interaction(group.number,type)",x.lims = c(0,1),.alpha = 0.01)
 
 KS.p <-
   query_edgeDistanceDT() |>
   filter(n == 8 & samp.eff == 75) |>
   collect() |>
   plot_distance(dist = "KS.p",ylab = "Kolmogorov-Smirnoff p-value",
-                geom = "density",x.lims = c(0,1))
+                geom = "density",.group = "interaction(group.number,type)",x.lims = c(0,1),.alpha = 0.01)
 
 KL <-
   query_edgeDistanceDT() |>
   filter(n == 8 & samp.eff == 75) |>
   collect() |>
   plot_distance(dist = "KL",ylab = "Kullback-Leibler divergence",
-                geom = "density",x.lims = c(0,NA))
+                geom = "density",.group = "interaction(group.number,type)",x.lims = c(0,NA),.alpha = 0.01)
 
 JS <-
   query_edgeDistanceDT() |>
   filter(n == 8 & samp.eff == 75) |>
   collect() |>
   plot_distance(dist = "JS",ylab = "Jensen-Shannon distance",
-                geom = "density",x.lims = c(0,1)) # base 2 log make the boundaries [0,1]
+                geom = "density",.group = "interaction(group.number,type)",x.lims = c(0,1),.alpha = 0.01) # base 2 log make the boundaries [0,1]
 
 # EMD.e <-
 #   query_edgeDistanceDT() |>
@@ -188,11 +197,38 @@ JS <-
 #   plot_distance(dist = "EMD.m",ylab = "Earth Mover Distance (Manhattan dist.)",
 #                 geom = "density",x.lims = c(0,NA))
 
-gridExtra::grid.arrange(KS.stat,KS.p,KL,JS,# EMD.e,EMD.m,
-                        ncol = 2,top = grid::textGrob("SimuNet compared to...",
+p.grid <- gridExtra::grid.arrange(KS.stat,KS.p,KL,JS,# EMD.e,EMD.m,
+                        ncol = 2,top = grid::textGrob("How far from the real network are...",
                                              gp=grid::gpar(fontsize = 16,fontface = "bold")))
+p.grid
+ggsave(filename = ".WIP/simulation.data/Distances densities.png",
+       plot = p.grid,width = 15,height = 10,units = "in",dpi = 200)
 
 # Graphic exploration ---------------------------------------------------------------------------------------
+## Sampling effort ----
+query_edgeDT() |>
+  filter(n == 5 & group.number == 1) |>
+  collect() |>
+  {\(.) .[
+    ,
+    by = .(netgen_name,n,samp.eff,group.number,type,i,j),
+
+    .(
+      weight = median(weight),
+      low = quantile(weight,probs = 0.025),
+      up = quantile(weight,probs = 0.975)
+    )
+  ]}() |>
+  # subset(type %in% c("real","real.bis","SimuNet")) |>
+  ggplot(aes(samp.eff,weight,colour = type,fill = type,linetype = type))+
+  facet_grid(i ~ j)+
+  geom_ribbon(aes(ymin = low,ymax = up),alpha = 0.2)+
+  geom_line()+
+  geom_point()+
+  scale_fill_manual(values = c("tomato","royalblue","darkgreen",rep("grey50",4)))+
+  scale_colour_manual(values = c("tomato","royalblue","darkgreen",rep("grey50",4)))+
+  theme_bw(16)
+
 ## single sim ----
 type.str <- c("the real network",
               "the real network bis",
@@ -202,9 +238,10 @@ type.str <- c("the real network",
               "a Random network (fixed prob.)",
               "a Random network (variable prob.)")
 n.single <-
-  results |>
-  subset(samp.eff == 50) |>
-  subset(group.number == 1 & group.rep == 1) |>
+  query_edgeDT() |>
+  filter(n == 5 & samp.eff == 75) |>
+  filter(group.number == 1 & group.rep == 1) |>
+  collect() |>
   pull(n)
 
 Adj.obs.dt <-
