@@ -711,9 +711,9 @@ gg_color_hue <- function(n) {
 ### graphs ----
 #### Distances & divergences ----
 x.labs <- c(
-  "Expected null distance",
-  paste0("... ",c("the real network",
-                  "another network (similar generation)",
+  "...the same network (expected null distance)",
+  paste0("... ",c("the SimuNet's approximation",
+                  "another network\n(similar generation, different group)",
                   "an Erdős–Rényi graph (p = 0.5)",
                   "a Random network (fixed prob.)",
                   "a Random network (variable prob.)"))
@@ -727,7 +727,7 @@ x.labs.face <- c(
 x.fill <- c("#FF6347","#4169E1",gg_color_hue(5)[2:5]) # "tomato" and "royalblue"
 
 plot_distance <- function(data,dist,ylab,geom = c("boxplot","density"),
-                          x.lims = c(NA,NA),.group = "interaction(i,j,type,group.number)") {
+                          x.lims = c(NA,NA),.group = "interaction(i,j,type,group.number)",.alpha = 0.005) {
   geom <- match.arg(geom)
   switch(
     geom,
@@ -749,7 +749,7 @@ plot_distance <- function(data,dist,ylab,geom = c("boxplot","density"),
       geom_density_ridges(aes_string(y = "type",group = .group),
                           fill = NA,scale = .8)+
       geom_density_ridges(aes_string(y = "type",group = .group),
-                          colour = NA,alpha = 0.005,scale = .8)+
+                          colour = NA,alpha = .alpha,scale = .8)+
       geom_hline(yintercept = 0)+geom_vline(xintercept = 0)+
       geom_hline(yintercept = 1.9,size = 1.2)+
       scale_y_discrete(labels = x.labs)+
