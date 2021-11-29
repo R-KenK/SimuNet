@@ -5,6 +5,7 @@ library(dplyr)
 library(pbapply)
 library(ggridges)
 devtools::load_all(".")
+arrow::set_cpu_count(1)
 
 # custom functions -----
 ## Network generation algorithms ----
