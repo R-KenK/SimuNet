@@ -188,7 +188,7 @@ generate_paramList <- function(param.n,param.samp.eff,param.netgen,
         )
       ]
     }() |>
-  # aggregates into a list the arguments to be passed to the netgen_fun
+    # aggregates into a list the arguments to be passed to the netgen_fun
     {\(.) .[,fixed.rand.prob := NULL]}()
 
   param.list
@@ -209,6 +209,13 @@ pastetmp <- function(path) {
     paste0(path,"tmp")
 }
 
+set.seed.alpha <- function(x) {
+  # from https://stackoverflow.com/a/10913336/11939996
+  hexval <- paste0("0x",digest::digest(x,"crc32"))
+  intval <- type.convert(hexval,as.is = TRUE) %% .Machine$integer.max
+  intval
+}
+
 ## Simulating weighted adjacency matrices ----
 run_simulation_single <- function(r,
                                   edgeDT.path = ".WIP/simulation.data/edgeDT/") {
@@ -221,6 +228,9 @@ run_simulation_single <- function(r,
   f               <- param.list$netgen_fun[[r]];
   args            <- param.list$netgen_args[[r]];
   other           <- param.list$netgen_other[[r]];
+  seed            <- param.list$seed[[r]];
+
+  set.seed(seed)
 
   real <- replicate(
     n = n.rep,
@@ -311,6 +321,13 @@ run_simulations <- function(param.list,n.cores = 7,
                             edgeDT.path.tmp = pastetmp(edgeDT.path),
                             delete.tmp = TRUE,
                             partitioning.vec = c("netgen_name","n","samp.eff")) {
+  message("Generating replicable RNG seeds...")
+  param.list[
+    ,
+    seed :=
+      paste(netgen_name,n,samp.eff,group.number,group.rep,sep = ".") |>
+      sapply(set.seed.alpha)
+  ]
   message("Creating parallel workers...")
   cl <- parallel::makeCluster(n.cores)
   on.exit({parallel::stopCluster(cl);rm(cl);gc()})
