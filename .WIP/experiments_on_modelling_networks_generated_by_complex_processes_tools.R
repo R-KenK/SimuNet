@@ -310,10 +310,10 @@ run_simulation_single <- function(r,
     )
   ] |>
     tidyfast::dt_unnest(netgen_output) |>
-    arrow::write_dataset(path = edgeDT.path.tmp,
+    arrow::write_dataset(path = edgeDT.path,
                          partitioning = c("netgen_name","n","samp.eff","group.number","group.rep")
     )
-  message("Simulations done!")
+  "Simulations done!"
 }
 
 run_simulations <- function(param.list,n.cores = 7,
