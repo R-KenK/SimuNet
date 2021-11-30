@@ -345,6 +345,7 @@ run_simulations <- function(param.list,n.cores = 7,
     ),
     envir = environment()
   )
+  parallel::clusterEvalQ(cl,\() {library(arrow);arrow::set_cpu_count(1)})
   message("Running the simulations...")
   pbapply::pblapply(
     X = 1:nrow(param.list),
@@ -353,7 +354,7 @@ run_simulations <- function(param.list,n.cores = 7,
     cl = cl
   )
   message("Flushing parallel workers...")
-  parallel::stopCluster(cl);rm(cl);gc();on.exit()
+  parallel::stopCluster(cl);rm(cl);on.exit()
   query_edgeDT(edgeDT.path.tmp) |>
     arrow::write_dataset(path = edgeDT.path,
                          partitioning = partitioning.vec)
@@ -466,6 +467,7 @@ measure_distances <- function(param.list,
   cl <- parallel::makeCluster(n.cores)
   on.exit({parallel::stopCluster(cl);rm(cl);gc()})
   parallel::clusterExport(cl,list("dist.param","measure_distances_single"),envir = environment())
+  parallel::clusterEvalQ(cl,\() {library(arrow);arrow::set_cpu_count(1)})
 
   message("Measuring distances...")
   pbapply::pblapply(
@@ -476,7 +478,7 @@ measure_distances <- function(param.list,
     cl = cl
   )
   message("Flushing parallel workers...")
-  parallel::stopCluster(cl);rm(cl);gc();on.exit()
+  parallel::stopCluster(cl);rm(cl);on.exit()
 
   message("Aggregating individual .parquet files...")
   query_edgeDistanceDT(edgeDistanceDT.path.tmp) |>
