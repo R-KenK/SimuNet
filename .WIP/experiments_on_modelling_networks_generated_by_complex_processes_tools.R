@@ -359,7 +359,7 @@ run_simulations <- function(param.list,n.cores = 7,
     arrow::write_dataset(path = edgeDT.path,
                          partitioning = partitioning.vec)
   if (delete.tmp)
-    unlink(edgeDistanceDT.path.tmp,recursive = TRUE)
+    unlink(edgeDT.path.tmp,recursive = TRUE)
 
   message("Simulations done!")
 }
