@@ -459,7 +459,6 @@ measure_distances_single <-
                                 "reference","type","i","j")) |>
       arrow::write_dataset(path = edgeDistanceDT.path,
                            partitioning = c("netgen_name","n","samp.eff","group.number","group.rep"))
-    rm(dt);gc()
     message("distances measured!")
   }
 
