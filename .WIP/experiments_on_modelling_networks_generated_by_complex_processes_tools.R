@@ -195,10 +195,28 @@ generate_paramList <- function(param.n,param.samp.eff,param.netgen,
 }
 
 ## Network data extraction: WIP ----
-compute.EV <- function(M) {
+compute.deg <- function(M,scale = FALSE) {
   M |>
-    igraph::graph.adjacency(mode = "upper",weighted = TRUE)  %>%
-    {igraph::eigen_centrality(.)$vector}
+    igraph::graph.adjacency(mode = "upper",weighted = TRUE) |>
+    igraph::degree()
+}
+
+compute.str <- function(M,scale = FALSE) {
+  M |>
+    igraph::graph.adjacency(mode = "upper",weighted = TRUE) |>
+    igraph::strength()
+}
+
+compute.EV <- function(M,scale = FALSE) {
+  M |>
+    igraph::graph.adjacency(mode = "upper",weighted = TRUE) |>
+    {\(.) igraph::eigen_centrality(.,scale = scale)$vector}()
+}
+
+compute.bet <- function(M,scale = FALSE) {
+  M |>
+    igraph::graph.adjacency(mode = "upper",weighted = TRUE) |>
+    {\(.) igraph::betweenness(graph = .,weights = 1 / igraph::E(.)$weight)}()
 }
 
 ## Misc. ----
