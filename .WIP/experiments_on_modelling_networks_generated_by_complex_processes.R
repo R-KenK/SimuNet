@@ -2,7 +2,6 @@
 source(".WIP/experiments_on_modelling_networks_generated_by_complex_processes_tools.R")
 
 # Variables and parameters list ----
-set.seed(42)
 
 n.rep   <- 105L
 n.group <- 21L
@@ -10,11 +9,11 @@ n.each  <- 56L
 
 ## generating the list of parameters ----
 param.n <-
-  # seq(6,30,by = 3)
-  c(5,8,10,15,18)[1]
+  seq(6,24,by = 3)
+  # c(5,8,10,15,18)
 param.samp.eff <-
-  # seq(20,500,by = 20)
-  c(10,25,50,75,100,150,250,500)
+  c(c(1,2.5,5) %o% 10^(1:3))[1:7]
+  # c(10,25,50,75,100,150,250,500)
 
 param.netgen <-
   list(
@@ -22,6 +21,7 @@ param.netgen <-
     data.table(netgen_name = "GWC",netgen_fun = list(gregWithinClique_generate_asso))
   )
 
+set.seed(42)
 param.list <-
   generate_paramList(param.n = param.n,
                      param.samp.eff = param.samp.eff,
@@ -61,50 +61,17 @@ end.time <- Sys.time()
 end.time
 end.time - start.time
 
-# troubleshooting bench ----
-param.list <-
-  param.list |> subset(n == 5 & samp.eff == 100 & group.number == 1)
-query_edgeDT() |>
-  filter(n == 5 & group.rep <= 10 & type %in% c("real","real.bis","SimuNet")) |>
-  collect() |>
-  ggplot(aes(type,weight,colour = type))+
-  geom_point(aes(interaction(type,j,i)),alpha = .3,position = position_jitterdodge())+
-  theme_bw()
+# Network metrics bench ----
+start.time <- Sys.time()
+start.time
+calculate_nodeMetrics(param.list = param.list,n.cores = 7)
+end.time <- Sys.time()
+end.time
+end.time - start.time
 
-  param.list |> subset(n == 5 & samp.eff == 100 & group.number == 1)
-
-param.list[1]
-
-# Reimporting results ----
-query_edgeDT(edgeDT.path = ".WIP/simulation.data/edgeDT/") |>
-  filter(n == 5 & samp.eff == 150 & group.number == 3) |>
+query_nodeDT() |>
+  # filter(group.number == 1) |>
   collect()
-query_edgeDistanceData(".WIP/simulation.data/edgeDistanceData/") |>
-  filter(n == 5 & samp.eff == 10 & group.number == 3) |>
-  collect()
-query_edgeDistanceDT(edgeDistanceDT.path = ".WIP/simulation.data/edgeDistanceDT/") |>
-  filter(n == 5 & samp.eff == 150) |>
-  collect()
-
-query_edgeDT(edgeDT.path = ".WIP/simulation.data/edgeDT/") |>
-  filter(n == 5 & samp.eff == 500 & group.number == 1 & group.rep == 1) |>
-  filter(type %in% c("real","real.bis","SimuNet")) |>
-  collect() |>
-  ggplot(aes(type,weight,colour = type))+
-  geom_point(aes(interaction(type,j,i)),alpha = .3,position = position_jitterdodge())+
-  theme_bw()
-
-
-reconstruct_adjacencies(.netgen_name = "GWC",.n = 5,.samp.eff = 100,.type = "SimuNet",
-                        .group.number = 1,.group.rep = 1:5,n.rep = 105L) |>
-  {\(.) .[2,3,]}()
-
-reconstruct_adjacencies(.netgen_name = "GWC",.n = 5,.samp.eff = 100,.type = "real",
-                        .group.number = 1,.group.rep = 1:5,n.rep = 105L) |>
-  {\(.) .[2,3,]}()
-
-reconstruct_adjacencies(.netgen_name = "GWC",.n = 15,.samp.eff = 250,.type = "SimuNet",
-                        .group.number = 1,.group.rep = 1,n.rep = 105L)
 ## Plotting distances ----
 ### Single case as boxplots ----
 KS.stat <-
