@@ -6,6 +6,7 @@ library(pbapply)
 library(ggridges)
 devtools::load_all(".")
 arrow::set_cpu_count(1)
+options(arrow.use_threads = FALSE)
 
 # custom functions -----
 ## Network generation algorithms ----
@@ -363,7 +364,7 @@ run_simulations <- function(param.list,n.cores = 7,
     ),
     envir = environment()
   )
-  parallel::clusterEvalQ(cl,\() {library(arrow);arrow::set_cpu_count(1)})
+  parallel::clusterEvalQ(cl,\() {library(arrow);arrow::set_cpu_count(1);options(arrow.use_threads = FALSE)})
   message("Running the simulations...")
   pbapply::pblapply(
     X = 1:nrow(param.list),
@@ -483,7 +484,7 @@ measure_distances <- function(param.list,
   cl <- parallel::makeCluster(n.cores)
   on.exit({parallel::stopCluster(cl);rm(cl);gc()})
   parallel::clusterExport(cl,list("dist.param","measure_distances_single"),envir = environment())
-  parallel::clusterEvalQ(cl,\() {library(arrow);arrow::set_cpu_count(1)})
+  parallel::clusterEvalQ(cl,\() {library(arrow);arrow::set_cpu_count(1);options(arrow.use_threads = FALSE)})
 
   message("Measuring distances...")
   pbapply::pblapply(
@@ -603,7 +604,7 @@ calculate_nodeMetrics <- function(param.list,
                                   "compute.EV",
                                   "calculate_nodeMetrics_single"),
                           envir = environment())
-  parallel::clusterEvalQ(cl,\() {library(arrow);arrow::set_cpu_count(1)})
+  parallel::clusterEvalQ(cl,\() {library(arrow);arrow::set_cpu_count(1);options(arrow.use_threads = FALSE)})
 
   message("Calculating node metrics...")
   pbapply::pblapply(
