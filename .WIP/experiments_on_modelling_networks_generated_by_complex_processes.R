@@ -124,28 +124,28 @@ gridExtra::grid.arrange(KS.stat,KS.p,KL,JS,#EMD.e,EMD.m,
 ### Multiple cases as densities ----
 KS.stat <-
   query_edgeDistanceDT() |>
-  filter(n == 8 & samp.eff == 75) |>
+  filter(n == 9 & samp.eff == 250) |>
   collect() |>
   plot_distance(dist = "KS.stat",ylab = "Kolmogorov-Smirnoff statistic",
                 geom = "density",.group = "interaction(group.number,type)",x.lims = c(0,1),.alpha = 0.01)
 
 KS.p <-
   query_edgeDistanceDT() |>
-  filter(n == 8 & samp.eff == 75) |>
+  filter(n == 9 & samp.eff == 250) |>
   collect() |>
   plot_distance(dist = "KS.p",ylab = "Kolmogorov-Smirnoff p-value",
                 geom = "density",.group = "interaction(group.number,type)",x.lims = c(0,1),.alpha = 0.01)
 
 KL <-
   query_edgeDistanceDT() |>
-  filter(n == 8 & samp.eff == 75) |>
+  filter(n == 9 & samp.eff == 250) |>
   collect() |>
   plot_distance(dist = "KL",ylab = "Kullback-Leibler divergence",
                 geom = "density",.group = "interaction(group.number,type)",x.lims = c(0,NA),.alpha = 0.01)
 
 JS <-
   query_edgeDistanceDT() |>
-  filter(n == 8 & samp.eff == 75) |>
+  filter(n == 9 & samp.eff == 250) |>
   collect() |>
   plot_distance(dist = "JS",ylab = "Jensen-Shannon distance",
                 geom = "density",.group = "interaction(group.number,type)",x.lims = c(0,1),.alpha = 0.01) # base 2 log make the boundaries [0,1]
@@ -174,19 +174,20 @@ ggsave(filename = ".WIP/simulation.data/Distances densities.png",
 # Graphic exploration ---------------------------------------------------------------------------------------
 ## Sampling effort ----
 query_edgeDT() |>
-  filter(n == 5 & group.number == 1) |>
+  filter(n == 6 & group.number == 1) |>
   collect() |>
+  {\(.) .[,weight.scaled := weight / samp.eff]}() |>
   {\(.) .[
     ,
     by = .(netgen_name,n,samp.eff,group.number,type,i,j),
 
     .(
-      weight = median(weight),
-      low = quantile(weight,probs = 0.025),
-      up = quantile(weight,probs = 0.975)
+      weight = median(weight.scaled),
+      low = quantile(weight.scaled,probs = 0.025),
+      up = quantile(weight.scaled,probs = 0.975)
     )
   ]}() |>
-  # subset(type %in% c("real","real.bis","SimuNet")) |>
+  subset(type %in% c("real","real.bis","SimuNet")) |>
   ggplot(aes(samp.eff,weight,colour = type,fill = type,linetype = type))+
   facet_grid(i ~ j)+
   geom_ribbon(aes(ymin = low,ymax = up),alpha = 0.2)+
