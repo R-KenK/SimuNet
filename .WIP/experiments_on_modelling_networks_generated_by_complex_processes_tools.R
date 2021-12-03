@@ -698,7 +698,7 @@ complete_edgedt <- function(dt,.group.rep,n,n.rep) {
     data.table::setDT() |>
     subset(i >= j) |>
     rbind(dt) |>
-    dplyr::arrange(rep,group.rep,j,i)
+    dplyr::arrange(group.rep,rep,j,i)
 }
 
 reconstruct_adjacencies <- function(.netgen_name,
