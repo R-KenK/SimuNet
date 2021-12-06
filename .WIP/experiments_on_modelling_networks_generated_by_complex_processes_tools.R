@@ -522,111 +522,266 @@ measure_distances <- function(param.list,
 }
 
 ## Calculating node metrics distributions ----
-calculate_nodeMetrics_single <-
-  function(r,
-           param.list,
-           edgeDT.path = ".WIP/simulation.data/edgeDT/",
-           nodeDT.path = ".WIP/simulation.data/nodeDT/") {
-    .netgen_name  <- param.list$netgen_name[r]
-    .n            <- param.list$n[r]
-    .samp.eff     <- param.list$samp.eff[r]
-    .group.number <- param.list$group.number[r]
-    .group.rep    <- param.list$group.rep[[r]]
-    dt <-
-      query_edgeDT(edgeDT.path = edgeDT.path) |>
-      dplyr::filter(
-        netgen_name %in% .netgen_name &
-          n %in% .n &
-          samp.eff %in% .samp.eff &
-          group.number %in% .group.number &
-          group.rep %in% .group.rep
-      ) |>
-      dplyr::select(-rep,-i,-j,-weight) |>
-      dplyr::collect() |>
-      dplyr::distinct()
+calculate_networkMetrics_single <-
+  function(r,dist.param,
+           edgeDT.path = ".WIP/simulation.data/edgeDT",
+           nodeDT.path = ".WIP/simulation.data/network.metrics/nodeDT",
+           groupDT.path = ".WIP/simulation.data/network.metrics/groupDT") {
+    .n            <- dist.param$n[r]
+    .netgen_name  <- dist.param$netgen_name[r]
+    .samp.eff     <- dist.param$samp.eff[r]
+    .group.number <- dist.param$group.number[r]
+    .group.rep    <- dist.param$group.rep[[r]]
 
-    dt[
-      ,Adj.list :=
-        lapply(
-          c("real","real.bis","SimuNet","other","ER","fixed.rand","total.rand"),
-          reconstruct_adjacencies,
-          .netgen_name = .netgen_name,
-          .n = .n,
-          .samp.eff = .samp.eff,
-          .group.number = .group.number,
-          .group.rep = .group.rep,
-          edgeDT.path = edgeDT.path
-        )
-    ][
-      ,Adj.list := lapply(Adj.list,\(.) lapply(1:(dim(.)[3]),\(r) .[,,r]))
-    ][
-      ,node.metrics :=
-        lapply(
-          Adj.list,
-          \(.) data.table::data.table(
-            rep          = rep(1:length(.),each = dim(.[[1]])[1]),
-            node         = rep(1:(dim(.[[1]])[1]),length(.)),
-            degree       = sapply(.,\(Adj) compute.deg(Adj)) |> c(),
-            strength     = sapply(.,\(Adj) compute.str(Adj)) |> c(),
-            betweeness  = sapply(.,\(Adj) compute.bet(Adj)) |> c(),
-            EV           = sapply(.,\(Adj) compute.EV(Adj)) |> c()
+    reconstruct_AdjList(
+      .n = .n,
+      .netgen_name = .netgen_name,
+      .samp.eff = .samp.eff,
+      .group.number = .group.number,
+      .group.rep = .group.rep,
+      .n.rep = 105L,
+      edgeDT.path = edgeDT.path
+    ) |>
+      {\(.) .[,node.metrics :=
+                # pbapply::pblapply(
+                lapply(
+                  Adj.list,
+                  \(A) data.table::data.table(
+                    node       = rep(1:(dim(A)[1]),length(A)),
+                    degree     = compute.deg(A),
+                    strength   = compute.str(A),
+                    CC         = DirectedClustering::ClustBCG(A + t(A))$LocalCC,
+                    # betweeness = compute.bet(A) |> c(),
+                    EV         = compute.EV(A) |> c()#,
+                    # cl = NULL
+                  )
+                )
+      ][,group.metrics :=
+          # pbapply::pblapply(
+          lapply(
+            Adj.list,
+            \(A) data.table::data.table(
+              diam = A |> igraph::graph.adjacency("upper",TRUE) |> igraph::diameter(),
+              CC   =  DirectedClustering::ClustBCG(A + t(A))$GlobalCC#,
+              # cl = NULL
+            )
           )
-        )
-    ][
-      ,Adj.list := NULL
-    ] |>
-      tidyfast::dt_unnest(node.metrics) |>
-      data.table::setcolorder(c("netgen_name","n","samp.eff",
-                                "group.number","group.rep",
-                                "n.rep","seed","type","rep","node",
-                                "degree","strength","betweeness","EV")) |>
-      arrow::write_dataset(path = nodeDT.path,
-                           partitioning = c("netgen_name","n","samp.eff","group.number","group.rep"))
-    "node metrics calculated!"
+      ][
+        ,Adj.list := NULL
+      ][]}() |>
+      {
+        \(.) {
+          tidyfast::dt_unnest(.,node.metrics) |>
+            data.table::setcolorder(
+              c("netgen_name","n","samp.eff",
+                "group.number","group.rep",
+                "n.rep","seed","type","rep","node",
+                "degree",
+                "strength",
+                "CC",
+                # "betweeness",
+                "EV"
+              )
+            ) |>
+            arrow::write_dataset(path = nodeDT.path,
+                                 partitioning = c("netgen_name","n","samp.eff"
+                                                  ,"group.number","group.rep"))
+          tidyfast::dt_unnest(.,group.metrics) |>
+            data.table::setcolorder(c("netgen_name","n","samp.eff",
+                                      "group.number","group.rep",
+                                      "n.rep","seed","type","rep",
+                                      "diam","CC")) |>
+            arrow::write_dataset(path = groupDT.path,
+                                 partitioning = c("netgen_name","n","samp.eff"
+                                                  ,"group.number","group.rep"))
+          NULL
+        }
+      }()
+    gc()
+    "Network metrics calculated!"
   }
 
-calculate_nodeMetrics <- function(param.list,
+calculate_networkMetrics <- function(param.list,
                                   edgeDT.path = ".WIP/simulation.data/edgeDT/",
-                                  nodeDT.path = ".WIP/simulation.data/nodeDT/",
+                                  nodeDT.path = ".WIP/simulation.data/network.metrics/nodeDT",
                                   nodeDT.path.tmp = pastetmp(nodeDT.path),
+                                  groupDT.path = ".WIP/simulation.data/network.metrics/groupDT",
+                                  groupDT.path.tmp = pastetmp(groupDT.path),
                                   delete.tmp = TRUE,
                                   partitioning.vec = c("netgen_name","n","samp.eff"),
                                   n.cores = 7L) {
+  dist.param <-
+    param.list |>
+    dplyr::select(n,netgen_name,samp.eff,group.number) |>
+    dplyr::distinct() |>
+    data.table::setDT() |>
+    {\(.) .[,`:=`(group.rep = list(data.table::data.table(group.rep = parallel::splitIndices(56,7))))][]}() |>
+    tidyfast::dt_unnest(group.rep)
+
   message("Creating parallel workers...")
   cl <- parallel::makeCluster(n.cores)
   on.exit({parallel::stopCluster(cl);rm(cl);gc()})
-  parallel::clusterExport(cl,list("param.list","query_edgeDT",
-                                  "reconstruct_adjacencies",
+  parallel::clusterExport(cl,list("dist.param",
+                                  "query_edgeDT",
+                                  "reconstruct_AdjList",
                                   "complete_edgedt",
                                   "compute.deg",
                                   "compute.str",
-                                  "compute.bet",
+                                  # "compute.bet",
                                   "compute.EV",
-                                  "calculate_nodeMetrics_single"),
+                                  "calculate_networkMetrics_single"),
                           envir = environment())
   parallel::clusterEvalQ(cl,\() {library(arrow);arrow::set_cpu_count(1);options(arrow.use_threads = FALSE)})
 
-  message("Calculating node metrics...")
+  message("Calculating network metrics...")
   pbapply::pblapply(
-    1:nrow(param.list),
-    calculate_nodeMetrics_single,
-    param.list = param.list,
+    1:nrow(dist.param),
+    calculate_networkMetrics_single,
+    dist.param,
     edgeDT.path = edgeDT.path,
     nodeDT.path = nodeDT.path.tmp,
+    groupDT.path = groupDT.path.tmp,
     cl = cl
   )
   message("Flushing parallel workers...")
   parallel::stopCluster(cl);rm(cl);on.exit()
 
-  message("Aggregating individual .parquet files...")
-  query_nodeDT(nodeDT.path.tmp) |>
-    arrow::write_dataset(path = nodeDT.path,
-                         partitioning = partitioning.vec)
-
-  if (delete.tmp)
+  param.list.aggregated <-
+    param.list |>
+    dplyr::select(netgen_name,n,samp.eff) |>
+    dplyr::distinct() |>
+    data.table::setDT()
+  message("Aggregating individual .parquet files (node metrics)...")
+  aggregate_parquets(
+    param.list.aggregated = param.list.aggregated,
+    dataset = "nodeDT",
+    sources.path = nodeDT.path.tmp,
+    new.path = nodeDT.path,
+    partitioning.vec = partitioning.vec,
+    n.cores = n.cores
+  )
+  message("Aggregating individual .parquet files (group metrics)...")
+  aggregate_parquets(
+    param.list.aggregated = param.list.aggregated,
+    dataset = "groupDT",
+    sources.path = groupDT.path.tmp,
+    new.path = groupDT.path,
+    partitioning.vec = partitioning.vec,
+    n.cores = n.cores
+  )
+  if (delete.tmp) {
     unlink(nodeDT.path.tmp,recursive = TRUE)
+    unlink(groupDT.path.tmp,recursive = TRUE)
+  }
   message("Node metrics calculated!")
 }
+
+# old
+# calculate_nodeMetrics_single <-
+#   function(r,
+#            param.list,
+#            edgeDT.path = ".WIP/simulation.data/edgeDT/",
+#            nodeDT.path = ".WIP/simulation.data/nodeDT/") {
+#     .netgen_name  <- param.list$netgen_name[r]
+#     .n            <- param.list$n[r]
+#     .samp.eff     <- param.list$samp.eff[r]
+#     .group.number <- param.list$group.number[r]
+#     .group.rep    <- param.list$group.rep[[r]]
+#     dt <-
+#       query_edgeDT(edgeDT.path = edgeDT.path) |>
+#       dplyr::filter(
+#         netgen_name %in% .netgen_name &
+#           n %in% .n &
+#           samp.eff %in% .samp.eff &
+#           group.number %in% .group.number &
+#           group.rep %in% .group.rep
+#       ) |>
+#       dplyr::select(-rep,-i,-j,-weight) |>
+#       dplyr::collect() |>
+#       dplyr::distinct()
+#
+#     dt[
+#       ,Adj.list :=
+#         lapply(
+#           c("real","real.bis","SimuNet","other","ER","fixed.rand","total.rand"),
+#           reconstruct_adjacencies,
+#           .netgen_name = .netgen_name,
+#           .n = .n,
+#           .samp.eff = .samp.eff,
+#           .group.number = .group.number,
+#           .group.rep = .group.rep,
+#           edgeDT.path = edgeDT.path
+#         )
+#     ][
+#       ,Adj.list := lapply(Adj.list,\(.) lapply(1:(dim(.)[3]),\(r) .[,,r]))
+#     ][
+#       ,node.metrics :=
+#         lapply(
+#           Adj.list,
+#           \(.) data.table::data.table(
+#             rep          = rep(1:length(.),each = dim(.[[1]])[1]),
+#             node         = rep(1:(dim(.[[1]])[1]),length(.)),
+#             degree       = sapply(.,\(Adj) compute.deg(Adj)) |> c(),
+#             strength     = sapply(.,\(Adj) compute.str(Adj)) |> c(),
+#             betweeness  = sapply(.,\(Adj) compute.bet(Adj)) |> c(),
+#             EV           = sapply(.,\(Adj) compute.EV(Adj)) |> c()
+#           )
+#         )
+#     ][
+#       ,Adj.list := NULL
+#     ] |>
+#       tidyfast::dt_unnest(node.metrics) |>
+#       data.table::setcolorder(c("netgen_name","n","samp.eff",
+#                                 "group.number","group.rep",
+#                                 "n.rep","seed","type","rep","node",
+#                                 "degree","strength","betweeness","EV")) |>
+#       arrow::write_dataset(path = nodeDT.path,
+#                            partitioning = c("netgen_name","n","samp.eff","group.number","group.rep"))
+#     "node metrics calculated!"
+#   }
+#
+# calculate_nodeMetrics <- function(param.list,
+#                                   edgeDT.path = ".WIP/simulation.data/edgeDT/",
+#                                   nodeDT.path = ".WIP/simulation.data/nodeDT/",
+#                                   nodeDT.path.tmp = pastetmp(nodeDT.path),
+#                                   delete.tmp = TRUE,
+#                                   partitioning.vec = c("netgen_name","n","samp.eff"),
+#                                   n.cores = 7L) {
+#   message("Creating parallel workers...")
+#   cl <- parallel::makeCluster(n.cores)
+#   on.exit({parallel::stopCluster(cl);rm(cl);gc()})
+#   parallel::clusterExport(cl,list("param.list","query_edgeDT",
+#                                   "reconstruct_adjacencies",
+#                                   "complete_edgedt",
+#                                   "compute.deg",
+#                                   "compute.str",
+#                                   "compute.bet",
+#                                   "compute.EV",
+#                                   "calculate_nodeMetrics_single"),
+#                           envir = environment())
+#   parallel::clusterEvalQ(cl,\() {library(arrow);arrow::set_cpu_count(1);options(arrow.use_threads = FALSE)})
+#
+#   message("Calculating node metrics...")
+#   pbapply::pblapply(
+#     1:nrow(param.list),
+#     calculate_nodeMetrics_single,
+#     param.list = param.list,
+#     edgeDT.path = edgeDT.path,
+#     nodeDT.path = nodeDT.path.tmp,
+#     cl = cl
+#   )
+#   message("Flushing parallel workers...")
+#   parallel::stopCluster(cl);rm(cl);on.exit()
+#
+#   message("Aggregating individual .parquet files...")
+#   query_nodeDT(nodeDT.path.tmp) |>
+#     arrow::write_dataset(path = nodeDT.path,
+#                          partitioning = partitioning.vec)
+#
+#   if (delete.tmp)
+#     unlink(nodeDT.path.tmp,recursive = TRUE)
+#   message("Node metrics calculated!")
+# }
 ## Aggregating edge weight data ----
 adjacencies_to_dt <- function(adj.array) {
   .n     <- dim(adj.array)[1]
@@ -641,14 +796,16 @@ adjacencies_to_dt <- function(adj.array) {
 ## Aggregate parquet files ----
 aggregate_parquets_single <- function(r,
                                       param.list.aggregated = param.list.aggregated,
-                                      dataset = c("edgeDT","edgeDistanceDT","edgeDistanceData"),
+                                      dataset = c("edgeDT","edgeDistanceDT",
+                                                  "nodeDT","groupDT"),
                                       sources.path,
                                       new.path,
                                       partitioning.vec = c("netgen_name","n","samp.eff")) {
   dataset <- match.arg(dataset)
   query_fun <- switch(dataset,"edgeDT" = query_edgeDT,
                       "edgeDistanceDT" = query_edgeDistanceDT,
-                      "edgeDistanceData" = query_edgeDistanceData
+                      "nodeDT" = query_nodeDT,
+                      "groupDT" = query_groupDT
   )
   .n             <- param.list.aggregated$n[r]
   .samp.eff      <- param.list.aggregated$samp.eff[r]
@@ -663,7 +820,8 @@ aggregate_parquets_single <- function(r,
 }
 
 aggregate_parquets <- function(param.list.aggregated,
-                               dataset = c("edgeDT","edgeDistanceDT","edgeDistanceData"),
+                               dataset = c("edgeDT","edgeDistanceDT",
+                                           "nodeDT","groupDT"),
                                sources.path,
                                new.path,
                                partitioning.vec = c("netgen_name","n","samp.eff"),
@@ -676,7 +834,8 @@ aggregate_parquets <- function(param.list.aggregated,
                                "aggregate_parquets_single",
                                "query_edgeDT",
                                "query_edgeDistanceDT",
-                               "query_edgeDistanceData"),
+                               "query_nodeDT",
+                               "query_groupDT"),
                           envir = environment())
   message("Aggregating parquet files...")
   pbapply::pblapply(
@@ -742,14 +901,145 @@ query_edgeDistanceDT <- function(edgeDistanceDT.path = ".WIP/simulation.data/edg
     dplyr::arrange(n,samp.eff,group.number,group.rep,i,j)
 }
 
-query_nodeDT <- function(nodeDT.path = ".WIP/simulation.data/nodeDT/") {
+query_nodeDT <- function(nodeDT.path = ".WIP/simulation.data/network.metrics/nodeDT/") {
   arrow::open_dataset(sources = nodeDT.path) |>
-    dplyr::relocate(c("netgen_name","n","samp.eff",
-                      "group.number","group.rep",
-                      "type","n.rep","seed","rep","node",
-                      "degree","strength","betweeness","EV")) |>
+    dplyr::relocate(
+      c("netgen_name","n","samp.eff",
+        "group.number","group.rep",
+        "type","n.rep","seed","rep","node",
+        "degree",
+        "strength",
+        "CC",
+        # "betweeness",
+        "EV"
+      )) |>
     dplyr::arrange(n,samp.eff,group.number,group.rep,rep,node)
 }
+
+query_groupDT <- function(groupDT.path = ".WIP/simulation.data/network.metrics/groupDT") {
+  arrow::open_dataset(sources = groupDT.path) |>
+    dplyr::relocate(
+      c("netgen_name","n","samp.eff",
+         "group.number","group.rep",
+         "n.rep","seed","type","rep",
+         "diam","CC")) |>
+    dplyr::arrange(n,samp.eff,group.number,group.rep,rep)
+}
+
+reconstruct_AdjList <-
+  function(.n,
+           .netgen_name,
+           .samp.eff,
+           .group.number,
+           .group.rep = 1:n.each,
+           .type = c("real","real.bis","SimuNet","other",
+                     "ER","fixed.rand","total.rand"),
+           .n.rep = 105L,
+           edgeDT.path = ".WIP/simulation.data/edgeDT/"
+  ) {
+    if (length(unique(.n)) != 1)
+      stop(".n not unique.")
+
+    .netgen_name  <- unique(.netgen_name)
+    .samp.eff     <- unique(.samp.eff)
+    .group.number <- unique(.group.number)
+    .group.rep    <- unique(.group.rep)
+    .type         <- unique(.type)
+
+    dt <-
+      query_edgeDT(edgeDT.path = edgeDT.path) |>
+      dplyr::filter(n == .n) |>
+      dplyr::filter(
+        netgen_name  %in% .netgen_name,
+        samp.eff     %in% .samp.eff,
+        group.number %in% .group.number,
+        group.rep    %in% .group.rep,
+        type         %in% .type
+      ) |>
+      dplyr::collect()
+    dt |>
+      {\(.) tidyr::expand(
+        .,netgen_name,n,samp.eff,
+        group.number,group.rep,
+        type,n.rep,
+        rep,i = 1:.n,j = 1:.n
+      ) |>
+          dplyr::left_join(
+            y = .,
+            by = c("netgen_name","n","samp.eff",
+                   "group.number","group.rep",
+                   "type","n.rep",
+                   "rep","i","j"
+            )
+          )
+      }() |>
+      data.table::setDT() |>
+      dplyr::arrange(netgen_name,n,samp.eff,
+                     group.number,group.rep,
+                     type,n.rep,
+                     rep,j,i) |>
+      dplyr::pull(weight) |>
+      array(
+        dim = c(.n,.n,
+                .n.rep * length(.type) *
+                  length(.group.rep) *
+                  length(.group.number) *
+                  length(.samp.eff) *
+                  length(.netgen_name)
+        ),
+        dimnames = list(as.character(1:.n),as.character(1:.n),NULL)
+      ) |>
+      {\(.) ifelse(is.na(.),0L,.)}() |>
+      SimuNet::array2matList() |>
+      {
+        \(.) {
+          dt |>
+            dplyr::select(-i,-j,-weight) |>
+            dplyr::distinct() |>
+            data.table::setDT() |>
+            {\(d) d[,`:=`(Adj.list = .)][]}()
+        }
+      }()
+  }
+
+reconstruct_all_adjacencies <- function(param.n,param.samp.eff,param.netgen_name) {
+  n.samp.eff.list <-
+    expand.grid(n = param.n,samp.eff = param.samp.eff,netgen_name = param.netgen_name) |>
+    {\(.) split(.,1:nrow(.))}()
+  message("Creating parallel workers...")
+  cl <- parallel::makeCluster(7L)
+  parallel::clusterExport(cl,list("query_edgeDT","reconstruct_AdjList","n.each"))
+  on.exit({parallel::stopCluster(cl);rm(cl)})
+  lapply(
+    n.samp.eff.list,
+    \(r) {
+      .n <- r$n
+      .samp.eff <- r$samp.eff
+      message("Reconstruction adjacency matrices for n = ",.n," - samp.eff = ",.samp.eff,"...")
+      pblapply(
+        1:n.group,
+        reconstruct_AdjList,
+        .n = .n,
+        .netgen_name = "GWC",
+        .samp.eff = .samp.eff,
+        cl = cl
+      ) |>
+        data.table::rbindlist()
+    }
+  ) |>
+    data.table::rbindlist() |>
+    dplyr::arrange(
+      netgen_name,
+      n,
+      samp.eff,
+      group.number,
+      group.rep,
+      type,
+      n.rep,
+      rep
+    )
+}
+
 
 ## Plotting ----
 ### tools ----
