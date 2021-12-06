@@ -61,17 +61,22 @@ end.time <- Sys.time()
 end.time
 end.time - start.time
 
+## Calculate node metric distributions ----
+# start.time <- Sys.time()
+# start.time
+# calculate_nodeMetrics(param.list = param.list,n.cores = 7)
+# end.time <- Sys.time()
+# end.time
+# end.time - start.time
+
 # Network metrics bench ----
 start.time <- Sys.time()
 start.time
-calculate_nodeMetrics(param.list = param.list,n.cores = 7)
+calculate_networkMetrics(param.list[1:140])
 end.time <- Sys.time()
 end.time
 end.time - start.time
 
-query_nodeDT() |>
-  # filter(group.number == 1) |>
-  collect()
 ## Plotting distances ----
 ### Single case as boxplots ----
 KS.stat <-
